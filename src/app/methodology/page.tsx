@@ -89,18 +89,28 @@ export default function MethodologyPage() {
         </p>
         <ul className="list-disc pl-6 space-y-1">
           <li>
-            <code>RPM = total revenue ÷ total views × 1000</code>
+            <code>RPM = total revenue ÷ total views × 1000</code>{" "}
+            (YouTube&apos;s definition: divides by TOTAL views, so it already
+            builds in the non-monetized-views gap)
           </li>
           <li>
             <code>CPM = gross ad revenue ÷ monetized impressions × 1000</code>
           </li>
           <li>
-            <strong>Creator earnings estimate</strong>:
+            <strong>Creator ad-revenue estimate</strong>:
             <code className="ml-1">
-              monthly ad revenue = (monthly views × monetized %) ÷ 1000 × RPM
+              monthly ad revenue = (monthly views ÷ 1000) × RPM × (monetized
+              % ÷ 90)
             </code>
           </li>
         </ul>
+        <p>
+          At the default monetized-view percentage (90%, the industry-typical
+          rate) the third factor is exactly 1.0 and the formula collapses to
+          YouTube&apos;s own <code>views ÷ 1000 × RPM</code>. That means an
+          untouched calculator gives results consistent with what YouTube
+          Studio would show for a typical channel — no double-discount.
+        </p>
         <p>
           The main calculator never multiplies views by CPM to estimate
           creator earnings — that&apos;s a common shortcut in other tools that
@@ -115,15 +125,35 @@ export default function MethodologyPage() {
       <p>
         Not every view generates ad revenue — viewers may skip ads, use
         ad-blockers, or watch on YouTube Premium (which shares differently).
-        The monetized-view percentage slider caps what fraction of your views
-        we treat as revenue-generating. Ninety percent is a common starting
-        point for a mature channel; a very family-friendly, brand-safe channel
-        might monetize higher, and a fringe-topic channel could monetize much
-        lower.
+        Our niche and country RPM tables are calibrated for a channel that
+        monetizes at the industry-typical rate of <strong>90%</strong> of
+        views. The slider is a <em>relative</em> adjustment against that
+        baseline:
       </p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>
+          <strong>At 90% (the default)</strong> — the (monetized ÷ 90)
+          factor is exactly 1.0. Ad revenue equals{" "}
+          <code>views ÷ 1000 × RPM</code>. This matches what YouTube Studio
+          reports for a typical channel.
+        </li>
+        <li>
+          <strong>At 100%</strong> — you&apos;re modelling a channel that
+          monetizes better than typical (few ad-blockers, no Premium
+          viewers, high fill rate). Ad revenue is ~11% higher than the
+          reference.
+        </li>
+        <li>
+          <strong>At 60%</strong> — you&apos;re modelling a channel that
+          monetizes worse than typical (Made-for-Kids / COPPA restrictions,
+          heavy Premium audience). Ad revenue is ~33% lower than the
+          reference.
+        </li>
+      </ul>
       <p>
-        This percentage is applied <strong>exactly once</strong> in the
-        formula, before RPM is applied.
+        Because it is a relative adjustment (not a raw discount on views),
+        the formula does not double-count the monetization gap that
+        YouTube&apos;s RPM already includes in its own denominator.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">

@@ -431,6 +431,28 @@ export const BAND_FACTORS = {
   optimistic: 1.5,
 } as const;
 
+// ─── Reference monetization ────────────────────────────────────────
+//
+// YouTube's official definition of RPM is `total revenue ÷ total views
+// × 1000` — i.e. it already accounts for non-monetized views.
+//
+// The country / niche `baseRpm` tables above are calibrated to that
+// definition: they represent the YouTube-Studio RPM of a channel that
+// monetizes at the industry-typical rate of ~90% of its views.
+//
+// This makes the `monetizedPercentage` slider in the UI a *relative*
+// adjustment — a knob the user can pull if their channel monetizes
+// unusually high or low (e.g. a very family-friendly channel at 95%,
+// or a COPPA-restricted kids channel at ~60%). At the reference
+// value, the formula collapses to `views ÷ 1000 × RPM`, matching
+// YouTube's own metric exactly.
+//
+// Design intent: users who don't touch the slider get numbers that
+// line up with YouTube Studio's RPM for a typical channel — no
+// double-discount.
+//
+export const REFERENCE_MONETIZATION_PCT = 90;
+
 // ─── Currencies ────────────────────────────────────────────────────
 //
 // Static approximate FX table. This tool does not consume a live FX

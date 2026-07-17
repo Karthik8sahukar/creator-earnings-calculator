@@ -3,6 +3,7 @@ import {
   BAND_FACTORS,
   MIXED_LONG_SHARE,
   MIXED_SHORTS_SHARE,
+  REFERENCE_MONETIZATION_PCT,
   findCountry,
   findCurrency,
   findNiche,
@@ -20,7 +21,37 @@ import type { EarningsInput } from "./schemas";
  * conservative / expected / optimistic band of estimated creator
  * earnings, broken down by daily / weekly / monthly / annual.
  *
- * Design rules (do not silently break these):
+ * ──────────────────────────────────────────────────────────────────
+ *   The RPM definition we follow
+ * ──────────────────────────────────────────────────────────────────
+ *
+ * YouTube (per YouTube Help / YouTube Studio) defines RPM as:
+ *
+ *     RPM = total_revenue ÷ total_views × 1000
+ *
+ * which crucially divides by TOTAL views (including non-monetized
+ * views) and includes revenue from ads, YouTube Premium, memberships,
+ * Super Chat, and Super Stickers.
+ *
+ * The country × niche `baseRpm` tables in `rpmData.ts` are calibrated
+ * to that definition — they represent the RPM of a channel that
+ * monetizes at the industry-typical rate of ~90% of its views.
+ *
+ * The engine therefore uses the equivalent creator-side formula:
+ *
+ *     monthly_ad_revenue
+ *       = (monthly_views ÷ 1000)
+ *       × effective_RPM
+ *       × (monetized_% ÷ REFERENCE_MONETIZATION_PCT)
+ *
+ * where `effective_RPM = country.baseRpm × niche.rpmMultiplier` (or a
+ * user-supplied custom RPM). At the reference monetization value the
+ * (monetized_% ÷ REFERENCE) factor is 1.0 and the formula collapses
+ * to YouTube's canonical `views ÷ 1000 × RPM` — no double-discount.
+ *
+ * ──────────────────────────────────────────────────────────────────
+ *   Design rules (do not silently break these):
+ * ──────────────────────────────────────────────────────────────────
  *
  *   1. **Never multiply views by CPM.** Advertiser CPM (before Google's
  *      share) is not the same as creator RPM (after Google's share).
@@ -29,10 +60,11 @@ import type { EarningsInput } from "./schemas";
  *      Shorts. This engine always uses RPM.
  *
  *   2. **RPM is per-1,000-TOTAL-views, not per-1,000-monetized-views.**
- *      Applying `monetizedPercentage` in the formula is what bridges
- *      that gap. We apply it exactly once, before the RPM step, so
- *      passing 100% monetized + custom RPM lets the user model any
- *      hypothetical.
+ *      YouTube's RPM figure already includes the monetization gap in
+ *      its denominator. `monetizedPercentage` in this engine is a
+ *      *relative* adjustment against `REFERENCE_MONETIZATION_PCT`, not
+ *      a raw discount factor on the view count. Applying it any other
+ *      way would double-discount.
  *
  *   3. **Shorts have their own RPM path.** They use a shared revenue
  *      pool with fundamentally different economics from long-form's
@@ -64,10 +96,21 @@ export function calculateEarnings(input: EarningsInput): EarningsResult {
       ? Number.POSITIVE_INFINITY
       : 0;
   const safeViews = rawViews > 0 ? rawViews : 0;
+
   const monetizedPct = Number.isFinite(input.monetizedPercentage)
     ? Math.min(Math.max(input.monetizedPercentage, 0), 100)
     : 0;
-  const monetizedViews = safeViews * (monetizedPct / 100);
+
+  // The monetization *adjustment factor* — see the module comment.
+  // At the reference (90%) this is 1.0, so the formula reduces to
+  // YouTube's canonical `views ÷ 1000 × RPM`. Above 90% the user is
+  // modelling a better-than-typical channel; below 90%, a worse one.
+  //
+  // NOTE: this is NOT the same as multiplying views by `monetizedPct
+  // ÷ 100`. That would double-discount because `baseRpm` is already
+  // a per-total-views figure that bakes in the average monetization
+  // gap.
+  const monetizationFactor = monetizedPct / REFERENCE_MONETIZATION_PCT;
 
   // ── 2. Pick the RPM path for this content type. ────────────────
   //
@@ -116,15 +159,23 @@ export function calculateEarnings(input: EarningsInput): EarningsResult {
     rpmHigh = country.baseRpm.high * niche.rpmMultiplier;
   }
 
-  // ── 3. Monthly ad revenue = monetized views × RPM ÷ 1000. ─────
+  // ── 3. Monthly ad revenue = views ÷ 1000 × RPM × monetization. ─
   //
-  // This is the canonical creator-side formula. Multiplying by RPM/1000
-  // (not by CPM) is what makes this a creator-earnings estimate rather
-  // than an advertiser-spend estimate.
+  // Formula:
   //
-  const monthlyAdLow = (monetizedViews / 1000) * rpmLow;
-  const monthlyAdExpected = (monetizedViews / 1000) * rpmExpected;
-  const monthlyAdHigh = (monetizedViews / 1000) * rpmHigh;
+  //   monthly_ad_revenue
+  //     = (safeViews ÷ 1000) × RPM × monetizationFactor
+  //
+  // Because RPM is already a per-TOTAL-views quantity, dividing by
+  // 1000 (not by monetized views) is what makes this creator-side
+  // and consistent with YouTube's definition. `monetizationFactor`
+  // is a relative adjustment: at the reference monetization it is
+  // 1.0 and this collapses to YouTube's own `views ÷ 1000 × RPM`.
+  //
+  const monthlyAdLow = (safeViews / 1000) * rpmLow * monetizationFactor;
+  const monthlyAdExpected =
+    (safeViews / 1000) * rpmExpected * monetizationFactor;
+  const monthlyAdHigh = (safeViews / 1000) * rpmHigh * monetizationFactor;
 
   // ── 4. Non-ad income adds on top. ──────────────────────────────
   //

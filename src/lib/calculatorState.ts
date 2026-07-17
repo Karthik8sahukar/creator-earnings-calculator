@@ -55,6 +55,11 @@ export const DEFAULT_CALCULATOR_STATE: CalculatorState = {
   rpmMode: "auto",
   customRpm: 0,
   currency: "USD",
+  // Default matches `REFERENCE_MONETIZATION_PCT` in rpmData.ts. At this
+  // value the earnings formula collapses to `views ÷ 1000 × RPM` —
+  // YouTube's own canonical RPM formula. Users can drag this slider to
+  // model channels that monetize better (up to 100%) or worse (e.g.
+  // COPPA kids channels near 60%) than the industry-typical rate.
   monetizedPercentage: 90,
   sponsorship: 0,
   affiliate: 0,

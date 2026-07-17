@@ -5,30 +5,42 @@ import {
   BAND_FACTORS,
   MIXED_LONG_SHARE,
   MIXED_SHORTS_SHARE,
+  REFERENCE_MONETIZATION_PCT,
   findCountry,
   findNiche,
 } from "../rpmData";
 import type { EarningsInput } from "../schemas";
 
+// BASE uses monetizedPercentage = REFERENCE_MONETIZATION_PCT (90).
+// At the reference value the monetization adjustment factor is 1.0
+// and the formula collapses to YouTube's canonical
+//   monthly ad revenue = views ÷ 1000 × RPM.
+// That's the pure creator-side formula, which is what most of these
+// tests want to reason about.
 const BASE: EarningsInput = {
   monthlyViews: 1_000_000,
   country: "US",
   niche: "other",
   contentType: "long",
   currency: "USD",
-  monetizedPercentage: 100,
+  monetizedPercentage: REFERENCE_MONETIZATION_PCT,
   sponsorship: 0,
   affiliate: 0,
   membership: 0,
 };
 
 describe("calculateEarnings — core ad revenue math (long-form)", () => {
-  it("uses country × niche RPM (no content-type multiplier for long-form)", () => {
+  it("uses YouTube's canonical formula at the reference monetization", () => {
+    // At monetizedPercentage = REFERENCE_MONETIZATION_PCT the
+    // (monetized / reference) factor is exactly 1.0, so the formula
+    // reduces to:  ad revenue = views ÷ 1000 × RPM.
     const r = calculateEarnings(BASE);
     const us = findCountry("US");
     const other = findNiche("other");
-    // 1,000,000 views × RPM / 1000 = 1000 × RPM
-    expect(r.low.monthly).toBeCloseTo(1000 * us.baseRpm.low * other.rpmMultiplier, 5);
+    expect(r.low.monthly).toBeCloseTo(
+      1000 * us.baseRpm.low * other.rpmMultiplier,
+      5,
+    );
     expect(r.expected.monthly).toBeCloseTo(
       1000 * us.baseRpm.expected * other.rpmMultiplier,
       5,
@@ -40,8 +52,8 @@ describe("calculateEarnings — core ad revenue math (long-form)", () => {
   });
 
   it("respects a custom RPM override and applies the configured band factors", () => {
+    // At reference monetization: 1,000,000 views × $10 RPM ÷ 1000 = $10,000.
     const r = calculateEarnings({ ...BASE, rpm: 10 });
-    // 1,000,000 monetized views @ RPM 10 → $10,000 expected
     expect(r.expected.monthly).toBeCloseTo(10_000, 5);
     expect(r.low.monthly).toBeCloseTo(10_000 * BAND_FACTORS.conservative, 5);
     expect(r.high.monthly).toBeCloseTo(10_000 * BAND_FACTORS.optimistic, 5);
@@ -67,6 +79,7 @@ describe("calculateEarnings — core ad revenue math (long-form)", () => {
       affiliate: 500,
       membership: 250,
     });
+    // BASE uses reference monetization → adjustment factor is 1.0.
     const ad = (1_000_000 * 5) / 1000;
     expect(r.expected.monthly).toBeCloseTo(ad + 1000 + 500 + 250, 5);
     expect(r.extras.sponsorship).toBe(1000);
@@ -149,8 +162,69 @@ describe("calculateEarnings — core ad revenue math (long-form)", () => {
   });
 });
 
+describe("calculateEarnings — RPM semantics: no double-discount", () => {
+  it("at the reference monetization, ad revenue matches YouTube's Studio formula (views ÷ 1000 × RPM)", () => {
+    const r = calculateEarnings({
+      ...BASE,
+      monetizedPercentage: REFERENCE_MONETIZATION_PCT,
+      rpm: 5,
+    });
+    // YouTube's own RPM formula, applied directly.
+    expect(r.expected.monthly).toBeCloseTo((1_000_000 / 1000) * 5, 5);
+    expect(r.monthlyAdRevenue.monthly).toBeCloseTo((1_000_000 / 1000) * 5, 5);
+  });
+
+  it("does NOT double-discount views: 100% monetized > reference monetized", () => {
+    // Prior to the fix the engine applied (monetizedPct ÷ 100) directly,
+    // so 100% monetized equalled the raw RPM. Under the corrected
+    // formula 100% is *above* the reference (typical ~90%) and should
+    // therefore produce a proportionally *higher* result — modelling
+    // an unusually well-monetized channel.
+    const atRef = calculateEarnings({
+      ...BASE,
+      monetizedPercentage: REFERENCE_MONETIZATION_PCT,
+      rpm: 5,
+    });
+    const at100 = calculateEarnings({ ...BASE, monetizedPercentage: 100, rpm: 5 });
+    expect(at100.expected.monthly).toBeGreaterThan(atRef.expected.monthly);
+    expect(at100.expected.monthly / atRef.expected.monthly).toBeCloseTo(
+      100 / REFERENCE_MONETIZATION_PCT,
+      5,
+    );
+  });
+
+  it("monetization adjustment is linear in the slider value", () => {
+    // Doubling monetization from reference/2 to reference should double
+    // the ad revenue, and reference → 2×reference should double it again
+    // (subject to the 0..100 clamp).
+    const half = calculateEarnings({
+      ...BASE,
+      monetizedPercentage: REFERENCE_MONETIZATION_PCT / 2,
+      rpm: 5,
+    });
+    const full = calculateEarnings({
+      ...BASE,
+      monetizedPercentage: REFERENCE_MONETIZATION_PCT,
+      rpm: 5,
+    });
+    expect(full.expected.monthly / half.expected.monthly).toBeCloseTo(2, 5);
+  });
+
+  it("at zero monetization, ad revenue is zero regardless of other inputs", () => {
+    const r = calculateEarnings({
+      ...BASE,
+      monetizedPercentage: 0,
+      rpm: 5,
+    });
+    expect(r.expected.monthly).toBe(0);
+    expect(r.low.monthly).toBe(0);
+    expect(r.high.monthly).toBe(0);
+    expect(r.monthlyAdRevenue.monthly).toBe(0);
+  });
+});
+
 describe("calculateEarnings — Shorts have their own path (not a long-form multiplier)", () => {
-  it("uses country.shortsRpm × niche.shortsRpmMultiplier for shorts", () => {
+  it("uses country.shortsRpm × niche.shortsRpmMultiplier for shorts (at reference monetization)", () => {
     const r = calculateEarnings({ ...BASE, contentType: "shorts" });
     const us = findCountry("US");
     const other = findNiche("other");
@@ -262,9 +336,10 @@ describe("calculateEarnings — geography ordering", () => {
 
 describe("calculateEarnings — realistic magnitudes anchored to public reports", () => {
   // These bounds are deliberately wide because real creator earnings
-  // vary a lot. Their purpose is to catch a formula regression that
-  // e.g. multiplies by CPM instead of RPM (which would give ~2× the
-  // true value) or drops the /1000 step.
+  // vary a lot. Their purpose is to catch a formula regression — e.g.
+  // multiplying by CPM instead of RPM (which would give ~2× the true
+  // value), dropping the /1000 step, or a double-discount of monetized
+  // views. All scenarios assume the reference monetization from BASE.
 
   it("US Finance long-form @ 1M views: ~$8k–$20k/mo expected", () => {
     const r = calculateEarnings({

@@ -311,6 +311,7 @@ export function EarningsCalculator({
                 max={100}
                 step={1}
                 suffix="%"
+                hint="Relative to a typical channel (~90%). 90% matches YouTube Studio's RPM formula; drag up for a well-monetized channel or down for COPPA/Premium-heavy audiences."
               />
             </FieldGroup>
 
@@ -532,6 +533,7 @@ function SliderField({
   max,
   step,
   suffix,
+  hint,
 }: {
   label: string;
   name?: string;
@@ -541,6 +543,7 @@ function SliderField({
   max: number;
   step: number;
   suffix?: string;
+  hint?: string;
 }) {
   return (
     <label className="block col-span-full">
@@ -565,6 +568,9 @@ function SliderField({
         aria-valuenow={value}
         className="mt-2 w-full accent-brand-600"
       />
+      {hint && (
+        <span className="mt-1 block text-[11px] text-slate-500">{hint}</span>
+      )}
     </label>
   );
 }

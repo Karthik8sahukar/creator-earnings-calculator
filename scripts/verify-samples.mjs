@@ -46,7 +46,11 @@ const money = (n) =>
 console.log(`Band factors: conservative=${BAND_FACTORS.conservative}x, expected=${BAND_FACTORS.expected}x, optimistic=${BAND_FACTORS.optimistic}x`);
 console.log(`Mixed blend: ${(MIXED_LONG_SHARE * 100).toFixed(0)}% long / ${(MIXED_SHORTS_SHARE * 100).toFixed(0)}% shorts`);
 console.log("");
-console.log("Assumed 100% monetized views, USD, no sponsorship/affiliate/membership.");
+console.log(
+  "Assumed monetizedPercentage = 90 (the reference); at this value the",
+);
+console.log("formula collapses to YouTube's canonical views / 1000 × RPM.");
+console.log("USD, no sponsorship / affiliate / membership added.");
 console.log("");
 
 // Print country + niche detail table
@@ -75,7 +79,7 @@ for (const s of SCENARIOS) {
       niche: s.niche,
       contentType: s.contentType,
       currency: "USD",
-      monetizedPercentage: 100,
+      monetizedPercentage: 90,
       sponsorship: 0,
       affiliate: 0,
       membership: 0,
