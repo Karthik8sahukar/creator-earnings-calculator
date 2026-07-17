@@ -110,7 +110,8 @@ function findProp(
 beforeEach(() => {
   process.env.YOUTUBE_API_KEY = "test-key";
   process.env.NEXT_PUBLIC_SITE_URL = "https://example.test";
-  process.env.NEXT_PUBLIC_SITE_NAME = "YouTube Money Calculator";
+  // Note: NEXT_PUBLIC_SITE_NAME is intentionally NOT set — the brand
+  // is a hardcoded constant in src/lib/config.ts, immune to env drift.
   getChannelById.mockReset();
   getRecentVideos.mockReset();
 });

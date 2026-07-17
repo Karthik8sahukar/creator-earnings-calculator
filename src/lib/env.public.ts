@@ -8,12 +8,16 @@
  *
  * Validation uses Zod so misconfiguration is caught at boot with a
  * clear error, rather than surfacing later as mysterious runtime bugs.
+ *
+ * NOTE: the product name is NOT an env variable. See `BRAND_NAME` in
+ * `config.ts`. Branding is a compile-time constant so that a stale
+ * value on any deployment cannot leave the old brand rendered in the
+ * header, footer, or metadata.
  */
 
 import { z } from "zod";
 
 const RAW = {
-  NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   NODE_ENV: process.env.NODE_ENV,
 } as const;
@@ -30,10 +34,6 @@ const siteUrlSchema = isProduction
   : z.string().url().or(z.string().length(0)).optional();
 
 const publicSchema = z.object({
-  NEXT_PUBLIC_SITE_NAME: z
-    .string()
-    .min(1)
-    .default("YouTube Money Calculator"),
   NEXT_PUBLIC_SITE_URL: siteUrlSchema,
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -72,7 +72,6 @@ const normalizedSiteUrl = (
 ).replace(/\/$/, "");
 
 export const publicEnv = Object.freeze({
-  siteName: data.NEXT_PUBLIC_SITE_NAME,
   siteUrl: normalizedSiteUrl,
   nodeEnv: data.NODE_ENV,
   isProduction: data.NODE_ENV === "production",
