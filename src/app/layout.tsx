@@ -114,7 +114,6 @@ export default function RootLayout({
           id="ld-json"
           type="application/ld+json"
           strategy="afterInteractive"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </body>

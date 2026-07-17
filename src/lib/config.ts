@@ -1,23 +1,29 @@
 /**
- * Centralized runtime & public configuration.
- * Do NOT import server-only secrets from here in client components.
- * `serverEnv` is only safe inside route handlers / server components.
+ * Centralized runtime and public configuration.
+ *
+ * This module is safe to import from both client and server code —
+ * everything here is either a compile-time constant or derived from
+ * `NEXT_PUBLIC_*` environment variables (validated in `env.public.ts`).
+ *
+ * Server-only secrets (the YouTube API key, timeouts, rate-limit
+ * settings, etc.) live in `env.server.ts` and can only be imported
+ * from server code. Client bundles never see them.
  */
 
-export const publicConfig = {
-  siteName: process.env.NEXT_PUBLIC_SITE_NAME ?? "Creator Earnings Calculator",
-  siteUrl: (
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ).replace(/\/$/, ""),
-  description:
-    "Search any YouTube channel and estimate creator earnings using public statistics from the YouTube Data API v3.",
-} as const;
+import { publicEnv } from "./env.public";
 
-export const serverEnv = {
-  youtubeApiKey: process.env.YOUTUBE_API_KEY ?? "",
-} as const;
+const description =
+  "Search any YouTube channel and estimate creator earnings using public statistics from the YouTube Data API v3.";
 
-export const youtube = {
+export const publicConfig = Object.freeze({
+  siteName: publicEnv.siteName,
+  siteUrl: publicEnv.siteUrl,
+  description,
+});
+
+export type PublicConfig = typeof publicConfig;
+
+export const youtube = Object.freeze({
   apiBase: "https://www.googleapis.com/youtube/v3",
   searchMaxResults: 8,
   recentVideosCount: 12,
@@ -25,4 +31,10 @@ export const youtube = {
   handleUrlPrefix: "https://www.youtube.com/@",
   watchUrlPrefix: "https://www.youtube.com/watch?v=",
   shortsUrlPrefix: "https://www.youtube.com/shorts/",
-} as const;
+});
+
+/**
+ * Editorial "last updated" date for legal / methodology pages. Sourced
+ * from centralized config so all legal copy stays in sync.
+ */
+export const legalLastUpdatedIso = "2026-07-17";

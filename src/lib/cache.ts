@@ -14,6 +14,8 @@
  * change — only the internal storage does.
  */
 
+import { markCache } from "./observability";
+
 export interface CacheOptions {
   /** Max entry count before least-recently-used entries are evicted. */
   maxSize: number;
@@ -102,11 +104,20 @@ export class TtlCache<V> {
    */
   async getOrLoad(key: string, loader: () => Promise<V>): Promise<V> {
     const cached = this.get(key);
-    if (cached !== undefined) return cached;
+    if (cached !== undefined) {
+      markCache("hit");
+      return cached;
+    }
 
     const existing = this.inflight.get(key);
-    if (existing) return existing;
+    if (existing) {
+      // A concurrent request already kicked off the load — from this
+      // caller's perspective this is a coalesced miss, not a fresh hit.
+      markCache("miss");
+      return existing;
+    }
 
+    markCache("miss");
     const promise = (async () => {
       try {
         const result = await loader();

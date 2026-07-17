@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { track } from "@/lib/analytics";
 import { formatCurrency } from "@/lib/format";
 import { findCountry, findNiche, NICHES, COUNTRIES, CURRENCIES } from "@/lib/rpmData";
 import { calculateSponsorship } from "@/lib/simpleCalculators";
 
 export function SponsorshipCalcClient() {
+  useEffect(() => {
+    track({ name: "additional_calculator.opened", kind: "sponsorship" });
+  }, []);
   const [subscribers, setSubscribers] = useState<number>(100_000);
   const [averageViews, setAverageViews] = useState<number>(50_000);
   const [engagement, setEngagement] = useState<number>(5);
