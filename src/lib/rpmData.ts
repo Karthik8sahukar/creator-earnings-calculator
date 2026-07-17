@@ -21,7 +21,21 @@
  *   used by many other calculators — we deliberately avoid it.
  *
  * ─────────────────────────────────────────────────────────────────────
- *   Where these numbers come from
+ *   Data-model shape (2026 revision)
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * `baseRpm` and `shortsRpm` are now SINGLE numbers, not low/expected/
+ * high triples. The Conservative / Expected / Optimistic scenario
+ * bands are derived exclusively from `BAND_FACTORS` (0.6 / 1.0 / 1.5)
+ * applied to the expected value. That gives us:
+ *
+ *   - one source of truth for the RPM uncertainty band (BAND_FACTORS);
+ *   - consistent behaviour between the "auto" and "custom RPM" modes;
+ *   - a clean separation from view-count uncertainty (which is a
+ *     different, orthogonal concept exposed on the performance card).
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ *   Where the numbers come from
  * ─────────────────────────────────────────────────────────────────────
  *
  * The values below are aggregated approximations from publicly-reported
@@ -35,12 +49,6 @@
  */
 
 // ─── Types ──────────────────────────────────────────────────────────
-
-export interface RpmRange {
-  low: number;
-  expected: number;
-  high: number;
-}
 
 /**
  * A niche has TWO multipliers because the mechanisms are different:
@@ -66,28 +74,31 @@ export interface Niche {
 }
 
 /**
- * A country tier carries TWO RPM ranges — one for long-form, one for
+ * A country tier carries TWO RPM figures — one for long-form, one for
  * Shorts — because the Shorts revenue pool is much flatter globally
- * than long-form ad prices are.
+ * than long-form ad prices are. Both are single expected values;
+ * Conservative / Optimistic bands are derived at compute time via
+ * `BAND_FACTORS`.
  */
 export interface CountryTier {
   id: string;
   label: string;
-  /** Long-form RPM range in USD (per 1,000 total views). */
-  baseRpm: RpmRange;
+  /** Expected long-form RPM in USD (per 1,000 total views). */
+  baseRpm: number;
   /**
-   * Shorts RPM range in USD (per 1,000 Shorts views). Values are
+   * Expected Shorts RPM in USD (per 1,000 Shorts views). Values are
    * roughly 1–2 orders of magnitude below long-form because the
    * Shorts monetization pool is smaller and shared broadly.
    */
-  shortsRpm: RpmRange;
+  shortsRpm: number;
 }
 
 // ─── Country RPM tiers ─────────────────────────────────────────────
 //
-// Long-form ranges reflect the typical creator-reported spread for a
-// mid-desirable niche in each country. Shorts ranges are drawn from
-// public creator reports of the YouTube Shorts monetization program.
+// Each `baseRpm` is the expected long-form RPM for a mid-desirable
+// niche. Each `shortsRpm` is the expected Shorts RPM. Conservative
+// and Optimistic bands come from `BAND_FACTORS` applied at compute
+// time, so cross-country ratios stay uniform.
 //
 // Real-world reference points (all publicly cited, non-proprietary):
 //   • US mid-market long-form RPM: $4–$10, with premium niches $10–$25.
@@ -99,128 +110,37 @@ export interface CountryTier {
 //
 
 export const COUNTRIES: CountryTier[] = [
-  {
-    id: "US",
-    label: "United States",
-    baseRpm: { low: 3.5, expected: 6.5, high: 12 },
-    shortsRpm: { low: 0.04, expected: 0.08, high: 0.18 },
-  },
-  {
-    id: "GB",
-    label: "United Kingdom",
-    baseRpm: { low: 3, expected: 5.5, high: 9 },
-    shortsRpm: { low: 0.03, expected: 0.07, high: 0.14 },
-  },
-  {
-    id: "CA",
-    label: "Canada",
-    baseRpm: { low: 3, expected: 5.5, high: 9 },
-    shortsRpm: { low: 0.03, expected: 0.07, high: 0.14 },
-  },
-  {
-    id: "AU",
-    label: "Australia",
-    baseRpm: { low: 3, expected: 5.8, high: 9.5 },
-    shortsRpm: { low: 0.03, expected: 0.07, high: 0.14 },
-  },
-  {
-    id: "DE",
-    label: "Germany",
-    baseRpm: { low: 2.5, expected: 4.8, high: 8 },
-    shortsRpm: { low: 0.03, expected: 0.06, high: 0.12 },
-  },
-  {
-    id: "FR",
-    label: "France",
-    baseRpm: { low: 2, expected: 3.8, high: 6.5 },
-    shortsRpm: { low: 0.02, expected: 0.05, high: 0.1 },
-  },
-  {
-    id: "NL",
-    label: "Netherlands",
-    baseRpm: { low: 2.5, expected: 4.6, high: 7.5 },
-    shortsRpm: { low: 0.03, expected: 0.06, high: 0.12 },
-  },
-  {
-    id: "SE",
-    label: "Sweden",
-    baseRpm: { low: 2.5, expected: 4.4, high: 7.2 },
-    shortsRpm: { low: 0.03, expected: 0.06, high: 0.11 },
-  },
-  {
-    id: "JP",
-    label: "Japan",
-    baseRpm: { low: 2, expected: 3.5, high: 6 },
-    shortsRpm: { low: 0.02, expected: 0.05, high: 0.1 },
-  },
-  {
-    id: "KR",
-    label: "South Korea",
-    baseRpm: { low: 1.5, expected: 2.8, high: 4.8 },
-    shortsRpm: { low: 0.015, expected: 0.04, high: 0.08 },
-  },
-  {
-    id: "IN",
-    label: "India",
-    baseRpm: { low: 0.4, expected: 1.1, high: 2.2 },
-    shortsRpm: { low: 0.005, expected: 0.012, high: 0.03 },
-  },
-  {
-    id: "BR",
-    label: "Brazil",
-    baseRpm: { low: 0.6, expected: 1.4, high: 2.6 },
-    shortsRpm: { low: 0.008, expected: 0.018, high: 0.04 },
-  },
-  {
-    id: "MX",
-    label: "Mexico",
-    baseRpm: { low: 0.8, expected: 1.6, high: 2.8 },
-    shortsRpm: { low: 0.01, expected: 0.02, high: 0.045 },
-  },
-  {
-    id: "ES",
-    label: "Spain",
-    baseRpm: { low: 1.5, expected: 3, high: 5 },
-    shortsRpm: { low: 0.02, expected: 0.04, high: 0.08 },
-  },
-  {
-    id: "IT",
-    label: "Italy",
-    baseRpm: { low: 1.5, expected: 2.8, high: 4.6 },
-    shortsRpm: { low: 0.02, expected: 0.04, high: 0.08 },
-  },
-  {
-    id: "ID",
-    label: "Indonesia",
-    baseRpm: { low: 0.3, expected: 0.9, high: 1.8 },
-    shortsRpm: { low: 0.005, expected: 0.012, high: 0.025 },
-  },
-  {
-    id: "PH",
-    label: "Philippines",
-    baseRpm: { low: 0.4, expected: 1, high: 1.9 },
-    shortsRpm: { low: 0.005, expected: 0.013, high: 0.028 },
-  },
+  { id: "US", label: "United States", baseRpm: 6.5, shortsRpm: 0.08 },
+  { id: "GB", label: "United Kingdom", baseRpm: 5.5, shortsRpm: 0.07 },
+  { id: "CA", label: "Canada", baseRpm: 5.5, shortsRpm: 0.07 },
+  { id: "AU", label: "Australia", baseRpm: 5.8, shortsRpm: 0.07 },
+  { id: "DE", label: "Germany", baseRpm: 4.8, shortsRpm: 0.06 },
+  { id: "FR", label: "France", baseRpm: 3.8, shortsRpm: 0.05 },
+  { id: "NL", label: "Netherlands", baseRpm: 4.6, shortsRpm: 0.06 },
+  { id: "SE", label: "Sweden", baseRpm: 4.4, shortsRpm: 0.06 },
+  { id: "JP", label: "Japan", baseRpm: 3.5, shortsRpm: 0.05 },
+  { id: "KR", label: "South Korea", baseRpm: 2.8, shortsRpm: 0.04 },
+  { id: "IN", label: "India", baseRpm: 1.1, shortsRpm: 0.012 },
+  { id: "BR", label: "Brazil", baseRpm: 1.4, shortsRpm: 0.018 },
+  { id: "MX", label: "Mexico", baseRpm: 1.6, shortsRpm: 0.02 },
+  { id: "ES", label: "Spain", baseRpm: 3, shortsRpm: 0.04 },
+  { id: "IT", label: "Italy", baseRpm: 2.8, shortsRpm: 0.04 },
+  { id: "ID", label: "Indonesia", baseRpm: 0.9, shortsRpm: 0.012 },
+  { id: "PH", label: "Philippines", baseRpm: 1, shortsRpm: 0.013 },
   {
     id: "ZA",
     label: "South Africa",
-    // Adjusted slightly down from the previous $1.5 expected; public
-    // creator reports for ZA cluster around $1–$1.6 for general content.
-    baseRpm: { low: 0.5, expected: 1.2, high: 2.2 },
-    shortsRpm: { low: 0.008, expected: 0.02, high: 0.04 },
+    // Public creator reports for ZA cluster around $1–$1.6 for general content.
+    baseRpm: 1.2,
+    shortsRpm: 0.02,
   },
-  {
-    id: "AE",
-    label: "United Arab Emirates",
-    baseRpm: { low: 2, expected: 4, high: 7 },
-    shortsRpm: { low: 0.025, expected: 0.05, high: 0.1 },
-  },
+  { id: "AE", label: "United Arab Emirates", baseRpm: 4, shortsRpm: 0.05 },
   {
     id: "OTHER",
     label: "Other / Global mix",
     // A safe global-average fallback for a channel with mixed geography.
-    baseRpm: { low: 1, expected: 2.2, high: 4 },
-    shortsRpm: { low: 0.015, expected: 0.03, high: 0.06 },
+    baseRpm: 2.2,
+    shortsRpm: 0.03,
   },
 ];
 
@@ -411,20 +331,21 @@ export const NICHES: Niche[] = [
 export const MIXED_LONG_SHARE = 0.6;
 export const MIXED_SHORTS_SHARE = 0.4;
 
-// ─── Estimate bands ────────────────────────────────────────────────
+// ─── Estimate bands (RPM uncertainty) ──────────────────────────────
 //
-// Given an "expected" RPM, we return a low/expected/high band to
-// visualize uncertainty. Real per-creator variance is wide because so
-// many factors (fill rate, ad category mix, seasonality, refund rate,
-// YouTube share) are hidden from us.
+// Given an "expected" RPM, we derive Conservative / Expected /
+// Optimistic bands by multiplying by these factors. Real per-creator
+// variance is wide because so many factors (fill rate, ad category
+// mix, seasonality, refund rate, YouTube share) are hidden from us.
 //
-// The band factors are exposed here (rather than hard-coded in
-// `earnings.ts`) so tests can reference the same source of truth.
+// Every call site — auto mode, custom RPM, Shorts, mixed — funnels
+// through these constants so there is only one source of truth for
+// the RPM uncertainty band. The bands do NOT touch the monthly view
+// count. View-count uncertainty is a separate concept exposed via
+// the performance analysis (`monthlyViewEstimate.low/expected/high`
+// on the channel page) and is deliberately not compounded on top of
+// the RPM band.
 //
-// Widened in the 2026 revision from 0.7/1.35 → 0.6/1.5 to reflect
-// real-world variance more honestly.
-//
-
 export const BAND_FACTORS = {
   conservative: 0.6,
   expected: 1.0,

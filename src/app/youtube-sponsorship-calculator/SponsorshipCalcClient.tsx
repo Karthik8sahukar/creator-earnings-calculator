@@ -33,8 +33,8 @@ export function SponsorshipCalcClient() {
     // Approximate country multiplier from the country RPM tier vs US.
     const countryDef = findCountry(country);
     const us = findCountry("US");
-    const countryMultiplier =
-      countryDef.baseRpm.expected / us.baseRpm.expected;
+    // `baseRpm` is now a single expected value (see rpmData.ts docstring).
+    const countryMultiplier = countryDef.baseRpm / us.baseRpm;
     return calculateSponsorship({
       subscribers,
       averageViews,

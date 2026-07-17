@@ -238,16 +238,28 @@ export default function MethodologyPage() {
       <p>
         We then report a low / expected / high band (0.7× / 1.0× / 1.35×) to
         reflect traffic-side uncertainty (the same channel can naturally see
-        20–30% more or fewer monthly views than its recent average). This is
-        the input to the earnings calculator by default, but you can override
-        it manually.
+        20–30% more or fewer monthly views than its recent average). These
+        bands are shown on the <strong>Performance</strong> card. The
+        earnings calculator seeds its monthly-views field with the{" "}
+        <em>expected</em> traffic estimate — the single best guess. You can
+        then edit the value manually (your input is preserved).
       </p>
       <p>
-        The <strong>earnings-side</strong> bands are wider — 0.6× / 1.0× /
-        1.5× around the expected RPM — because so many factors (fill rate,
-        ad category mix, seasonality, refund rate) are hidden from us. In the
-        UI these are labelled <strong>Conservative</strong> /{" "}
+        The <strong>earnings-side</strong> bands are separate and cover a
+        different kind of uncertainty. Given a specific monthly-views value,
+        they represent the plausible spread of creator RPM around the
+        expected value. Because so many factors are hidden from us — fill
+        rate, ad category mix, seasonality, refund rate, YouTube share —
+        the earnings-side spread is wider (0.6× / 1.0× / 1.5×). In the UI
+        these are labelled <strong>Conservative</strong> /{" "}
         <strong>Expected</strong> / <strong>Optimistic</strong>.
+      </p>
+      <p>
+        Switching Conservative / Expected / Optimistic multiplies the
+        earnings result by <em>exactly</em> 0.6× / 1.0× / 1.5×. It does not
+        change your monthly-views input. The two uncertainty axes
+        (traffic-side and revenue-side) are surfaced separately so they
+        never compound invisibly.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">

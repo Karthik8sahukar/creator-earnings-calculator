@@ -125,39 +125,43 @@ export function calculateEarnings(input: EarningsInput): EarningsResult {
   // Custom RPM applies regardless of content type — the user is
   // telling us "I know my RPM, just use this number".
   //
-  let rpmLow: number;
+  // ── 2a. Pick the *expected* RPM for this content type. ────────
+  //
+  // Only the expected value is computed from the data tables; the
+  // Conservative and Optimistic bands are then derived uniformly via
+  // BAND_FACTORS. This keeps every content-type path (long / shorts /
+  // mixed / custom) using the same 0.6× / 1.0× / 1.5× ratios, so
+  // switching scenario tabs multiplies the expected result by an
+  // exactly-known factor — no cross-country asymmetry, no compound
+  // uncertainty.
+  //
   let rpmExpected: number;
-  let rpmHigh: number;
 
   if (input.rpm && input.rpm > 0) {
+    // Custom RPM override — the user told us their exact RPM. Use it
+    // as the expected value regardless of content type.
     rpmExpected = input.rpm;
-    rpmLow = input.rpm * BAND_FACTORS.conservative;
-    rpmHigh = input.rpm * BAND_FACTORS.optimistic;
   } else if (input.contentType === "shorts") {
-    rpmLow = country.shortsRpm.low * niche.shortsRpmMultiplier;
-    rpmExpected = country.shortsRpm.expected * niche.shortsRpmMultiplier;
-    rpmHigh = country.shortsRpm.high * niche.shortsRpmMultiplier;
+    rpmExpected = country.shortsRpm * niche.shortsRpmMultiplier;
   } else if (input.contentType === "mixed") {
-    // Blend long-form and Shorts on the same low/expected/high band.
-    // The blend is on the RPM itself — we don't split the view count
-    // because we don't know the exact view split; the caller can lean
-    // toward pure long-form or pure Shorts via the content-type
-    // selector if they want a specific split.
-    rpmLow =
-      country.baseRpm.low * niche.rpmMultiplier * MIXED_LONG_SHARE +
-      country.shortsRpm.low * niche.shortsRpmMultiplier * MIXED_SHORTS_SHARE;
+    // Blend long-form and Shorts. The blend is on the RPM itself —
+    // we don't split the view count because we don't know the exact
+    // view split; the caller can lean toward pure long-form or pure
+    // Shorts via the content-type selector for a specific split.
     rpmExpected =
-      country.baseRpm.expected * niche.rpmMultiplier * MIXED_LONG_SHARE +
-      country.shortsRpm.expected * niche.shortsRpmMultiplier * MIXED_SHORTS_SHARE;
-    rpmHigh =
-      country.baseRpm.high * niche.rpmMultiplier * MIXED_LONG_SHARE +
-      country.shortsRpm.high * niche.shortsRpmMultiplier * MIXED_SHORTS_SHARE;
+      country.baseRpm * niche.rpmMultiplier * MIXED_LONG_SHARE +
+      country.shortsRpm * niche.shortsRpmMultiplier * MIXED_SHORTS_SHARE;
   } else {
     // Default: long-form.
-    rpmLow = country.baseRpm.low * niche.rpmMultiplier;
-    rpmExpected = country.baseRpm.expected * niche.rpmMultiplier;
-    rpmHigh = country.baseRpm.high * niche.rpmMultiplier;
+    rpmExpected = country.baseRpm * niche.rpmMultiplier;
   }
+
+  // ── 2b. Derive Conservative / Optimistic bands from BAND_FACTORS.
+  //
+  // A single source of truth. Every path funnels here.
+  //
+  const rpmLow = rpmExpected * BAND_FACTORS.conservative;
+  const rpmHigh = rpmExpected * BAND_FACTORS.optimistic;
 
   // ── 3. Monthly ad revenue = views ÷ 1000 × RPM × monetization. ─
   //

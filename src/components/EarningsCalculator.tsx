@@ -63,11 +63,26 @@ function pickDefaultContentType(shorts: number): CalculatorState["contentType"] 
 /**
  * Compute the initial calculator state.
  *
+ * Design rules:
+ *
+ *  • The scenario band (`estimateBand`) is purely a *revenue*
+ *    uncertainty knob. It never touches `monthlyViews`.
+ *  • `monthlyViews` is always seeded from the analysis's *expected*
+ *    view estimate — the single best guess of the channel's actual
+ *    monthly views. Users can then adjust it manually (their input is
+ *    preserved), and the low/high traffic bands remain visible on the
+ *    performance card as a separate uncertainty axis.
+ *  • This gives us one clear, non-compound source of uncertainty:
+ *    switching Conservative → Expected → Optimistic multiplies the
+ *    result by exactly `BAND_FACTORS.conservative / .expected /
+ *    .optimistic` (0.6 / 1.0 / 1.5) and nothing else.
+ *
  * Order of precedence (last wins):
  *   1. Baseline defaults (DEFAULT_CALCULATOR_STATE) — including
  *      estimateBand = "expected".
- *   2. Analysis-derived defaults (auto-estimated monthly views for the
- *      chosen band, sensible contentType from Shorts share).
+ *   2. Analysis-derived defaults (auto-estimated `monthlyViews` from
+ *      `analysis.monthlyViewEstimate.expected`, sensible content type
+ *      from the Shorts share).
  *   3. URL-provided partial state — only fields the URL actually
  *      included; anything absent lets the analysis default stand.
  *   4. `channelId` from the route — always wins, ignores URL/legacy.
@@ -81,11 +96,8 @@ function computeInitialState({
   initialState?: Partial<CalculatorState>;
   channelId: string | null;
 }): CalculatorState {
-  const seedBand: EstimateBand =
-    initialState?.estimateBand ?? DEFAULT_SCENARIO;
-
   const analysisDerived: Partial<CalculatorState> = {
-    monthlyViews: analysis.monthlyViewEstimate[seedBand] || 0,
+    monthlyViews: analysis.monthlyViewEstimate.expected || 0,
     contentType: pickDefaultContentType(analysis.shortsPercentage),
   };
 
@@ -136,11 +148,12 @@ export function EarningsCalculator({
   const active = earnings[estimateBand];
 
   function applyBand(band: EstimateBand) {
-    setState((s) => ({
-      ...s,
-      estimateBand: band,
-      monthlyViews: analysis.monthlyViewEstimate[band] || 0,
-    }));
+    // Scenario tabs represent RPM uncertainty (BAND_FACTORS in
+    // earnings.ts), NOT view-count uncertainty. Deliberately do NOT
+    // touch `monthlyViews` here — a manually-entered value would get
+    // clobbered, and stacking a view-band adjustment on top of the
+    // RPM band would compound two uncertainties invisibly.
+    setState((s) => ({ ...s, estimateBand: band }));
     track({ name: "calculator.assumption_changed", field: "estimateBand" });
   }
 

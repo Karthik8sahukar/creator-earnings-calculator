@@ -37,16 +37,18 @@ describe("calculateEarnings — core ad revenue math (long-form)", () => {
     const r = calculateEarnings(BASE);
     const us = findCountry("US");
     const other = findNiche("other");
+    const rpm = us.baseRpm * other.rpmMultiplier;
+    // Expected uses the pure formula.
+    expect(r.expected.monthly).toBeCloseTo(1000 * rpm, 5);
+    // Conservative and Optimistic are derived exclusively from
+    // BAND_FACTORS — no per-country asymmetric range, no compounded
+    // view-count adjustment.
     expect(r.low.monthly).toBeCloseTo(
-      1000 * us.baseRpm.low * other.rpmMultiplier,
-      5,
-    );
-    expect(r.expected.monthly).toBeCloseTo(
-      1000 * us.baseRpm.expected * other.rpmMultiplier,
+      1000 * rpm * BAND_FACTORS.conservative,
       5,
     );
     expect(r.high.monthly).toBeCloseTo(
-      1000 * us.baseRpm.high * other.rpmMultiplier,
+      1000 * rpm * BAND_FACTORS.optimistic,
       5,
     );
   });
@@ -162,6 +164,72 @@ describe("calculateEarnings — core ad revenue math (long-form)", () => {
   });
 });
 
+describe("calculateEarnings — scenario bands ARE BAND_FACTORS (single source of uncertainty)", () => {
+  it("US Tech long-form @ 1M views @ 90% monetization: exactly $6,240 / $10,400 / $15,600", () => {
+    // Concrete regression test for the numerical inconsistency reported
+    // in the audit. Under the correct model:
+    //   rpmExpected = 6.5 (US baseRpm) × 1.6 (tech mult) = $10.40
+    //   monthlyExpected = 1,000,000 / 1000 × 10.40 = $10,400
+    //   monthlyLow      = $10,400 × 0.6 = $6,240
+    //   monthlyHigh     = $10,400 × 1.5 = $15,600
+    const r = calculateEarnings({
+      monthlyViews: 1_000_000,
+      country: "US",
+      niche: "tech",
+      contentType: "long",
+      currency: "USD",
+      monetizedPercentage: REFERENCE_MONETIZATION_PCT,
+      sponsorship: 0,
+      affiliate: 0,
+      membership: 0,
+    });
+    expect(r.expected.monthly).toBeCloseTo(10_400, 1);
+    expect(r.low.monthly).toBeCloseTo(6_240, 1);
+    expect(r.high.monthly).toBeCloseTo(15_600, 1);
+  });
+
+  it("bands are BAND_FACTORS × expected on every scenario (auto long-form)", () => {
+    // Loop over a handful of countries × niches to prove the ratios
+    // are uniform. Any country-specific asymmetry (like the previous
+    // US: 0.538/1.0/1.846 spread) would fail here.
+    for (const country of ["US", "GB", "DE", "IN", "OTHER"]) {
+      for (const niche of ["finance", "tech", "gaming", "kids", "other"]) {
+        const r = calculateEarnings({ ...BASE, country, niche });
+        expect(r.low.monthly / r.expected.monthly).toBeCloseTo(
+          BAND_FACTORS.conservative,
+          5,
+        );
+        expect(r.high.monthly / r.expected.monthly).toBeCloseTo(
+          BAND_FACTORS.optimistic,
+          5,
+        );
+      }
+    }
+  });
+
+  it("bands are BAND_FACTORS × expected for a custom RPM", () => {
+    const r = calculateEarnings({ ...BASE, rpm: 7.5 });
+    expect(r.expected.monthly).toBeCloseTo(1_000_000 / 1000 * 7.5, 5);
+    expect(r.low.monthly).toBeCloseTo(r.expected.monthly * BAND_FACTORS.conservative, 5);
+    expect(r.high.monthly).toBeCloseTo(r.expected.monthly * BAND_FACTORS.optimistic, 5);
+  });
+
+  it("scenario bands do NOT depend on any hidden view-count adjustment", () => {
+    // If the engine were also scaling views by a low/high traffic
+    // multiplier (e.g. 0.7 / 1.35 from performance.ts), the ratios
+    // would compound. This test locks in that bands come from RPM
+    // ONLY.
+    const r = calculateEarnings({ ...BASE, rpm: 10 });
+    // Pure ratios:
+    expect(r.low.monthly / r.expected.monthly).toBeCloseTo(0.6, 5);
+    expect(r.high.monthly / r.expected.monthly).toBeCloseTo(1.5, 5);
+    // Absolute values at 1M views, RPM 10, monetization = reference:
+    expect(r.expected.monthly).toBeCloseTo(10_000, 5);
+    expect(r.low.monthly).toBeCloseTo(6_000, 5);
+    expect(r.high.monthly).toBeCloseTo(15_000, 5);
+  });
+});
+
 describe("calculateEarnings — RPM semantics: no double-discount", () => {
   it("at the reference monetization, ad revenue matches YouTube's Studio formula (views ÷ 1000 × RPM)", () => {
     const r = calculateEarnings({
@@ -229,7 +297,19 @@ describe("calculateEarnings — Shorts have their own path (not a long-form mult
     const us = findCountry("US");
     const other = findNiche("other");
     expect(r.expected.monthly).toBeCloseTo(
-      (1_000_000 / 1000) * us.shortsRpm.expected * other.shortsRpmMultiplier,
+      (1_000_000 / 1000) * us.shortsRpm * other.shortsRpmMultiplier,
+      5,
+    );
+  });
+
+  it("Shorts bands also follow BAND_FACTORS (0.6/1.0/1.5)", () => {
+    const r = calculateEarnings({ ...BASE, contentType: "shorts" });
+    expect(r.low.monthly / r.expected.monthly).toBeCloseTo(
+      BAND_FACTORS.conservative,
+      5,
+    );
+    expect(r.high.monthly / r.expected.monthly).toBeCloseTo(
+      BAND_FACTORS.optimistic,
       5,
     );
   });
