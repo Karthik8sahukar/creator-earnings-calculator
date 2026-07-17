@@ -80,7 +80,8 @@ export default defineConfig({
     env: {
       E2E_MOCK_MODE: "1",
       NEXT_PUBLIC_SITE_URL: BASE_URL,
-      NEXT_PUBLIC_SITE_NAME: "YouTube Money Calculator",
+      // NEXT_PUBLIC_SITE_NAME intentionally not set — brand comes
+      // from a hardcoded constant in src/lib/config.ts.
       // The mock never touches YouTube — but the env schema requires
       // a non-empty key when the code path expects one. We pass a
       // placeholder so `isYoutubeApiConfigured()` is true in tests

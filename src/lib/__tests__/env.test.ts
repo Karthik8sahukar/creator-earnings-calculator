@@ -11,7 +11,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 type EnvSnapshot = Record<string, string | undefined>;
 
 const KEYS_UNDER_TEST = [
-  "NEXT_PUBLIC_SITE_NAME",
+  // NEXT_PUBLIC_SITE_NAME intentionally omitted — the brand is a
+  // hardcoded constant in config.ts, not an env variable.
   "NEXT_PUBLIC_SITE_URL",
   "NODE_ENV",
   "YOUTUBE_API_KEY",
@@ -62,11 +63,9 @@ describe("env.public", () => {
   it("uses safe defaults in development", async () => {
     setEnv({
       NODE_ENV: "development",
-      NEXT_PUBLIC_SITE_NAME: undefined,
       NEXT_PUBLIC_SITE_URL: undefined,
     });
     const { publicEnv } = await loadPublicEnv();
-    expect(publicEnv.siteName).toBe("YouTube Money Calculator");
     expect(publicEnv.siteUrl).toBe("http://localhost:3000");
     expect(publicEnv.isDevelopment).toBe(true);
     expect(publicEnv.isProduction).toBe(false);
@@ -110,12 +109,24 @@ describe("env.public", () => {
     setEnv({
       NODE_ENV: "production",
       NEXT_PUBLIC_SITE_URL: "https://prod.example.com",
-      NEXT_PUBLIC_SITE_NAME: "Prod Site",
     });
     const { publicEnv } = await loadPublicEnv();
     expect(publicEnv.siteUrl).toBe("https://prod.example.com");
     expect(publicEnv.isProduction).toBe(true);
-    expect(publicEnv.siteName).toBe("Prod Site");
+  });
+
+  it("ignores a stale NEXT_PUBLIC_SITE_NAME env var (brand is a code constant)", async () => {
+    // Even if a deployment still has the old NEXT_PUBLIC_SITE_NAME
+    // env var set to the old brand, the code must never render it.
+    setEnv({
+      NODE_ENV: "test",
+      NEXT_PUBLIC_SITE_URL: "https://example.test",
+      NEXT_PUBLIC_SITE_NAME: "Creator Earnings Calculator",
+    });
+    vi.resetModules();
+    const { publicConfig, BRAND_NAME } = await import("../config");
+    expect(BRAND_NAME).toBe("YouTube Money Calculator");
+    expect(publicConfig.siteName).toBe("YouTube Money Calculator");
   });
 });
 

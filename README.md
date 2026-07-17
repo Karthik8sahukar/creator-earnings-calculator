@@ -113,16 +113,20 @@ for this app).
 3. In **Settings → Environment Variables**, add:
    - `YOUTUBE_API_KEY` — your YouTube Data API v3 key (Production +
      Preview + Development).
-4. Add `NEXT_PUBLIC_SITE_NAME` — the human-readable product name.
-5. Add the production `NEXT_PUBLIC_SITE_URL` — for example
+4. Add the production `NEXT_PUBLIC_SITE_URL` — for example
    `https://your-domain.example`. This must be an absolute URL in
    production (Zod-validated at boot; the app will fail to start with
    a clear message if it isn't).
-6. Optionally configure the rate-limit / timeout / proxy variables
+5. Optionally configure the rate-limit / timeout / proxy variables
    (`RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS`, `YOUTUBE_TIMEOUT_MS`,
    `TRUST_PROXY=1`).
-7. **Deploy.** Vercel builds using the same `npm run build` you use
+6. **Deploy.** Vercel builds using the same `npm run build` you use
    locally — no real API call happens during build.
+7. **If you're migrating from an older deployment that set
+   `NEXT_PUBLIC_SITE_NAME`, remove that env var.** The brand is now
+   hardcoded in `src/lib/config.ts` (`BRAND_NAME`) so branding cannot
+   drift because of a stale env value. A leftover env var has no
+   effect; delete it for cleanliness.
 8. Test the production API routes:
    `/api/health` should return `200` with `youtubeApiConfigured: true`.
 9. **Confirm channel search** at your production URL — search for any
@@ -328,7 +332,6 @@ Copy `.env.example` to `.env.local`:
 ```env
 YOUTUBE_API_KEY=your-key-here
 
-NEXT_PUBLIC_SITE_NAME=YouTube Money Calculator
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 
 # Optional server tuning
