@@ -30,7 +30,7 @@ export function ChannelWorkspace() {
     const state = decodeCalculatorState(
       searchParams ?? new URLSearchParams(),
     );
-    return state.channelId;
+    return state.channelId ?? null;
   }, [searchParams]);
 
   const [recentToken] = useState(0);
@@ -41,6 +41,8 @@ export function ChannelWorkspace() {
     const state = decodeCalculatorState(
       searchParams ?? new URLSearchParams(),
     );
+    // Drop `cid` from the query before re-encoding — the id is in the
+    // path now, and encodeCalculatorState ignores the `null` sentinel.
     const query = encodeCalculatorState({ ...state, channelId: null });
     const q = query.toString();
     const href = q

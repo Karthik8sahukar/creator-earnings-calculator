@@ -9,10 +9,12 @@ import { track } from "@/lib/analytics";
 import {
   CALCULATOR_PARAM_KEYS,
   DEFAULT_CALCULATOR_STATE,
+  DEFAULT_SCENARIO,
   buildShareUrl,
   encodeCalculatorState,
   toEarningsInput,
   type CalculatorState,
+  type EstimateBand,
 } from "@/lib/calculatorState";
 import { calculateEarnings } from "@/lib/earnings";
 import { formatCurrency, formatCompact, formatNumber } from "@/lib/format";
@@ -26,7 +28,11 @@ import type { PerformanceAnalysis } from "@/types/youtube";
 
 interface Props {
   analysis: PerformanceAnalysis;
-  /** Optional seed state (from URL) — takes precedence over analysis. */
+  /**
+   * Partial seed state (typically decoded from a URL). Only the keys
+   * the URL actually provided are present here — anything absent falls
+   * back to the analysis-derived defaults computed below.
+   */
   initialState?: Partial<CalculatorState>;
   /** Called every time the calculator state changes (URL sync). */
   onStateChange?: (state: CalculatorState) => void;
@@ -36,18 +42,49 @@ interface Props {
   channelId?: string | null;
 }
 
-type Estimate = "low" | "expected" | "high";
-
 function pickDefaultContentType(shorts: number): CalculatorState["contentType"] {
   if (shorts >= 70) return "shorts";
   if (shorts >= 30) return "mixed";
   return "long";
 }
 
-function resolveCountry(country: string | undefined): string {
-  if (!country) return "US";
-  const match = COUNTRIES.find((c) => c.id === country);
-  return match ? match.id : "OTHER";
+/**
+ * Compute the initial calculator state.
+ *
+ * Order of precedence (last wins):
+ *   1. Baseline defaults (DEFAULT_CALCULATOR_STATE) — including
+ *      estimateBand = "expected".
+ *   2. Analysis-derived defaults (auto-estimated monthly views for the
+ *      chosen band, sensible contentType from Shorts share).
+ *   3. URL-provided partial state — only fields the URL actually
+ *      included; anything absent lets the analysis default stand.
+ *   4. `channelId` from the route — always wins, ignores URL/legacy.
+ */
+function computeInitialState({
+  analysis,
+  initialState,
+  channelId,
+}: {
+  analysis: PerformanceAnalysis;
+  initialState?: Partial<CalculatorState>;
+  channelId: string | null;
+}): CalculatorState {
+  const seedBand: EstimateBand =
+    initialState?.estimateBand ?? DEFAULT_SCENARIO;
+
+  const analysisDerived: Partial<CalculatorState> = {
+    monthlyViews: analysis.monthlyViewEstimate[seedBand] || 0,
+    contentType: pickDefaultContentType(analysis.shortsPercentage),
+  };
+
+  return {
+    ...DEFAULT_CALCULATOR_STATE,
+    ...analysisDerived,
+    ...(initialState ?? {}),
+    channelId,
+    // Defense-in-depth: never allow estimateBand to become undefined.
+    estimateBand: initialState?.estimateBand ?? DEFAULT_SCENARIO,
+  };
 }
 
 export function EarningsCalculator({
@@ -60,18 +97,11 @@ export function EarningsCalculator({
 }: Props) {
   const initialViews = analysis.monthlyViewEstimate.expected || 0;
 
-  const [state, setState] = useState<CalculatorState>(() => {
-    const base: CalculatorState = {
-      ...DEFAULT_CALCULATOR_STATE,
-      channelId,
-      monthlyViews: initialViews,
-      contentType: pickDefaultContentType(analysis.shortsPercentage),
-      country: resolveCountry(analysis.sampleSize > 0 ? undefined : "US"),
-    };
-    return { ...base, ...initialState };
-  });
+  const [state, setState] = useState<CalculatorState>(() =>
+    computeInitialState({ analysis, initialState, channelId }),
+  );
 
-  const [estimateBand, setEstimateBand] = useState<Estimate>("expected");
+  const estimateBand = state.estimateBand;
 
   // Debounce URL writes so a run of keystrokes (e.g. typing "1000000")
   // doesn't push a new history entry per character. The visible UI
@@ -93,12 +123,13 @@ export function EarningsCalculator({
   );
   const active = earnings[estimateBand];
 
-  function applyBand(band: Estimate) {
-    setEstimateBand(band);
+  function applyBand(band: EstimateBand) {
     setState((s) => ({
       ...s,
+      estimateBand: band,
       monthlyViews: analysis.monthlyViewEstimate[band] || 0,
     }));
+    track({ name: "calculator.assumption_changed", field: "estimateBand" });
   }
 
   function update<K extends keyof CalculatorState>(
@@ -111,13 +142,13 @@ export function EarningsCalculator({
   }
 
   function reset() {
-    setState({
-      ...DEFAULT_CALCULATOR_STATE,
-      channelId,
-      monthlyViews: initialViews,
-      contentType: pickDefaultContentType(analysis.shortsPercentage),
-    });
-    setEstimateBand("expected");
+    setState(
+      computeInitialState({
+        analysis,
+        initialState: undefined,
+        channelId,
+      }),
+    );
   }
 
   const shareUrl = useMemo(() => {
@@ -164,6 +195,7 @@ export function EarningsCalculator({
               type="button"
               role="tab"
               aria-selected={estimateBand === band}
+              data-testid={`estimate-tab-${band}`}
               onClick={() => applyBand(band)}
               className={`px-3 py-1.5 rounded-md capitalize transition ${
                 estimateBand === band

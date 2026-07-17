@@ -26,6 +26,15 @@ function readState() {
   };
 }
 
+function readMonthlyText(): string {
+  return screen.getByTestId("earnings-monthly").textContent ?? "";
+}
+
+/** Parse the visible headline back to a plain number for comparison. */
+function readMonthlyNumber(): number {
+  return Number(readMonthlyText().replace(/[^\d.]/g, ""));
+}
+
 beforeEach(() => {
   // navigation.mediaMatch is already stubbed in vitest.setup.ts
   Object.defineProperty(window, "location", {
@@ -56,6 +65,131 @@ describe("EarningsCalculator — defaults", () => {
   it("picks 'shorts' content type at 70% or higher", () => {
     render(<EarningsCalculator analysis={{ ...ANALYSIS, shortsPercentage: 80, longFormPercentage: 20 }} />);
     expect(readState().state.contentType).toBe("shorts");
+  });
+});
+
+describe("EarningsCalculator — scenario selection", () => {
+  it("selects Expected on initial render with no user interaction", () => {
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    expect(readState().state.estimateBand).toBe("expected");
+    const expectedTab = screen.getByTestId("estimate-tab-expected");
+    expect(expectedTab).toHaveAttribute("aria-selected", "true");
+    // Low and High should not be selected.
+    expect(screen.getByTestId("estimate-tab-low")).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+    expect(screen.getByTestId("estimate-tab-high")).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+  });
+
+  it("shows the Expected earnings result immediately (no click required)", () => {
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    const monthly = readMonthlyText();
+    // Should be a real, non-zero currency amount reflecting the
+    // auto-estimated monthly views for the Expected band.
+    expect(monthly).toMatch(/^\$\d/);
+    expect(monthly).not.toMatch(/^\$0\.00/);
+  });
+
+  it("auto-estimated channel views populate the Expected result via a URL-partial seed", () => {
+    // Simulates ChannelDashboard's flow: URL had no calculator params,
+    // so `initialState` is an empty partial. The calculator must still
+    // seed monthly views from analysis and produce a non-zero result.
+    render(<EarningsCalculator analysis={ANALYSIS} initialState={{}} />);
+    expect(readState().state.monthlyViews).toBe(
+      ANALYSIS.monthlyViewEstimate.expected,
+    );
+    expect(readState().state.estimateBand).toBe("expected");
+    expect(readMonthlyText()).toMatch(/^\$\d/);
+    expect(readMonthlyText()).not.toMatch(/^\$0\.00/);
+  });
+
+  it("even when the URL provides other keys, missing scenario defaults to Expected", () => {
+    render(
+      <EarningsCalculator
+        analysis={ANALYSIS}
+        initialState={{ country: "GB", monetizedPercentage: 60 }}
+      />,
+    );
+    expect(readState().state.estimateBand).toBe("expected");
+    expect(screen.getByTestId("estimate-tab-expected")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // And the Expected calculation is visible immediately.
+    expect(readMonthlyText()).toMatch(/^\$\d/);
+    expect(readMonthlyText()).not.toMatch(/^\$0\.00/);
+  });
+
+  it("preserves the scenario when the URL provides it (eb=high)", () => {
+    render(
+      <EarningsCalculator
+        analysis={ANALYSIS}
+        initialState={{ estimateBand: "high" }}
+      />,
+    );
+    expect(readState().state.estimateBand).toBe("high");
+    expect(screen.getByTestId("estimate-tab-high")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // And the seeded monthlyViews should reflect the high band.
+    expect(readState().state.monthlyViews).toBe(
+      ANALYSIS.monthlyViewEstimate.high,
+    );
+  });
+
+  it("switching to Low changes the earnings result", async () => {
+    const user = userEvent.setup();
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    const beforeMonthly = readMonthlyNumber();
+    await user.click(screen.getByTestId("estimate-tab-low"));
+    expect(readState().state.estimateBand).toBe("low");
+    expect(readState().state.monthlyViews).toBe(
+      ANALYSIS.monthlyViewEstimate.low,
+    );
+    // A non-empty positive change is enough — the numeric direction
+    // (lower) is enforced by calculateEarnings' unit tests.
+    const afterMonthly = readMonthlyNumber();
+    expect(afterMonthly).toBeGreaterThan(0);
+    expect(afterMonthly).not.toBe(beforeMonthly);
+  });
+
+  it("switching to High changes the earnings result", async () => {
+    const user = userEvent.setup();
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    const beforeMonthly = readMonthlyNumber();
+    await user.click(screen.getByTestId("estimate-tab-high"));
+    expect(readState().state.estimateBand).toBe("high");
+    expect(readState().state.monthlyViews).toBe(
+      ANALYSIS.monthlyViewEstimate.high,
+    );
+    const afterMonthly = readMonthlyNumber();
+    expect(afterMonthly).toBeGreaterThan(0);
+    expect(afterMonthly).not.toBe(beforeMonthly);
+  });
+
+  it("Reset returns the scenario to Expected", async () => {
+    const user = userEvent.setup();
+    render(
+      <EarningsCalculator
+        analysis={ANALYSIS}
+        initialState={{ estimateBand: "high" }}
+      />,
+    );
+    expect(readState().state.estimateBand).toBe("high");
+    await user.click(screen.getByRole("button", { name: /reset/i }));
+    expect(readState().state.estimateBand).toBe("expected");
+    expect(screen.getByTestId("estimate-tab-expected")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // And the Expected result is visible immediately after reset.
+    expect(readMonthlyText()).toMatch(/^\$\d/);
+    expect(readMonthlyText()).not.toMatch(/^\$0\.00/);
   });
 });
 
@@ -123,7 +257,6 @@ describe("EarningsCalculator — user interactions", () => {
     render(<EarningsCalculator analysis={ANALYSIS} />);
     const sponsor = screen.getByLabelText("Sponsorships");
     await user.clear(sponsor);
-    // Number inputs reject non-numeric strings; make sure we don't blow up.
     expect(readState().state.sponsorship).toBe(0);
   });
 
@@ -145,13 +278,6 @@ describe("EarningsCalculator — user interactions", () => {
     expect(monthly.textContent).toMatch(/^\$/);
     await user.selectOptions(screen.getByLabelText("Display currency"), "EUR");
     expect(monthly.textContent).toMatch(/€/);
-  });
-
-  it("switching to the 'high' band pushes the higher monthly-views value", async () => {
-    const user = userEvent.setup();
-    render(<EarningsCalculator analysis={ANALYSIS} />);
-    await user.click(screen.getByRole("tab", { name: /high/i }));
-    expect(readState().state.monthlyViews).toBe(ANALYSIS.monthlyViewEstimate.high);
   });
 
   it("initial state can be seeded from URL-shaped params", () => {
