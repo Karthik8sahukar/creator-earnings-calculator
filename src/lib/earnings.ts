@@ -22,8 +22,18 @@ export function calculateEarnings(input: EarningsInput): EarningsResult {
   const currency = findCurrency(input.currency);
   const contentMultiplier = CONTENT_TYPE_MULTIPLIERS[input.contentType];
 
-  const monetizedViews =
-    Math.max(input.monthlyViews, 0) * (input.monetizedPercentage / 100);
+  // Sanitize inputs: NaN → 0, negatives → 0. Infinity is allowed to
+  // propagate (the caller asked for that), but must never become NaN.
+  const rawViews = Number.isFinite(input.monthlyViews)
+    ? input.monthlyViews
+    : input.monthlyViews === Number.POSITIVE_INFINITY
+      ? Number.POSITIVE_INFINITY
+      : 0;
+  const safeViews = rawViews > 0 ? rawViews : 0;
+  const monetizedPct = Number.isFinite(input.monetizedPercentage)
+    ? Math.min(Math.max(input.monetizedPercentage, 0), 100)
+    : 0;
+  const monetizedViews = safeViews * (monetizedPct / 100);
 
   // If the user provided an explicit RPM override we use it as the "expected"
   // value and keep +/- bands proportional. Otherwise we derive RPM from the

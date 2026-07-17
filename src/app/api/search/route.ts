@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 
+import { applyRateLimit, safeErrorResponse } from "@/lib/apiHelpers";
 import { searchQuerySchema } from "@/lib/schemas";
-import { YouTubeApiError, searchChannels } from "@/lib/youtube";
+import { searchChannels } from "@/lib/youtube";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  const limited = applyRateLimit(request);
+  if (limited) return limited;
+
   const url = new URL(request.url);
   const parsed = searchQuerySchema.safeParse({
     q: url.searchParams.get("q") ?? "",
@@ -30,26 +33,6 @@ export async function GET(request: Request) {
       },
     );
   } catch (err) {
-    return handleApiError(err);
+    return safeErrorResponse(err);
   }
-}
-
-function handleApiError(err: unknown) {
-  if (err instanceof YouTubeApiError) {
-    return NextResponse.json(
-      { error: err.code, message: err.message },
-      { status: err.status },
-    );
-  }
-  if (err instanceof z.ZodError) {
-    return NextResponse.json(
-      { error: "INVALID_QUERY", message: err.issues[0]?.message },
-      { status: 400 },
-    );
-  }
-  const message = err instanceof Error ? err.message : "Unknown error";
-  return NextResponse.json(
-    { error: "INTERNAL_ERROR", message },
-    { status: 500 },
-  );
 }

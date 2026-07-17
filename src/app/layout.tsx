@@ -23,6 +23,8 @@ export const metadata: Metadata = {
     "RPM",
     "CPM",
     "YouTube revenue",
+    "Shorts RPM",
+    "sponsorship rate",
     "creator economy",
   ],
   authors: [{ name: publicConfig.siteName }],
@@ -66,21 +68,33 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: publicConfig.siteName,
-    description: publicConfig.description,
-    url: publicConfig.siteUrl,
-    applicationCategory: "FinanceApplication",
-    operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
+  // JSON-LD: WebSite + WebApplication. FAQ pages own their own FAQPage schema.
+  // We deliberately do NOT publish aggregate rating markup — this tool has no
+  // fake reviews.
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: publicConfig.siteName,
+      url: publicConfig.siteUrl,
+      description: publicConfig.description,
     },
-    creator: { "@type": "Organization", name: publicConfig.siteName },
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: publicConfig.siteName,
+      description: publicConfig.description,
+      url: publicConfig.siteUrl,
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      creator: { "@type": "Organization", name: publicConfig.siteName },
+    },
+  ];
 
   return (
     <html lang="en">
@@ -100,6 +114,7 @@ export default function RootLayout({
           id="ld-json"
           type="application/ld+json"
           strategy="afterInteractive"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </body>

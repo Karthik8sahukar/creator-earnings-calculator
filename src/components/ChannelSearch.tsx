@@ -43,6 +43,7 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
       abortRef.current = controller;
 
       setState((s) => ({ ...s, status: "loading" }));
+      setOpen(true);
       try {
         const res = await fetch(
           `/api/search?q=${encodeURIComponent(trimmed)}`,

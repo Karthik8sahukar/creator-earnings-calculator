@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 
+import { applyRateLimit, safeErrorResponse } from "@/lib/apiHelpers";
 import { channelIdSchema } from "@/lib/schemas";
-import { YouTubeApiError, getChannelById } from "@/lib/youtube";
+import { getChannelById } from "@/lib/youtube";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  const limited = applyRateLimit(request);
+  if (limited) return limited;
+
   const url = new URL(request.url);
   const parsed = channelIdSchema.safeParse({
     channelId: url.searchParams.get("channelId") ?? "",
@@ -28,16 +32,6 @@ export async function GET(request: Request) {
     }
     return NextResponse.json({ channel });
   } catch (err) {
-    if (err instanceof YouTubeApiError) {
-      return NextResponse.json(
-        { error: err.code, message: err.message },
-        { status: err.status },
-      );
-    }
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json(
-      { error: "INTERNAL_ERROR", message },
-      { status: 500 },
-    );
+    return safeErrorResponse(err);
   }
 }

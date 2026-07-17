@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        # Tests mock YouTube API calls — no real key needed.
+        env:
+          YOUTUBE_API_KEY: test-key
+        run: npm run test
+
+      - name: Build
+        # The build must succeed without a real API key. Config values that
+        # are strictly required at runtime are read lazily, not at build.
+        env:
+          YOUTUBE_API_KEY: build-time-placeholder
+          NEXT_PUBLIC_SITE_URL: https://creator-earnings.example
+        run: npm run build

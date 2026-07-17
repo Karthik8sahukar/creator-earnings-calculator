@@ -53,11 +53,12 @@ export function ProfileCard({ channel }: Props) {
           <a
             href={channel.channelUrl}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="btn-primary self-start sm:self-end"
+            aria-label={`View ${channel.title} on YouTube (opens in a new tab)`}
           >
             View on YouTube
-            <ExternalIcon width={16} height={16} />
+            <ExternalIcon width={16} height={16} aria-hidden />
           </a>
         </div>
 

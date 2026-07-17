@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 
+import { applyRateLimit, safeErrorResponse } from "@/lib/apiHelpers";
 import { videosQuerySchema } from "@/lib/schemas";
-import { YouTubeApiError, getRecentVideos } from "@/lib/youtube";
+import { getRecentVideos } from "@/lib/youtube";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  const limited = applyRateLimit(request);
+  if (limited) return limited;
+
   const url = new URL(request.url);
   const parsed = videosQuerySchema.safeParse({
     playlistId: url.searchParams.get("playlistId") ?? "",
@@ -26,16 +30,6 @@ export async function GET(request: Request) {
     );
     return NextResponse.json({ videos });
   } catch (err) {
-    if (err instanceof YouTubeApiError) {
-      return NextResponse.json(
-        { error: err.code, message: err.message },
-        { status: err.status },
-      );
-    }
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json(
-      { error: "INTERNAL_ERROR", message },
-      { status: 500 },
-    );
+    return safeErrorResponse(err);
   }
 }

@@ -23,8 +23,8 @@ export function VideosGrid({ videos }: Props) {
           <a
             href={v.url}
             target="_blank"
-            rel="noreferrer"
-            aria-label={`Watch: ${v.title}`}
+            rel="noopener noreferrer"
+            aria-label={`Watch: ${v.title} (opens in a new tab)`}
             className="relative block aspect-video bg-slate-100 group"
           >
             {v.thumbnail ? (
@@ -52,7 +52,7 @@ export function VideosGrid({ videos }: Props) {
               <a
                 href={v.url}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="hover:text-brand-700"
               >
                 {v.title}
