@@ -1,19 +1,18 @@
 "use client";
 
+/**
+ * Lightweight wrapper around the Recharts canvas.
+ *
+ * We deliberately DO NOT import Recharts at the module top level. It
+ * lives in `EarningsChartsCanvas` and is loaded via `next/dynamic`
+ * (client-only) only after the wrapper mounts AND has real data.
+ *
+ * A screen-reader-accessible text summary is rendered synchronously,
+ * so users on assistive tech never depend on the chart canvas loading.
+ */
+
+import dynamic from "next/dynamic";
 import { useMemo } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 import { formatCurrency } from "@/lib/format";
 import type { EarningsResult } from "@/types/youtube";
@@ -25,55 +24,39 @@ interface Props {
   otherIncome?: number;
 }
 
-const PALETTE = [
-  "#7c3aed", // brand
-  "#06b6d4", // accent cyan
-  "#f59e0b", // amber
-  "#ec4899", // pink
-  "#10b981", // emerald
-];
-
 /**
- * Two accessible charts:
- *   1. Monthly revenue by source (bar) — expected values.
- *   2. Twelve-month projection (line) — constant monthly across
- *      low / expected / high bands. We deliberately don't imply growth.
- *
- * Charts respect prefers-reduced-motion by disabling entry animation.
- * Every chart is accompanied by a text summary for screen readers.
+ * Recharts is client-only. `ssr: false` avoids the ~40 kB chart module
+ * from entering the server-rendered HTML or the initial hydration
+ * bundle for the channel page.
  */
-export function EarningsCharts({ earnings, currency, otherIncome = 0 }: Props) {
-  const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EarningsChartsCanvas = dynamic(
+  () =>
+    import("./EarningsChartsCanvas").then((m) => ({
+      default: m.EarningsChartsCanvas,
+    })),
+  {
+    ssr: false,
+    loading: () => <ChartsSkeleton />,
+  },
+);
 
+export function EarningsCharts({ earnings, currency, otherIncome = 0 }: Props) {
   const breakdown = useMemo(
     () => [
-      { key: "ads", label: "Ads", value: earnings.monthlyAdRevenue.monthly },
-      { key: "spn", label: "Sponsorships", value: earnings.extras.sponsorship },
-      { key: "aff", label: "Affiliate", value: earnings.extras.affiliate },
-      { key: "mem", label: "Memberships", value: earnings.extras.membership },
-      { key: "oth", label: "Other", value: Math.max(otherIncome, 0) },
+      { label: "Ads", value: earnings.monthlyAdRevenue.monthly },
+      { label: "Sponsorships", value: earnings.extras.sponsorship },
+      { label: "Affiliate", value: earnings.extras.affiliate },
+      { label: "Memberships", value: earnings.extras.membership },
+      { label: "Other", value: Math.max(otherIncome, 0) },
     ],
     [earnings, otherIncome],
   );
 
   const total = breakdown.reduce((acc, r) => acc + Math.max(r.value, 0), 0);
+  const hasProjection = earnings.expected.monthly > 0;
+  const hasAnyData = total > 0 || hasProjection;
 
-  const projection = useMemo(() => {
-    // Constant monthly projection across the year — no growth assumption.
-    return Array.from({ length: 12 }, (_, i) => ({
-      month: `M${i + 1}`,
-      low: earnings.low.monthly * (i + 1),
-      expected: earnings.expected.monthly * (i + 1),
-      high: earnings.high.monthly * (i + 1),
-    }));
-  }, [earnings]);
-
-  const fmt = (n: number) => formatCurrency(n, currency, { compact: true });
-  const fmtFull = (n: number) => formatCurrency(n, currency);
-  const animation = prefersReducedMotion ? false : true;
+  const fmt = (n: number) => formatCurrency(n, currency);
 
   return (
     <section aria-labelledby="charts-title" className="card p-6 sm:p-8">
@@ -81,132 +64,35 @@ export function EarningsCharts({ earnings, currency, otherIncome = 0 }: Props) {
         Charts
       </h2>
       <p className="text-sm text-slate-500 mt-1">
-        Visual summary of the monthly breakdown and a flat 12-month
-        projection using the current assumptions.
+        Visual summary of the monthly breakdown and a flat 12-month projection
+        using the current assumptions.
       </p>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
-        <div>
-          <h3 className="text-sm font-medium text-slate-700 mb-2">
-            Monthly revenue by source
-          </h3>
-          {total === 0 ? (
-            <EmptyChart message="Enter monthly views or income to see the breakdown." />
-          ) : (
-            <div className="h-64" role="img" aria-labelledby="chart-breakdown-summary">
-              <ResponsiveContainer>
-                <BarChart data={breakdown} margin={{ top: 8, right: 10, bottom: 4, left: 0 }}>
-                  <CartesianGrid stroke="#e2e8f0" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#475569" }} />
-                  <YAxis
-                    tickFormatter={fmt}
-                    tick={{ fontSize: 12, fill: "#475569" }}
-                    width={56}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "rgba(124, 58, 237, 0.06)" }}
-                    formatter={(value) => [fmtFull(Number(value) || 0), "Monthly"]}
-                    contentStyle={{
-                      borderRadius: 8,
-                      border: "1px solid #e2e8f0",
-                      fontSize: 12,
-                    }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    isAnimationActive={animation}
-                    radius={[6, 6, 0, 0]}
-                    aria-label="Monthly revenue by source"
-                  >
-                    {breakdown.map((_, i) => (
-                      <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-          <p id="chart-breakdown-summary" className="sr-only">
-            Monthly revenue by source. {breakdown
-              .map((r) => `${r.label}: ${fmtFull(r.value)}`)
-              .join(", ")}. Total {fmtFull(total)}.
-          </p>
-        </div>
+      {/*
+        SR summaries are always in the DOM — they must be present even
+        when the visual canvas hasn't loaded yet.
+      */}
+      <p id="chart-breakdown-summary" className="sr-only">
+        Monthly revenue by source.{" "}
+        {breakdown.map((r) => `${r.label}: ${fmt(r.value)}`).join(", ")}. Total{" "}
+        {fmt(total)}.
+      </p>
+      <p id="chart-projection-summary" className="sr-only">
+        Twelve-month cumulative projection. Low {fmt(earnings.low.monthly * 12)},
+        expected {fmt(earnings.expected.monthly * 12)}, high{" "}
+        {fmt(earnings.high.monthly * 12)}.
+      </p>
 
-        <div>
-          <h3 className="text-sm font-medium text-slate-700 mb-2">
-            12-month cumulative projection
-          </h3>
-          <p className="text-xs text-slate-500 mb-2">
-            Assumes constant monthly earnings — no growth assumption is baked
-            in.
-          </p>
-          {earnings.expected.monthly === 0 ? (
-            <EmptyChart message="Enter monthly views or income to see the projection." />
-          ) : (
-            <div className="h-64" role="img" aria-labelledby="chart-projection-summary">
-              <ResponsiveContainer>
-                <LineChart data={projection} margin={{ top: 8, right: 10, bottom: 4, left: 0 }}>
-                  <CartesianGrid stroke="#e2e8f0" />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fontSize: 12, fill: "#475569" }}
-                  />
-                  <YAxis
-                    tickFormatter={fmt}
-                    tick={{ fontSize: 12, fill: "#475569" }}
-                    width={56}
-                  />
-                  <Tooltip
-                    formatter={(value) => [fmtFull(Number(value) || 0), ""]}
-                    contentStyle={{
-                      borderRadius: 8,
-                      border: "1px solid #e2e8f0",
-                      fontSize: 12,
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Line
-                    type="monotone"
-                    dataKey="low"
-                    name="Low"
-                    stroke="#94a3b8"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={animation}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="expected"
-                    name="Expected"
-                    stroke="#7c3aed"
-                    strokeWidth={2.5}
-                    dot={false}
-                    isAnimationActive={animation}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="high"
-                    name="High"
-                    stroke="#06b6d4"
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={animation}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-          <p id="chart-projection-summary" className="sr-only">
-            Twelve-month cumulative projection. Low
-            {" "}
-            {fmtFull(projection[11].low)}, expected
-            {" "}
-            {fmtFull(projection[11].expected)}, high
-            {" "}
-            {fmtFull(projection[11].high)}.
-          </p>
-        </div>
+      <div className="mt-6">
+        {hasAnyData ? (
+          <EarningsChartsCanvas
+            earnings={earnings}
+            currency={currency}
+            otherIncome={otherIncome}
+          />
+        ) : (
+          <EmptyChart message="Enter monthly views or income to see charts." />
+        )}
       </div>
     </section>
   );
@@ -219,6 +105,25 @@ function EmptyChart({ message }: { message: string }) {
       className="h-64 rounded-lg border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-sm text-slate-500 px-6 text-center"
     >
       {message}
+    </div>
+  );
+}
+
+function ChartsSkeleton() {
+  return (
+    <div
+      className="grid gap-8 lg:grid-cols-2"
+      aria-hidden
+      data-testid="charts-loading"
+    >
+      <div className="space-y-2">
+        <div className="skeleton h-4 w-1/3" />
+        <div className="skeleton h-64 w-full rounded-lg" />
+      </div>
+      <div className="space-y-2">
+        <div className="skeleton h-4 w-1/3" />
+        <div className="skeleton h-64 w-full rounded-lg" />
+      </div>
     </div>
   );
 }

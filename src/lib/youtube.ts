@@ -1,9 +1,22 @@
 import "server-only";
 
 import { channelCache, searchCache, videosCache } from "./cache";
-import { serverEnv, youtube } from "./config";
+import { youtube } from "./config";
+import {
+  announceE2EMockIfActive,
+  isE2EMockModeActive,
+  mockedGetChannelById,
+  mockedGetRecentVideos,
+  mockedSearchChannels,
+} from "./e2eFixtures";
+import { serverEnv } from "./env.server";
 import { YouTubeApiError } from "./errors";
 import { parseIsoDuration, formatDuration } from "./format";
+import {
+  markCache,
+  markUpstream,
+  type UpstreamCategory,
+} from "./observability";
 import { parseChannelQuery } from "./parseQuery";
 import type {
   ChannelDetails,
@@ -26,13 +39,12 @@ export { YouTubeApiError } from "./errors";
  *     `lib/cache.ts` and the deployment notes in README).
  */
 
-const UPSTREAM_TIMEOUT_MS = Number(
-  process.env.YOUTUBE_TIMEOUT_MS ?? 8000,
-);
+const UPSTREAM_TIMEOUT_MS = serverEnv.youtubeTimeoutMs;
 
 function assertKey(): string {
   const key = serverEnv.youtubeApiKey;
   if (!key) {
+    markUpstream("missing_key");
     throw new YouTubeApiError(
       500,
       "MISSING_API_KEY",
@@ -40,6 +52,30 @@ function assertKey(): string {
     );
   }
   return key;
+}
+
+/** Map our public error codes to observability categories. */
+function categoryFor(code: string): UpstreamCategory {
+  switch (code) {
+    case "QUOTA_EXCEEDED":
+      return "quota_exceeded";
+    case "UPSTREAM_TIMEOUT":
+      return "timeout";
+    case "NETWORK_ERROR":
+      return "network_error";
+    case "NOT_FOUND":
+      return "not_found";
+    case "INVALID_API_KEY":
+      return "invalid_key";
+    case "MISSING_API_KEY":
+      return "missing_key";
+    case "MALFORMED_UPSTREAM":
+      return "malformed_response";
+    case "FORBIDDEN":
+      return "forbidden";
+    default:
+      return "upstream_error";
+  }
 }
 
 /**
@@ -140,12 +176,14 @@ async function ytFetch<T>(
     // The fetch failed at the network level. This includes timeouts.
     // Do NOT include the request URL — it contains the API key.
     if ((err as { name?: string }).name === "AbortError") {
+      markUpstream("timeout");
       throw new YouTubeApiError(
         504,
         "UPSTREAM_TIMEOUT",
         "The YouTube API took too long to respond.",
       );
     }
+    markUpstream("network_error");
     throw new YouTubeApiError(
       502,
       "NETWORK_ERROR",
@@ -166,12 +204,16 @@ async function ytFetch<T>(
       // ignore — we already have a status code
     }
     const mapped = mapUpstreamError(res.status, reason);
+    markUpstream(categoryFor(mapped.code));
     throw new YouTubeApiError(mapped.status, mapped.code, mapped.message);
   }
 
   try {
-    return (await res.json()) as T;
+    const parsed = (await res.json()) as T;
+    markUpstream("success");
+    return parsed;
   } catch {
+    markUpstream("malformed_response");
     throw new YouTubeApiError(
       502,
       "MALFORMED_UPSTREAM",
@@ -385,6 +427,12 @@ export function mapVideo(v: YtVideoItem): VideoItem {
 export async function searchChannels(
   rawQuery: string,
 ): Promise<ChannelSearchResult[]> {
+  if (isE2EMockModeActive()) {
+    announceE2EMockIfActive();
+    markCache("miss");
+    markUpstream("success");
+    return mockedSearchChannels(rawQuery);
+  }
   const parsed = parseChannelQuery(rawQuery);
   const cacheKey = `${parsed.kind}:${parsed.value.toLowerCase()}`;
 
@@ -440,6 +488,12 @@ export async function searchChannels(
 export async function getChannelById(
   channelId: string,
 ): Promise<ChannelDetails | null> {
+  if (isE2EMockModeActive()) {
+    announceE2EMockIfActive();
+    markCache("miss");
+    markUpstream("success");
+    return mockedGetChannelById(channelId);
+  }
   return (channelCache as {
     getOrLoad(
       key: string,
@@ -462,6 +516,12 @@ export async function getRecentVideos(
   limit: number = youtube.recentVideosCount,
 ): Promise<VideoItem[]> {
   const safeLimit = Math.min(Math.max(Math.floor(limit || 0), 1), 50);
+  if (isE2EMockModeActive()) {
+    announceE2EMockIfActive();
+    markCache("miss");
+    markUpstream("success");
+    return mockedGetRecentVideos(uploadsPlaylistId, safeLimit);
+  }
   return (videosCache as {
     getOrLoad(
       key: string,

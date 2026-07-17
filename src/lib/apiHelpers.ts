@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { serverEnv } from "./env.server";
+import { reportException } from "./errorReporter";
 import { YouTubeApiError } from "./errors";
+import {
+  currentContext,
+  logRequestSummary,
+  markClient,
+  markRateLimit,
+  withContext,
+  type RequestContext,
+} from "./observability";
 import { apiLimiter, identifyClient } from "./rateLimit";
 
 /**
@@ -51,7 +61,15 @@ export function safeErrorResponse(err: unknown): NextResponse {
       { status: 400 },
     );
   }
-  // Deliberately generic: do not leak internal error text.
+  // Anything reaching this branch is unexpected — report it (redacted)
+  // and return a generic message. YouTubeApiError and ZodError above
+  // are expected, classified responses and are NOT reported.
+  const ctx = currentContext();
+  reportException(err, {
+    route: ctx?.route,
+    cacheStatus: ctx?.cacheStatus,
+    upstreamCategory: ctx?.upstreamCategory,
+  });
   return NextResponse.json(
     { error: "INTERNAL_ERROR", message: "Unexpected server error." },
     { status: 500 },
@@ -63,8 +81,10 @@ export function safeErrorResponse(err: unknown): NextResponse {
  * the caller is over budget, or null to indicate the request may proceed.
  */
 export function applyRateLimit(request: Request): NextResponse | null {
-  const trustProxy = process.env.TRUST_PROXY === "1";
-  const clientId = identifyClient(request.headers, { trustProxy });
+  const clientId = identifyClient(request.headers, {
+    trustProxy: serverEnv.trustProxy,
+  });
+  markClient(clientId);
   const result = apiLimiter.hit(clientId);
 
   const headers = new Headers({
@@ -74,6 +94,7 @@ export function applyRateLimit(request: Request): NextResponse | null {
   });
 
   if (!result.allowed) {
+    markRateLimit("blocked");
     headers.set("Retry-After", String(result.retryAfterSeconds));
     return NextResponse.json(
       {
@@ -85,8 +106,61 @@ export function applyRateLimit(request: Request): NextResponse | null {
     );
   }
 
+  markRateLimit("allowed");
   // Attach rate limit headers to a sentinel we can return; but for our
   // callers we simply return null and let them build their own response.
   // Callers are expected to opt-in to attaching these headers if desired.
   return null;
+}
+
+/**
+ * Wrap an API route handler with:
+ *   - A per-request observability context (populated by lower layers)
+ *   - A single summary log line at the end (status, duration, cache
+ *     result, upstream category, rate-limit result, error code).
+ *
+ * Any unexpected exception is funnelled through `safeErrorResponse`
+ * so the response body never leaks internals.
+ *
+ * The wrapper never records raw IP, user agent, or the full request URL.
+ */
+export function withRouteObservability(
+  route: string,
+  handler: () => Promise<NextResponse>,
+): Promise<NextResponse> {
+  return withContext(route, async (ctx: RequestContext) => {
+    let response: NextResponse;
+    let errorCode: string | undefined;
+    try {
+      response = await handler();
+    } catch (err) {
+      response = safeErrorResponse(err);
+    }
+
+    try {
+      // The response body always includes `error` for non-success paths.
+      if (response.status >= 400) {
+        const cloned = response.clone();
+        const parsed = (await cloned.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        errorCode = parsed?.error;
+      }
+    } catch {
+      // ignore — we still log the status
+    }
+
+    logRequestSummary({
+      route: ctx.route,
+      status: response.status,
+      startedAt: ctx.startedAt,
+      code: errorCode,
+      cacheStatus: ctx.cacheStatus,
+      upstreamCategory: ctx.upstreamCategory,
+      rateLimit: ctx.rateLimit,
+      clientId: ctx.clientId,
+    });
+
+    return response;
+  });
 }

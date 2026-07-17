@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { track } from "@/lib/analytics";
 import { calculateEarnings } from "@/lib/earnings";
 import { formatCurrency, formatCompact } from "@/lib/format";
 import { COUNTRIES, CURRENCIES, NICHES } from "@/lib/rpmData";
 
 export function ShortsCalcClient() {
+  useEffect(() => {
+    track({ name: "additional_calculator.opened", kind: "shorts" });
+  }, []);
   const [monthlyViews, setMonthlyViews] = useState<number>(1_000_000);
   const [country, setCountry] = useState("US");
   const [niche, setNiche] = useState("other");

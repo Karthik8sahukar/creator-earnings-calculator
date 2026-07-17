@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 
 import { StaticPage } from "@/components/StaticPage";
-
-/**
- * The last time we reviewed the benchmark tables (RPM ranges, niche
- * multipliers, currency rates). Update alongside any change to
- * `src/lib/rpmData.ts`.
- */
-const BENCHMARK_REVIEW_DATE = "2026-07-17";
+import { legalLastUpdatedIso } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Methodology",
@@ -23,11 +17,13 @@ export default function MethodologyPage() {
       description="How the numbers on this site are produced and where our assumptions come from."
     >
       <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-        <strong className="font-medium text-slate-900">Benchmark review date:</strong>{" "}
-        <time dateTime={BENCHMARK_REVIEW_DATE}>{BENCHMARK_REVIEW_DATE}</time>. Country
-        RPM ranges, niche multipliers, and currency rates were last reviewed on
-        this date. Numbers are approximations from public creator-economy
-        reports — they are not official YouTube data.
+        <strong className="font-medium text-slate-900">
+          Benchmark review date:
+        </strong>{" "}
+        <time dateTime={legalLastUpdatedIso}>{legalLastUpdatedIso}</time>.
+        Country RPM ranges, niche multipliers, and currency rates were last
+        reviewed on this date. Numbers are approximations from public
+        creator-economy reports — they are not official YouTube data.
       </div>
 
       <h2 className="text-xl font-semibold text-slate-900">
@@ -211,6 +207,19 @@ export default function MethodologyPage() {
         that we update periodically. This tool does not consume a live FX
         feed. If you need to make a financial decision, always cross-check
         against a live rate.
+      </p>
+
+      <h2 className="text-xl font-semibold text-slate-900">
+        Rate limiting and caching (per instance)
+      </h2>
+      <p>
+        Every application instance keeps a small in-process cache to
+        protect the YouTube quota — search results for ~45 minutes, channel
+        details for ~6 hours, recent-uploads listings for ~2 hours. Requests
+        are also rate-limited per client on a sliding window (defaults 60
+        requests per minute). These limits are per-instance: in a multi-
+        replica deployment each replica has its own limiter and cache. For a
+        globally-consistent limiter, wire in Redis at the storage layer.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">

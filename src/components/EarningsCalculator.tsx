@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CopyShareLink } from "./CopyShareLink";
 import { EarningsCharts } from "./EarningsCharts";
 import { DollarIcon } from "./icons";
+import { track } from "@/lib/analytics";
 import {
   CALCULATOR_PARAM_KEYS,
   DEFAULT_CALCULATOR_STATE,
@@ -72,13 +73,24 @@ export function EarningsCalculator({
 
   const [estimateBand, setEstimateBand] = useState<Estimate>("expected");
 
+  // Debounce URL writes so a run of keystrokes (e.g. typing "1000000")
+  // doesn't push a new history entry per character. The visible UI
+  // updates immediately because it reads from `state`; only the URL
+  // sync callback is throttled.
   useEffect(() => {
-    onStateChange?.(state);
+    if (!onStateChange) return;
+    const timer = setTimeout(() => {
+      onStateChange(state);
+    }, 200);
+    return () => clearTimeout(timer);
   }, [state, onStateChange]);
 
   const input = useMemo(() => toEarningsInput(state), [state]);
   const earnings = useMemo(() => calculateEarnings(input), [input]);
-  const currencyMeta = findCurrency(state.currency);
+  const currencyMeta = useMemo(
+    () => findCurrency(state.currency),
+    [state.currency],
+  );
   const active = earnings[estimateBand];
 
   function applyBand(band: Estimate) {
@@ -94,6 +106,8 @@ export function EarningsCalculator({
     value: CalculatorState[K],
   ) {
     setState((s) => ({ ...s, [field]: value }));
+    // Analytics — only the field name, never the value.
+    track({ name: "calculator.assumption_changed", field: String(field) });
   }
 
   function reset() {

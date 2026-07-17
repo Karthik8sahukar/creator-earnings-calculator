@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { SearchIcon, XIcon, UsersIcon } from "./icons";
+import { track } from "@/lib/analytics";
 import { formatCompact } from "@/lib/format";
 import type { ChannelSearchResult } from "@/types/youtube";
 
@@ -59,6 +60,12 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
         } else {
           setState({ status: "success", results: body.results });
         }
+        // Analytics — never send raw text, only queryLength + resultCount.
+        track({
+          name: "search.submitted",
+          queryLength: trimmed.length,
+          resultCount: body.results.length,
+        });
         setOpen(true);
         setActiveIndex(-1);
       } catch (err) {
@@ -116,6 +123,11 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
     setOpen(false);
     setQuery("");
     setState({ status: "idle", results: [] });
+    track({
+      name: "channel.selected",
+      channelId: item.channelId,
+      source: "search",
+    });
     onSelect(item.channelId);
   }
 

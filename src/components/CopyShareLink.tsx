@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { track } from "@/lib/analytics";
+
 interface Props {
   /** Absolute URL to copy. */
   url: string;
@@ -42,6 +44,7 @@ export function CopyShareLink({ url, label = "Copy share link" }: Props) {
         if (!ok) throw new Error("copy-failed");
       }
       setState("copied");
+      track({ name: "share.link_copied", target: "calculator" });
     } catch {
       setState("error");
     }

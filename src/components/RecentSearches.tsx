@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+import { track } from "@/lib/analytics";
 import {
   clearRecent as clearRecentStorage,
   loadRecent,
@@ -63,7 +64,14 @@ export function RecentSearches({ onSelect, refreshToken = 0 }: Props) {
           <li key={r.channelId}>
             <button
               type="button"
-              onClick={() => onSelect(r.channelId)}
+              onClick={() => {
+                track({
+                  name: "channel.selected",
+                  channelId: r.channelId,
+                  source: "recent",
+                });
+                onSelect(r.channelId);
+              }}
               className="group inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm hover:border-brand-300 hover:bg-brand-50"
             >
               <span className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-slate-100">

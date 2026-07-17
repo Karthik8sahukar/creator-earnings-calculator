@@ -140,14 +140,14 @@ function anonymize(input: string): string {
   return `c_${h.toString(36)}`;
 }
 
-/** Default limiter used by API routes. Configurable via env. */
-const DEFAULT_LIMIT = Number(process.env.RATE_LIMIT_MAX ?? 60);
-const DEFAULT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000);
+/**
+ * Default limiter used by API routes. Configured via validated
+ * environment variables in `env.server.ts` — Zod already enforces
+ * sane bounds so we don't re-check here.
+ */
+import { serverEnv } from "./env.server";
 
 export const apiLimiter = new SlidingWindowLimiter({
-  limit: Number.isFinite(DEFAULT_LIMIT) && DEFAULT_LIMIT > 0 ? DEFAULT_LIMIT : 60,
-  windowMs:
-    Number.isFinite(DEFAULT_WINDOW_MS) && DEFAULT_WINDOW_MS > 0
-      ? DEFAULT_WINDOW_MS
-      : 60_000,
+  limit: serverEnv.rateLimitMax,
+  windowMs: serverEnv.rateLimitWindowMs,
 });

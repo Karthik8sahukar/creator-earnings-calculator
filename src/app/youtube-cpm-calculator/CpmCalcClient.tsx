@@ -1,11 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { track } from "@/lib/analytics";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import { calculateCpm } from "@/lib/simpleCalculators";
 
 export function CpmCalcClient() {
+  useEffect(() => {
+    track({ name: "additional_calculator.opened", kind: "cpm" });
+  }, []);
   const [revenue, setRevenue] = useState<number>(0);
   const [impressions, setImpressions] = useState<number>(0);
   const [currency, setCurrency] = useState<"USD" | "EUR" | "GBP">("USD");
