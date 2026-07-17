@@ -4,11 +4,13 @@ import { Suspense } from "react";
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
 
 /**
- * Homepage SEO — explicit metadata overrides the layout defaults so
- * that the branded title and description are stable no matter what
- * `NEXT_PUBLIC_SITE_NAME` is set to in a given deployment.
+ * Homepage SEO — explicit metadata overrides the layout defaults with
+ * the exact strings from the branding spec.
  *
- * Kept intentionally identical to the strings in the branding spec.
+ * The brand itself is a hardcoded code constant (`BRAND_NAME` in
+ * `src/lib/config.ts`), so no env-variable drift on any deployment
+ * can change the rendered title. Kept intentionally identical to the
+ * strings in the branding spec.
  */
 export const metadata: Metadata = {
   title: {
