@@ -165,11 +165,19 @@ Redeploy after the change so the new URL is baked into the static output.
 
 ### Google Cloud API-key restrictions
 
-- **Application restriction**: use **IP addresses** of your production /
-  preview hosts (or none, if you can accept broader exposure). Do **not**
-  use an HTTP-referrer restriction — requests are server-to-server and
-  have no `Referer` header.
-- **API restriction**: restrict to **YouTube Data API v3** only.
+- **API restriction (recommended)**: restrict this key to the
+  **YouTube Data API v3** only. This is the primary defense — it stops
+  the key being reused for other Google APIs if it ever leaks.
+- **HTTP referrer restriction**: **do not** use one. Requests are made
+  server-to-server and carry no `Referer` header, so a referrer
+  restriction rejects every request.
+- **IP restriction**: only appropriate when the deployment has stable
+  outbound IP addresses. Vercel (and most serverless platforms) do
+  **not** provide a single stable outbound IP by default — traffic can
+  originate from many rotating egress IPs. Do not enable an IP
+  restriction on Vercel unless you have a fixed-egress solution
+  configured (a dedicated / static egress add-on, or an outbound proxy
+  you control). Otherwise leave the application restriction empty.
 - The key is only ever read by `src/lib/env.server.ts` (imports
   `server-only`) — never inlined in the client bundle.
 
@@ -289,11 +297,21 @@ Exact steps to obtain a YouTube Data API v3 key:
    and click **Enable**.
 3. Go to **APIs & Services → Credentials → Create credentials → API key**.
 4. Copy the generated key.
-5. Apply **application restrictions**. Requests are made server-to-server,
-   so use an **IP restriction** (your production host / build worker),
-   or leave unrestricted if you're only running locally. Do NOT set an
-   HTTP referrer restriction — it will reject server requests.
-6. Apply **API restrictions**: restrict to **YouTube Data API v3** only.
+5. Apply **API restrictions**: restrict this key to **YouTube Data
+   API v3** only. This is the most important restriction — it stops
+   the key being reused for other Google APIs if it ever leaks.
+6. Choose an **application restriction** carefully:
+   - **Do not** use an HTTP referrer restriction. Requests are made
+     server-to-server and carry no `Referer` header, so a referrer
+     restriction rejects every request.
+   - Apply an **IP restriction** only if your deployment has stable
+     outbound IP addresses (traditional VMs, a self-hosted server,
+     or a serverless deployment configured with fixed egress).
+     Vercel and similar serverless platforms do not provide a single
+     stable outbound IP by default, so an IP restriction there will
+     block real traffic — leave the application restriction empty
+     unless you have a fixed egress path configured.
+   - For local development, no application restriction is required.
 7. Store the key as `YOUTUBE_API_KEY` — either in `.env.local` for local
    dev or as a secret in your deployment platform.
 8. **Never commit `.env.local`.** `.gitignore` already excludes it.
