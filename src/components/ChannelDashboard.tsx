@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { EarningsCalculator } from "./EarningsCalculator";
 import { ShareSection } from "./ShareSection";
 import {
-  DEFAULT_CALCULATOR_STATE,
   encodeCalculatorState,
   type CalculatorState,
 } from "@/lib/calculatorState";
@@ -24,8 +23,13 @@ import type {
 interface Props {
   channel: ChannelDetails;
   analysis: PerformanceAnalysis;
-  /** Calculator state as decoded from the incoming URL. */
-  initialCalculatorState: CalculatorState;
+  /**
+   * Calculator state as decoded from the incoming URL. Only fields the
+   * URL actually provided are present here — anything absent lets the
+   * `EarningsCalculator` fall back to its analysis-derived defaults
+   * (auto-estimated monthly views, sensible content type, etc.).
+   */
+  initialCalculatorState: Partial<CalculatorState>;
 }
 
 /**
@@ -46,9 +50,11 @@ export function ChannelDashboard({
   const router = useRouter();
   const pathname = `/channel/${channel.channelId}`;
 
-  const seededState = useMemo<CalculatorState>(
+  // Pass the URL partial straight through — the calculator layers it
+  // on top of its analysis-derived defaults. We only force the channel
+  // id from the route so the URL can never override it.
+  const initialCalculatorSeed = useMemo<Partial<CalculatorState>>(
     () => ({
-      ...DEFAULT_CALCULATOR_STATE,
       ...initialCalculatorState,
       channelId: channel.channelId,
     }),
@@ -97,7 +103,7 @@ export function ChannelDashboard({
       <EarningsCalculator
         analysis={analysis}
         channelId={channel.channelId}
-        initialState={seededState}
+        initialState={initialCalculatorSeed}
         onStateChange={onStateChange}
         shareOrigin={urlBase}
         sharePathname={pathname}

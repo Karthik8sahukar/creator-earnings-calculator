@@ -26,6 +26,15 @@ function readState() {
   };
 }
 
+function readMonthlyText(): string {
+  return screen.getByTestId("earnings-monthly").textContent ?? "";
+}
+
+/** Parse the visible headline back to a plain number for comparison. */
+function readMonthlyNumber(): number {
+  return Number(readMonthlyText().replace(/[^\d.]/g, ""));
+}
+
 beforeEach(() => {
   // navigation.mediaMatch is already stubbed in vitest.setup.ts
   Object.defineProperty(window, "location", {
@@ -56,6 +65,179 @@ describe("EarningsCalculator — defaults", () => {
   it("picks 'shorts' content type at 70% or higher", () => {
     render(<EarningsCalculator analysis={{ ...ANALYSIS, shortsPercentage: 80, longFormPercentage: 20 }} />);
     expect(readState().state.contentType).toBe("shorts");
+  });
+});
+
+describe("EarningsCalculator — scenario selection", () => {
+  it("selects Expected on initial render with no user interaction", () => {
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    expect(readState().state.estimateBand).toBe("expected");
+    const expectedTab = screen.getByTestId("estimate-tab-expected");
+    expect(expectedTab).toHaveAttribute("aria-selected", "true");
+    // Low and High should not be selected.
+    expect(screen.getByTestId("estimate-tab-low")).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+    expect(screen.getByTestId("estimate-tab-high")).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+  });
+
+  it("shows the Expected earnings result immediately (no click required)", () => {
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    const monthly = readMonthlyText();
+    // Should be a real, non-zero currency amount reflecting the
+    // auto-estimated monthly views for the Expected band.
+    expect(monthly).toMatch(/^\$\d/);
+    expect(monthly).not.toMatch(/^\$0\.00/);
+  });
+
+  it("auto-estimated channel views populate the Expected result via a URL-partial seed", () => {
+    // Simulates ChannelDashboard's flow: URL had no calculator params,
+    // so `initialState` is an empty partial. The calculator must still
+    // seed monthly views from analysis and produce a non-zero result.
+    render(<EarningsCalculator analysis={ANALYSIS} initialState={{}} />);
+    expect(readState().state.monthlyViews).toBe(
+      ANALYSIS.monthlyViewEstimate.expected,
+    );
+    expect(readState().state.estimateBand).toBe("expected");
+    expect(readMonthlyText()).toMatch(/^\$\d/);
+    expect(readMonthlyText()).not.toMatch(/^\$0\.00/);
+  });
+
+  it("even when the URL provides other keys, missing scenario defaults to Expected", () => {
+    render(
+      <EarningsCalculator
+        analysis={ANALYSIS}
+        initialState={{ country: "GB", monetizedPercentage: 60 }}
+      />,
+    );
+    expect(readState().state.estimateBand).toBe("expected");
+    expect(screen.getByTestId("estimate-tab-expected")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // And the Expected calculation is visible immediately.
+    expect(readMonthlyText()).toMatch(/^\$\d/);
+    expect(readMonthlyText()).not.toMatch(/^\$0\.00/);
+  });
+
+  it("preserves the scenario when the URL provides it (eb=high) without changing the seed views", () => {
+    render(
+      <EarningsCalculator
+        analysis={ANALYSIS}
+        initialState={{ estimateBand: "high" }}
+      />,
+    );
+    expect(readState().state.estimateBand).toBe("high");
+    expect(screen.getByTestId("estimate-tab-high")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // Views are seeded from the *expected* traffic estimate regardless
+    // of the scenario band — bands are pure RPM uncertainty and must
+    // not overwrite a distinct view-count uncertainty axis.
+    expect(readState().state.monthlyViews).toBe(
+      ANALYSIS.monthlyViewEstimate.expected,
+    );
+  });
+
+  it("switching to Conservative multiplies the headline by ~0.6 without touching monthlyViews", async () => {
+    const user = userEvent.setup();
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    const beforeMonthly = readMonthlyNumber();
+    const beforeViews = readState().state.monthlyViews;
+    await user.click(screen.getByTestId("estimate-tab-low"));
+    expect(readState().state.estimateBand).toBe("low");
+    // Views MUST be preserved — a compounded view-band adjustment
+    // would silently stack two uncertainties.
+    expect(readState().state.monthlyViews).toBe(beforeViews);
+    // The headline shrinks by the exact BAND_FACTORS ratio (0.6).
+    const afterMonthly = readMonthlyNumber();
+    expect(afterMonthly / beforeMonthly).toBeCloseTo(0.6, 2);
+  });
+
+  it("switching to Optimistic multiplies the headline by ~1.5 without touching monthlyViews", async () => {
+    const user = userEvent.setup();
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    const beforeMonthly = readMonthlyNumber();
+    const beforeViews = readState().state.monthlyViews;
+    await user.click(screen.getByTestId("estimate-tab-high"));
+    expect(readState().state.estimateBand).toBe("high");
+    expect(readState().state.monthlyViews).toBe(beforeViews);
+    const afterMonthly = readMonthlyNumber();
+    expect(afterMonthly / beforeMonthly).toBeCloseTo(1.5, 2);
+  });
+
+  it("switching bands preserves a manually entered monthlyViews value", async () => {
+    const user = userEvent.setup();
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    const input = screen.getByLabelText("Monthly views");
+    await user.clear(input);
+    await user.type(input, "1000000");
+    expect(readState().state.monthlyViews).toBe(1_000_000);
+    // Every tab click must leave the entered value alone.
+    await user.click(screen.getByTestId("estimate-tab-low"));
+    expect(readState().state.monthlyViews).toBe(1_000_000);
+    await user.click(screen.getByTestId("estimate-tab-high"));
+    expect(readState().state.monthlyViews).toBe(1_000_000);
+    await user.click(screen.getByTestId("estimate-tab-expected"));
+    expect(readState().state.monthlyViews).toBe(1_000_000);
+  });
+
+  it("with a manually entered 1M views, US Tech long produces ~$6,240 / $10,400 / $15,600", async () => {
+    const user = userEvent.setup();
+    // Feed a channel-shaped analysis but drive everything from user input.
+    render(<EarningsCalculator analysis={ANALYSIS} />);
+    await user.selectOptions(screen.getByLabelText("Country / audience"), "US");
+    await user.selectOptions(screen.getByLabelText("Niche"), "tech");
+    await user.selectOptions(screen.getByLabelText("Content type"), "long");
+    const input = screen.getByLabelText("Monthly views");
+    await user.clear(input);
+    await user.type(input, "1000000");
+    // Default monetization is 90% (the reference), so the formula
+    // reduces to views ÷ 1000 × RPM exactly.
+    await user.click(screen.getByTestId("estimate-tab-expected"));
+    expect(readMonthlyNumber()).toBeCloseTo(10_400, 0);
+    await user.click(screen.getByTestId("estimate-tab-low"));
+    expect(readMonthlyNumber()).toBeCloseTo(6_240, 0);
+    await user.click(screen.getByTestId("estimate-tab-high"));
+    expect(readMonthlyNumber()).toBeCloseTo(15_600, 0);
+    // And the input still reads 1,000,000.
+    expect(readState().state.monthlyViews).toBe(1_000_000);
+  });
+
+  it("Reset returns the scenario to Expected and re-seeds views to analysis.expected", async () => {
+    const user = userEvent.setup();
+    render(
+      <EarningsCalculator
+        analysis={ANALYSIS}
+        initialState={{ estimateBand: "high" }}
+      />,
+    );
+    expect(readState().state.estimateBand).toBe("high");
+    // Manually adjust views to something arbitrary before resetting.
+    const input = screen.getByLabelText("Monthly views");
+    await user.clear(input);
+    await user.type(input, "12345");
+    expect(readState().state.monthlyViews).toBe(12_345);
+
+    await user.click(screen.getByRole("button", { name: /reset/i }));
+
+    expect(readState().state.estimateBand).toBe("expected");
+    expect(screen.getByTestId("estimate-tab-expected")).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    // Reset re-seeds monthlyViews to the analysis-derived expected.
+    expect(readState().state.monthlyViews).toBe(
+      ANALYSIS.monthlyViewEstimate.expected,
+    );
+    // And the Expected result is visible immediately after reset.
+    expect(readMonthlyText()).toMatch(/^\$\d/);
+    expect(readMonthlyText()).not.toMatch(/^\$0\.00/);
   });
 });
 
@@ -123,7 +305,6 @@ describe("EarningsCalculator — user interactions", () => {
     render(<EarningsCalculator analysis={ANALYSIS} />);
     const sponsor = screen.getByLabelText("Sponsorships");
     await user.clear(sponsor);
-    // Number inputs reject non-numeric strings; make sure we don't blow up.
     expect(readState().state.sponsorship).toBe(0);
   });
 
@@ -145,13 +326,6 @@ describe("EarningsCalculator — user interactions", () => {
     expect(monthly.textContent).toMatch(/^\$/);
     await user.selectOptions(screen.getByLabelText("Display currency"), "EUR");
     expect(monthly.textContent).toMatch(/€/);
-  });
-
-  it("switching to the 'high' band pushes the higher monthly-views value", async () => {
-    const user = userEvent.setup();
-    render(<EarningsCalculator analysis={ANALYSIS} />);
-    await user.click(screen.getByRole("tab", { name: /high/i }));
-    expect(readState().state.monthlyViews).toBe(ANALYSIS.monthlyViewEstimate.high);
   });
 
   it("initial state can be seeded from URL-shaped params", () => {

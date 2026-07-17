@@ -44,5 +44,5 @@ export function buildWhatsAppShareUrl({ url, text }: ShareTargetInput): string {
  * claim the estimate is verified or endorsed.
  */
 export function defaultChannelShareText(channelTitle: string): string {
-  return `View public channel statistics and an independent creator earnings estimate for ${channelTitle}.`;
+  return `View public channel statistics and an independent monthly earnings estimate for ${channelTitle}.`;
 }

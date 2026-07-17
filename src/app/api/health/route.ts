@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 
 interface HealthResponseBody {
   status: "ok";
-  service: "creator-earnings-calculator";
+  service: "youtube-money-calculator";
   timestamp: string;
   youtubeApiConfigured: boolean;
 }
@@ -31,7 +31,7 @@ interface HealthResponseBody {
 export async function GET() {
   const body: HealthResponseBody = {
     status: "ok",
-    service: "creator-earnings-calculator",
+    service: "youtube-money-calculator",
     timestamp: new Date().toISOString(),
     youtubeApiConfigured: isYoutubeApiConfigured(),
   };

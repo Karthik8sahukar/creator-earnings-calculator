@@ -6,7 +6,7 @@ import { legalLastUpdatedIso } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Methodology",
   description:
-    "How Creator Earnings Calculator estimates YouTube revenue: data sources, RPM/CPM definitions, country and niche assumptions, Shorts vs. long-form, and known limitations.",
+    "How YouTube Money Calculator estimates YouTube revenue: data sources, RPM/CPM definitions, country and niche assumptions, Shorts vs. long-form, and known limitations.",
   alternates: { canonical: "/methodology" },
 };
 
@@ -74,7 +74,7 @@ export default function MethodologyPage() {
       <p>
         <strong>CPM</strong> (Cost Per Mille) is what advertisers pay per 1,000
         monetized ad impressions, before YouTube takes its cut. It&apos;s an
-        advertiser-side metric.
+        advertiser-side metric that creators do not directly see.
       </p>
       <p>
         <strong>RPM</strong> (Revenue Per Mille) is what remains for the
@@ -83,6 +83,41 @@ export default function MethodologyPage() {
         about &ldquo;how much a creator earns per 1,000 views&rdquo; they
         almost always mean RPM.
       </p>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 not-prose space-y-2">
+        <p>
+          <strong>Formulas used on this site:</strong>
+        </p>
+        <ul className="list-disc pl-6 space-y-1">
+          <li>
+            <code>RPM = total revenue ÷ total views × 1000</code>{" "}
+            (YouTube&apos;s definition: divides by TOTAL views, so it already
+            builds in the non-monetized-views gap)
+          </li>
+          <li>
+            <code>CPM = gross ad revenue ÷ monetized impressions × 1000</code>
+          </li>
+          <li>
+            <strong>Creator ad-revenue estimate</strong>:
+            <code className="ml-1">
+              monthly ad revenue = (monthly views ÷ 1000) × RPM × (monetized
+              % ÷ 90)
+            </code>
+          </li>
+        </ul>
+        <p>
+          At the default monetized-view percentage (90%, the industry-typical
+          rate) the third factor is exactly 1.0 and the formula collapses to
+          YouTube&apos;s own <code>views ÷ 1000 × RPM</code>. That means an
+          untouched calculator gives results consistent with what YouTube
+          Studio would show for a typical channel — no double-discount.
+        </p>
+        <p>
+          The main calculator never multiplies views by CPM to estimate
+          creator earnings — that&apos;s a common shortcut in other tools that
+          over-estimates because CPM is the advertiser&apos;s spend, not the
+          creator&apos;s take-home. We always use RPM.
+        </p>
+      </div>
 
       <h2 className="text-xl font-semibold text-slate-900">
         Monetized-view percentage
@@ -90,15 +125,35 @@ export default function MethodologyPage() {
       <p>
         Not every view generates ad revenue — viewers may skip ads, use
         ad-blockers, or watch on YouTube Premium (which shares differently).
-        The monetized-view percentage slider caps what fraction of your views
-        we treat as revenue-generating. Ninety percent is a common starting
-        point for a mature channel; a very family-friendly, brand-safe channel
-        might monetize higher, and a fringe-topic channel could monetize much
-        lower.
+        Our niche and country RPM tables are calibrated for a channel that
+        monetizes at the industry-typical rate of <strong>90%</strong> of
+        views. The slider is a <em>relative</em> adjustment against that
+        baseline:
       </p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>
+          <strong>At 90% (the default)</strong> — the (monetized ÷ 90)
+          factor is exactly 1.0. Ad revenue equals{" "}
+          <code>views ÷ 1000 × RPM</code>. This matches what YouTube Studio
+          reports for a typical channel.
+        </li>
+        <li>
+          <strong>At 100%</strong> — you&apos;re modelling a channel that
+          monetizes better than typical (few ad-blockers, no Premium
+          viewers, high fill rate). Ad revenue is ~11% higher than the
+          reference.
+        </li>
+        <li>
+          <strong>At 60%</strong> — you&apos;re modelling a channel that
+          monetizes worse than typical (Made-for-Kids / COPPA restrictions,
+          heavy Premium audience). Ad revenue is ~33% lower than the
+          reference.
+        </li>
+      </ul>
       <p>
-        This percentage is applied <strong>exactly once</strong> in the
-        formula, before RPM is applied.
+        Because it is a relative adjustment (not a raw discount on views),
+        the formula does not double-count the monetization gap that
+        YouTube&apos;s RPM already includes in its own denominator.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">
@@ -139,9 +194,18 @@ export default function MethodologyPage() {
         of magnitude lower than long-form RPM for a comparable channel.
       </p>
       <p>
-        We express this as a content-type multiplier on top of country ×
-        niche. A &ldquo;mixed&rdquo; channel gets a blended multiplier that
-        sits between the two.
+        For Shorts we use a <strong>separate RPM table</strong> — not a
+        multiplier on top of long-form. A US general-audience Shorts channel
+        has an expected RPM of about $0.08 (vs. ~$6.50 for the same channel
+        on long-form). Niche premiums are also compressed for Shorts (a
+        finance channel earns roughly 1.5× the general Shorts rate, versus
+        2.4× on long-form) because the Shorts revenue pool is allocated on
+        view share, not per-video auction.
+      </p>
+      <p>
+        A &ldquo;mixed&rdquo; channel gets a weighted blend of the two paths
+        — 60% long-form / 40% Shorts by default. You can override the
+        content type in the calculator to model a specific split.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">
@@ -173,8 +237,29 @@ export default function MethodologyPage() {
       </ol>
       <p>
         We then report a low / expected / high band (0.7× / 1.0× / 1.35×) to
-        reflect uncertainty. This is the input to the earnings calculator by
-        default, but you can override it manually.
+        reflect traffic-side uncertainty (the same channel can naturally see
+        20–30% more or fewer monthly views than its recent average). These
+        bands are shown on the <strong>Performance</strong> card. The
+        earnings calculator seeds its monthly-views field with the{" "}
+        <em>expected</em> traffic estimate — the single best guess. You can
+        then edit the value manually (your input is preserved).
+      </p>
+      <p>
+        The <strong>earnings-side</strong> bands are separate and cover a
+        different kind of uncertainty. Given a specific monthly-views value,
+        they represent the plausible spread of creator RPM around the
+        expected value. Because so many factors are hidden from us — fill
+        rate, ad category mix, seasonality, refund rate, YouTube share —
+        the earnings-side spread is wider (0.6× / 1.0× / 1.5×). In the UI
+        these are labelled <strong>Conservative</strong> /{" "}
+        <strong>Expected</strong> / <strong>Optimistic</strong>.
+      </p>
+      <p>
+        Switching Conservative / Expected / Optimistic multiplies the
+        earnings result by <em>exactly</em> 0.6× / 1.0× / 1.5×. It does not
+        change your monthly-views input. The two uncertainty axes
+        (traffic-side and revenue-side) are surfaced separately so they
+        never compound invisibly.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">

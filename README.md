@@ -1,7 +1,7 @@
-# Creator Earnings Calculator
+# YouTube Money Calculator
 
 A production-ready **Next.js 15** app that searches any public YouTube
-channel and produces an **independent** estimate of what its creator
+channel and produces an **independent** estimate of what its channel
 revenue might look like, using only the **official YouTube Data API v3**.
 
 - 🔎 Channel search — name, `@handle`, channel URL, or channel ID
@@ -267,7 +267,7 @@ Vercel deployment structurally impossible.
 ```json
 {
   "status": "ok",
-  "service": "creator-earnings-calculator",
+  "service": "youtube-money-calculator",
   "timestamp": "…ISO date…",
   "youtubeApiConfigured": true
 }
@@ -328,7 +328,7 @@ Copy `.env.example` to `.env.local`:
 ```env
 YOUTUBE_API_KEY=your-key-here
 
-NEXT_PUBLIC_SITE_NAME="Creator Earnings Calculator"
+NEXT_PUBLIC_SITE_NAME=YouTube Money Calculator
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 
 # Optional server tuning
@@ -538,7 +538,7 @@ the `/methodology` page inside the app.
 ```json
 {
   "status": "ok",
-  "service": "creator-earnings-calculator",
+  "service": "youtube-money-calculator",
   "timestamp": "2026-07-17T…Z",
   "youtubeApiConfigured": true
 }

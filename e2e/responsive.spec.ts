@@ -11,7 +11,7 @@ import { CHANNEL_IDS } from "./fixtures/ids";
 test("homepage renders and the search input is reachable", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /search any youtube channel/i }),
+    page.getByRole("heading", { level: 1, name: /youtube money calculator/i }),
   ).toBeVisible();
   await expect(page.getByRole("combobox")).toBeVisible();
 });

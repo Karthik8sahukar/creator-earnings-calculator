@@ -5,7 +5,7 @@ import { StaticPage } from "@/components/StaticPage";
 export const metadata: Metadata = {
   title: "Privacy",
   description:
-    "How Creator Earnings Calculator handles data: no account login, no tracking cookies, no analytics enabled by default, and how we use the YouTube Data API v3.",
+    "How YouTube Money Calculator handles data: no account login, no tracking cookies, no analytics enabled by default, and how we use the YouTube Data API v3.",
   alternates: { canonical: "/privacy" },
 };
 

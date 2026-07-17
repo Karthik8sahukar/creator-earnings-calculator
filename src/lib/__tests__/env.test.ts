@@ -66,7 +66,7 @@ describe("env.public", () => {
       NEXT_PUBLIC_SITE_URL: undefined,
     });
     const { publicEnv } = await loadPublicEnv();
-    expect(publicEnv.siteName).toBe("Creator Earnings Calculator");
+    expect(publicEnv.siteName).toBe("YouTube Money Calculator");
     expect(publicEnv.siteUrl).toBe("http://localhost:3000");
     expect(publicEnv.isDevelopment).toBe(true);
     expect(publicEnv.isProduction).toBe(false);

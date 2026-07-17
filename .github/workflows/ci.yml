@@ -59,7 +59,7 @@ jobs:
         # are strictly required at runtime are read lazily, not at build.
         env:
           YOUTUBE_API_KEY: build-time-placeholder
-          NEXT_PUBLIC_SITE_URL: https://creator-earnings.example
+          NEXT_PUBLIC_SITE_URL: https://youtube-money-calculator.example
         run: npm run build
 
   # ---------------------------------------------------------------

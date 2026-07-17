@@ -47,7 +47,7 @@ describe("GET /api/health", () => {
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toMatchObject({
       status: "ok",
-      service: "creator-earnings-calculator",
+      service: "youtube-money-calculator",
       youtubeApiConfigured: false,
     });
     expect(typeof body.timestamp).toBe("string");

@@ -33,7 +33,7 @@ const publicSchema = z.object({
   NEXT_PUBLIC_SITE_NAME: z
     .string()
     .min(1)
-    .default("Creator Earnings Calculator"),
+    .default("YouTube Money Calculator"),
   NEXT_PUBLIC_SITE_URL: siteUrlSchema,
   NODE_ENV: z
     .enum(["development", "test", "production"])

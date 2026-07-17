@@ -1,7 +1,17 @@
 /**
  * Small, pure formulas used by the standalone calculator pages.
  * Kept dependency-free so they're trivially unit-testable.
+ *
+ * Each function documents:
+ *   - the formula being applied,
+ *   - the definition of every input,
+ *   - a validation contract (never returns NaN; explicit error reasons
+ *     for the caller to render).
  */
+
+// ─────────────────────────────────────────────────────────────────────
+//   RPM Calculator
+// ─────────────────────────────────────────────────────────────────────
 
 export interface RpmInput {
   revenue: number;
@@ -14,6 +24,14 @@ export interface RpmResult {
   reason: string | null;
 }
 
+/**
+ * RPM = revenue ÷ total views × 1,000
+ *
+ * RPM is a "per 1,000 total views" metric — it does NOT filter to just
+ * monetized views. That's what distinguishes it from CPM (see below).
+ * If the caller wants a monetized-only ratio they should use
+ * `calculateCpm` instead.
+ */
 export function calculateRpm({ revenue, totalViews }: RpmInput): RpmResult {
   if (!Number.isFinite(revenue) || !Number.isFinite(totalViews)) {
     return { rpm: 0, valid: false, reason: "Please enter numeric values." };
@@ -35,6 +53,10 @@ export function calculateRpm({ revenue, totalViews }: RpmInput): RpmResult {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────────
+//   CPM Calculator
+// ─────────────────────────────────────────────────────────────────────
+
 export interface CpmInput {
   grossAdRevenue: number;
   monetizedImpressions: number;
@@ -46,6 +68,23 @@ export interface CpmResult {
   reason: string | null;
 }
 
+/**
+ * CPM = gross ad revenue ÷ monetized impressions × 1,000
+ *
+ * Notes on interpretation:
+ *
+ *   • The CPM this calculator returns is the *creator-side* CPM —
+ *     "how much did I earn per 1,000 monetized ad impressions?".
+ *   • The advertiser-side CPM (what the advertiser paid before Google's
+ *     share) is NOT exposed to creators by YouTube. Only Google knows
+ *     it. Anyone claiming to show you "the advertiser's real CPM" is
+ *     guessing.
+ *   • CPM ≠ RPM. If you divide by total views (including non-monetized
+ *     views), you're computing RPM, not CPM.
+ *   • Do NOT multiply views × CPM to estimate creator earnings — that's
+ *     mathematically incorrect. Use the main YouTube Money Calculator,
+ *     which uses RPM.
+ */
 export function calculateCpm({
   grossAdRevenue,
   monetizedImpressions,
@@ -73,12 +112,24 @@ export function calculateCpm({
   };
 }
 
-/**
- * A simple sponsorship rate estimator. Based on commonly-cited creator
- * economy rules of thumb — NOT an official Google/YouTube number. We
- * intentionally return a wide low/high band because sponsorship rates
- * are highly negotiable in the real world.
- */
+// ─────────────────────────────────────────────────────────────────────
+//   Sponsorship Estimator
+// ─────────────────────────────────────────────────────────────────────
+//
+// Sponsorship pricing is negotiated, not paid at a public rate card.
+// Industry rules of thumb converge on a "per 1,000 views" primary
+// driver, adjusted by deliverable type, usage rights, exclusivity, and
+// niche/geo premium. We combine those factors into a single
+// per-video expected rate and apply a wide low/high band (0.6× / 1.6×)
+// because real quotes vary enormously.
+//
+// Base per-1,000-views rates below are drawn from publicly cited
+// creator sponsorship guides (Passionfruit, Grin, Aspire, etc.) and
+// are intentionally on the "typical mid-market US creator" spectrum.
+// A well-negotiated deal for a top-tier creator can easily 2–3× these
+// numbers; a lower-desirable audience can hit the 0.6× floor.
+//
+
 export interface SponsorshipInput {
   subscribers: number;
   averageViews: number;
@@ -100,19 +151,48 @@ export interface SponsorshipResult {
   perVideoHigh: number;
 }
 
+/**
+ * Baseline USD per 1,000 views by deliverable type.
+ *
+ *   • integration    ($22/1k views): 30–90 second brand mention inside
+ *     a normal video. The most common format; the reference number
+ *     for the whole table.
+ *   • dedicated      ($50/1k views): the entire video is about the
+ *     sponsor. Higher rate because it exchanges channel goodwill for
+ *     the ad message.
+ *   • shortsMention  ($9/1k views): a mention inside a Short. Rates
+ *     are much lower because Shorts have less "commit" from viewers
+ *     and less content for the brand to attach to.
+ *   • productPlacement ($14/1k views): unspoken/visual placement,
+ *     no verbal endorsement. Priced between shortsMention and
+ *     integration because it lacks endorsement value.
+ */
 const DELIVERABLE_BASE = {
-  integration: 20,
-  shortsMention: 8,
-  dedicated: 45,
-  productPlacement: 12,
+  integration: 22,
+  shortsMention: 9,
+  dedicated: 50,
+  productPlacement: 14,
 };
 
+/**
+ * Usage-rights multipliers. Standard = "sponsor may use the video on
+ * my channel only". Extended = "sponsor may repurpose in their paid
+ * ads for 3–6 months". Perpetual = "sponsor may use forever, in any
+ * medium, worldwide". Perpetual is what many agencies push for and
+ * why creators should charge more for it.
+ */
 const USAGE_MULT = {
   standard: 1,
   extended: 1.35,
   perpetual: 1.75,
 };
 
+/**
+ * Exclusivity multipliers. None = "I can promote a competitor next
+ * week". Partial = "I won't promote a competitor in this specific
+ * category during the term". Full = "I won't accept ANY other
+ * sponsorships during the term".
+ */
 const EXCLUSIVITY_MULT = {
   none: 1,
   partial: 1.2,
@@ -120,8 +200,29 @@ const EXCLUSIVITY_MULT = {
 };
 
 /**
- * Baseline: $/1,000 views by deliverable type × usage × exclusivity ×
- * niche × country × engagement modifier. Then × video count.
+ * Sponsorship rate formula:
+ *
+ *   perViewRate  = base × usage × exclusivity × niche × country × engagementMod
+ *   primaryRate  = perViewRate × (avgViews / 1000)
+ *
+ *   subscriberFloor = subscribers × 0.005
+ *
+ *   perVideoExpected = max(primaryRate, subscriberFloor)
+ *   perVideoLow      = perVideoExpected × 0.6   ← wide band because
+ *   perVideoHigh     = perVideoExpected × 1.6      sponsorship is highly
+ *                                                  negotiable
+ *
+ * The subscriber floor exists because tiny channels still command a
+ * minimum fee — brands don't typically pay less than ~$5 per 1,000
+ * subscribers even for a low-view creator, especially in the
+ * micro-influencer segment.
+ *
+ * The engagement modifier treats 5% engagement rate as the reference
+ * baseline (1×). Below-average engagement gets discounted (down to
+ * 0.5×); premium engaged audiences get uplift (up to 2.5×). The
+ * clamp is important because raw engagement rate on YouTube can be
+ * misleading — e.g. a Shorts-heavy channel may show a very high
+ * engagement ratio simply because Shorts get many likes-per-view.
  */
 export function calculateSponsorship(input: SponsorshipInput): SponsorshipResult {
   const {
@@ -148,10 +249,11 @@ export function calculateSponsorship(input: SponsorshipInput): SponsorshipResult
   const safeNiche = Number.isFinite(nicheMultiplier) ? nicheMultiplier : 1;
   const safeCountry = Number.isFinite(countryMultiplier) ? countryMultiplier : 1;
 
-  // Engagement modifier — 5% is roughly average, we treat 1x at 5%.
+  // 5% engagement ≈ YouTube average; treat as 1×. Slope is gentle so
+  // an "engagement stat" doesn't overwhelm the rate.
   const engagementMod = clamp(safeEngagement / 5, 0.5, 2.5);
 
-  // Views-based rate is the primary driver.
+  // Views-based rate is the primary driver — big audience, big cheque.
   const perThousand = base * usage * excl * safeNiche * safeCountry * engagementMod;
   const primary = (safeViews / 1000) * perThousand;
 
@@ -162,6 +264,7 @@ export function calculateSponsorship(input: SponsorshipInput): SponsorshipResult
   const perVideoLow = perVideoExpected * 0.6;
   const perVideoHigh = perVideoExpected * 1.6;
 
+  // Number of sponsored videos scales the total package linearly.
   const count = Math.max(Math.floor(videoCount || 0), 1);
   return {
     perVideoLow,

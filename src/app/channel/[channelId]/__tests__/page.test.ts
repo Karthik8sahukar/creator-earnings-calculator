@@ -110,7 +110,7 @@ function findProp(
 beforeEach(() => {
   process.env.YOUTUBE_API_KEY = "test-key";
   process.env.NEXT_PUBLIC_SITE_URL = "https://example.test";
-  process.env.NEXT_PUBLIC_SITE_NAME = "Creator Earnings Calculator";
+  process.env.NEXT_PUBLIC_SITE_NAME = "YouTube Money Calculator";
   getChannelById.mockReset();
   getRecentVideos.mockReset();
 });
@@ -129,7 +129,7 @@ describe("generateMetadata", () => {
     });
 
     expect(meta.title).toContain("Independent Creators");
-    expect(meta.title).toContain("Creator Earnings Calculator");
+    expect(meta.title).toContain("YouTube Money Calculator");
     expect(meta.description).toContain("Independent Creators");
     // Must not claim official / endorsed.
     expect(String(meta.description)).not.toMatch(/official/i);

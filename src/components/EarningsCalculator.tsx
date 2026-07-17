@@ -9,10 +9,12 @@ import { track } from "@/lib/analytics";
 import {
   CALCULATOR_PARAM_KEYS,
   DEFAULT_CALCULATOR_STATE,
+  DEFAULT_SCENARIO,
   buildShareUrl,
   encodeCalculatorState,
   toEarningsInput,
   type CalculatorState,
+  type EstimateBand,
 } from "@/lib/calculatorState";
 import { calculateEarnings } from "@/lib/earnings";
 import { formatCurrency, formatCompact, formatNumber } from "@/lib/format";
@@ -26,7 +28,11 @@ import type { PerformanceAnalysis } from "@/types/youtube";
 
 interface Props {
   analysis: PerformanceAnalysis;
-  /** Optional seed state (from URL) — takes precedence over analysis. */
+  /**
+   * Partial seed state (typically decoded from a URL). Only the keys
+   * the URL actually provided are present here — anything absent falls
+   * back to the analysis-derived defaults computed below.
+   */
   initialState?: Partial<CalculatorState>;
   /** Called every time the calculator state changes (URL sync). */
   onStateChange?: (state: CalculatorState) => void;
@@ -36,7 +42,17 @@ interface Props {
   channelId?: string | null;
 }
 
-type Estimate = "low" | "expected" | "high";
+/**
+ * Human-readable labels for the scenario tabs. The internal enum stays
+ * `low | expected | high` so shareable URLs (`?eb=low`) remain stable,
+ * but the UI reads as "Conservative / Expected / Optimistic" — the
+ * industry-standard framing for an earnings range.
+ */
+const BAND_LABELS: Record<EstimateBand, string> = {
+  low: "Conservative",
+  expected: "Expected",
+  high: "Optimistic",
+};
 
 function pickDefaultContentType(shorts: number): CalculatorState["contentType"] {
   if (shorts >= 70) return "shorts";
@@ -44,10 +60,55 @@ function pickDefaultContentType(shorts: number): CalculatorState["contentType"] 
   return "long";
 }
 
-function resolveCountry(country: string | undefined): string {
-  if (!country) return "US";
-  const match = COUNTRIES.find((c) => c.id === country);
-  return match ? match.id : "OTHER";
+/**
+ * Compute the initial calculator state.
+ *
+ * Design rules:
+ *
+ *  • The scenario band (`estimateBand`) is purely a *revenue*
+ *    uncertainty knob. It never touches `monthlyViews`.
+ *  • `monthlyViews` is always seeded from the analysis's *expected*
+ *    view estimate — the single best guess of the channel's actual
+ *    monthly views. Users can then adjust it manually (their input is
+ *    preserved), and the low/high traffic bands remain visible on the
+ *    performance card as a separate uncertainty axis.
+ *  • This gives us one clear, non-compound source of uncertainty:
+ *    switching Conservative → Expected → Optimistic multiplies the
+ *    result by exactly `BAND_FACTORS.conservative / .expected /
+ *    .optimistic` (0.6 / 1.0 / 1.5) and nothing else.
+ *
+ * Order of precedence (last wins):
+ *   1. Baseline defaults (DEFAULT_CALCULATOR_STATE) — including
+ *      estimateBand = "expected".
+ *   2. Analysis-derived defaults (auto-estimated `monthlyViews` from
+ *      `analysis.monthlyViewEstimate.expected`, sensible content type
+ *      from the Shorts share).
+ *   3. URL-provided partial state — only fields the URL actually
+ *      included; anything absent lets the analysis default stand.
+ *   4. `channelId` from the route — always wins, ignores URL/legacy.
+ */
+function computeInitialState({
+  analysis,
+  initialState,
+  channelId,
+}: {
+  analysis: PerformanceAnalysis;
+  initialState?: Partial<CalculatorState>;
+  channelId: string | null;
+}): CalculatorState {
+  const analysisDerived: Partial<CalculatorState> = {
+    monthlyViews: analysis.monthlyViewEstimate.expected || 0,
+    contentType: pickDefaultContentType(analysis.shortsPercentage),
+  };
+
+  return {
+    ...DEFAULT_CALCULATOR_STATE,
+    ...analysisDerived,
+    ...(initialState ?? {}),
+    channelId,
+    // Defense-in-depth: never allow estimateBand to become undefined.
+    estimateBand: initialState?.estimateBand ?? DEFAULT_SCENARIO,
+  };
 }
 
 export function EarningsCalculator({
@@ -60,18 +121,11 @@ export function EarningsCalculator({
 }: Props) {
   const initialViews = analysis.monthlyViewEstimate.expected || 0;
 
-  const [state, setState] = useState<CalculatorState>(() => {
-    const base: CalculatorState = {
-      ...DEFAULT_CALCULATOR_STATE,
-      channelId,
-      monthlyViews: initialViews,
-      contentType: pickDefaultContentType(analysis.shortsPercentage),
-      country: resolveCountry(analysis.sampleSize > 0 ? undefined : "US"),
-    };
-    return { ...base, ...initialState };
-  });
+  const [state, setState] = useState<CalculatorState>(() =>
+    computeInitialState({ analysis, initialState, channelId }),
+  );
 
-  const [estimateBand, setEstimateBand] = useState<Estimate>("expected");
+  const estimateBand = state.estimateBand;
 
   // Debounce URL writes so a run of keystrokes (e.g. typing "1000000")
   // doesn't push a new history entry per character. The visible UI
@@ -93,12 +147,14 @@ export function EarningsCalculator({
   );
   const active = earnings[estimateBand];
 
-  function applyBand(band: Estimate) {
-    setEstimateBand(band);
-    setState((s) => ({
-      ...s,
-      monthlyViews: analysis.monthlyViewEstimate[band] || 0,
-    }));
+  function applyBand(band: EstimateBand) {
+    // Scenario tabs represent RPM uncertainty (BAND_FACTORS in
+    // earnings.ts), NOT view-count uncertainty. Deliberately do NOT
+    // touch `monthlyViews` here — a manually-entered value would get
+    // clobbered, and stacking a view-band adjustment on top of the
+    // RPM band would compound two uncertainties invisibly.
+    setState((s) => ({ ...s, estimateBand: band }));
+    track({ name: "calculator.assumption_changed", field: "estimateBand" });
   }
 
   function update<K extends keyof CalculatorState>(
@@ -111,13 +167,13 @@ export function EarningsCalculator({
   }
 
   function reset() {
-    setState({
-      ...DEFAULT_CALCULATOR_STATE,
-      channelId,
-      monthlyViews: initialViews,
-      contentType: pickDefaultContentType(analysis.shortsPercentage),
-    });
-    setEstimateBand("expected");
+    setState(
+      computeInitialState({
+        analysis,
+        initialState: undefined,
+        channelId,
+      }),
+    );
   }
 
   const shareUrl = useMemo(() => {
@@ -155,7 +211,7 @@ export function EarningsCalculator({
 
         <div
           role="tablist"
-          aria-label="Estimate band"
+          aria-label="Estimate scenario"
           className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm mb-6"
         >
           {(["low", "expected", "high"] as const).map((band) => (
@@ -164,14 +220,15 @@ export function EarningsCalculator({
               type="button"
               role="tab"
               aria-selected={estimateBand === band}
+              data-testid={`estimate-tab-${band}`}
               onClick={() => applyBand(band)}
-              className={`px-3 py-1.5 rounded-md capitalize transition ${
+              className={`px-3 py-1.5 rounded-md transition ${
                 estimateBand === band
                   ? "bg-white shadow-sm text-slate-900 font-medium"
                   : "text-slate-500 hover:text-slate-900"
               }`}
             >
-              {band}
+              {BAND_LABELS[band]}
             </button>
           ))}
         </div>
@@ -267,6 +324,7 @@ export function EarningsCalculator({
                 max={100}
                 step={1}
                 suffix="%"
+                hint="Relative to a typical channel (~90%). 90% matches YouTube Studio's RPM formula; drag up for a well-monetized channel or down for COPPA/Premium-heavy audiences."
               />
             </FieldGroup>
 
@@ -312,7 +370,7 @@ export function EarningsCalculator({
           <div className="lg:col-span-2">
             <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 text-white p-6 shadow-pop">
               <p className="text-xs uppercase tracking-wide text-brand-100">
-                {estimateBand} monthly total
+                {BAND_LABELS[estimateBand]} monthly total
               </p>
               <p
                 className="mt-1 text-4xl font-bold tracking-tight"
@@ -488,6 +546,7 @@ function SliderField({
   max,
   step,
   suffix,
+  hint,
 }: {
   label: string;
   name?: string;
@@ -497,6 +556,7 @@ function SliderField({
   max: number;
   step: number;
   suffix?: string;
+  hint?: string;
 }) {
   return (
     <label className="block col-span-full">
@@ -521,6 +581,9 @@ function SliderField({
         aria-valuenow={value}
         className="mt-2 w-full accent-brand-600"
       />
+      {hint && (
+        <span className="mt-1 block text-[11px] text-slate-500">{hint}</span>
+      )}
     </label>
   );
 }

@@ -1,6 +1,35 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
+
+/**
+ * Homepage SEO — explicit metadata overrides the layout defaults so
+ * that the branded title and description are stable no matter what
+ * `NEXT_PUBLIC_SITE_NAME` is set to in a given deployment.
+ *
+ * Kept intentionally identical to the strings in the branding spec.
+ */
+export const metadata: Metadata = {
+  title: {
+    absolute: "YouTube Money Calculator | Estimate Channel Earnings, RPM & CPM",
+  },
+  description:
+    "Estimate YouTube channel earnings using public statistics. Calculate potential monthly income, RPM, CPM, Shorts revenue, sponsorship value, and more with our free YouTube Money Calculator.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title:
+      "YouTube Money Calculator | Estimate Channel Earnings, RPM & CPM",
+    description:
+      "Estimate YouTube channel earnings using public statistics. Calculate potential monthly income, RPM, CPM, Shorts revenue, sponsorship value, and more with our free YouTube Money Calculator.",
+  },
+  twitter: {
+    title:
+      "YouTube Money Calculator | Estimate Channel Earnings, RPM & CPM",
+    description:
+      "Estimate YouTube channel earnings using public statistics. Calculate potential monthly income, RPM, CPM, Shorts revenue, sponsorship value, and more with our free YouTube Money Calculator.",
+  },
+};
 
 export default function HomePage() {
   return (
@@ -17,10 +46,11 @@ export default function HomePage() {
           id="hero-title"
           className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900"
         >
-          Search Any YouTube Channel
+          YouTube Money Calculator
         </h1>
         <p className="max-w-2xl mx-auto text-lg text-slate-600">
-          Estimate creator earnings using public YouTube statistics.
+          Estimate a YouTube channel&apos;s potential monthly earnings using
+          public YouTube data, estimated RPM, CPM, and view analytics.
         </p>
       </section>
 
