@@ -42,6 +42,18 @@ interface Props {
   channelId?: string | null;
 }
 
+/**
+ * Human-readable labels for the scenario tabs. The internal enum stays
+ * `low | expected | high` so shareable URLs (`?eb=low`) remain stable,
+ * but the UI reads as "Conservative / Expected / Optimistic" — the
+ * industry-standard framing for an earnings range.
+ */
+const BAND_LABELS: Record<EstimateBand, string> = {
+  low: "Conservative",
+  expected: "Expected",
+  high: "Optimistic",
+};
+
 function pickDefaultContentType(shorts: number): CalculatorState["contentType"] {
   if (shorts >= 70) return "shorts";
   if (shorts >= 30) return "mixed";
@@ -186,7 +198,7 @@ export function EarningsCalculator({
 
         <div
           role="tablist"
-          aria-label="Estimate band"
+          aria-label="Estimate scenario"
           className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm mb-6"
         >
           {(["low", "expected", "high"] as const).map((band) => (
@@ -197,13 +209,13 @@ export function EarningsCalculator({
               aria-selected={estimateBand === band}
               data-testid={`estimate-tab-${band}`}
               onClick={() => applyBand(band)}
-              className={`px-3 py-1.5 rounded-md capitalize transition ${
+              className={`px-3 py-1.5 rounded-md transition ${
                 estimateBand === band
                   ? "bg-white shadow-sm text-slate-900 font-medium"
                   : "text-slate-500 hover:text-slate-900"
               }`}
             >
-              {band}
+              {BAND_LABELS[band]}
             </button>
           ))}
         </div>
@@ -344,7 +356,7 @@ export function EarningsCalculator({
           <div className="lg:col-span-2">
             <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 text-white p-6 shadow-pop">
               <p className="text-xs uppercase tracking-wide text-brand-100">
-                {estimateBand} monthly total
+                {BAND_LABELS[estimateBand]} monthly total
               </p>
               <p
                 className="mt-1 text-4xl font-bold tracking-tight"

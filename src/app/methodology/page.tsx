@@ -74,7 +74,7 @@ export default function MethodologyPage() {
       <p>
         <strong>CPM</strong> (Cost Per Mille) is what advertisers pay per 1,000
         monetized ad impressions, before YouTube takes its cut. It&apos;s an
-        advertiser-side metric.
+        advertiser-side metric that creators do not directly see.
       </p>
       <p>
         <strong>RPM</strong> (Revenue Per Mille) is what remains for the
@@ -83,6 +83,31 @@ export default function MethodologyPage() {
         about &ldquo;how much a creator earns per 1,000 views&rdquo; they
         almost always mean RPM.
       </p>
+      <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 not-prose space-y-2">
+        <p>
+          <strong>Formulas used on this site:</strong>
+        </p>
+        <ul className="list-disc pl-6 space-y-1">
+          <li>
+            <code>RPM = total revenue ÷ total views × 1000</code>
+          </li>
+          <li>
+            <code>CPM = gross ad revenue ÷ monetized impressions × 1000</code>
+          </li>
+          <li>
+            <strong>Creator earnings estimate</strong>:
+            <code className="ml-1">
+              monthly ad revenue = (monthly views × monetized %) ÷ 1000 × RPM
+            </code>
+          </li>
+        </ul>
+        <p>
+          The main calculator never multiplies views by CPM to estimate
+          creator earnings — that&apos;s a common shortcut in other tools that
+          over-estimates because CPM is the advertiser&apos;s spend, not the
+          creator&apos;s take-home. We always use RPM.
+        </p>
+      </div>
 
       <h2 className="text-xl font-semibold text-slate-900">
         Monetized-view percentage
@@ -139,9 +164,18 @@ export default function MethodologyPage() {
         of magnitude lower than long-form RPM for a comparable channel.
       </p>
       <p>
-        We express this as a content-type multiplier on top of country ×
-        niche. A &ldquo;mixed&rdquo; channel gets a blended multiplier that
-        sits between the two.
+        For Shorts we use a <strong>separate RPM table</strong> — not a
+        multiplier on top of long-form. A US general-audience Shorts channel
+        has an expected RPM of about $0.08 (vs. ~$6.50 for the same channel
+        on long-form). Niche premiums are also compressed for Shorts (a
+        finance channel earns roughly 1.5× the general Shorts rate, versus
+        2.4× on long-form) because the Shorts revenue pool is allocated on
+        view share, not per-video auction.
+      </p>
+      <p>
+        A &ldquo;mixed&rdquo; channel gets a weighted blend of the two paths
+        — 60% long-form / 40% Shorts by default. You can override the
+        content type in the calculator to model a specific split.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">
@@ -173,8 +207,17 @@ export default function MethodologyPage() {
       </ol>
       <p>
         We then report a low / expected / high band (0.7× / 1.0× / 1.35×) to
-        reflect uncertainty. This is the input to the earnings calculator by
-        default, but you can override it manually.
+        reflect traffic-side uncertainty (the same channel can naturally see
+        20–30% more or fewer monthly views than its recent average). This is
+        the input to the earnings calculator by default, but you can override
+        it manually.
+      </p>
+      <p>
+        The <strong>earnings-side</strong> bands are wider — 0.6× / 1.0× /
+        1.5× around the expected RPM — because so many factors (fill rate,
+        ad category mix, seasonality, refund rate) are hidden from us. In the
+        UI these are labelled <strong>Conservative</strong> /{" "}
+        <strong>Expected</strong> / <strong>Optimistic</strong>.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">

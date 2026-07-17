@@ -137,23 +137,37 @@ export function SponsorshipCalcClient() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Band label="Low rate" value={result.perVideoLow} currency={currency} />
+        <Band
+          label="Conservative rate"
+          value={result.perVideoLow}
+          currency={currency}
+        />
         <Band
           label="Expected rate (per video)"
           value={result.perVideoExpected}
           currency={currency}
           highlight
         />
-        <Band label="High rate" value={result.perVideoHigh} currency={currency} />
+        <Band
+          label="Optimistic rate"
+          value={result.perVideoHigh}
+          currency={currency}
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3 text-sm">
-        <Row label="Package (low)" value={formatCurrency(result.low, currency)} />
+        <Row
+          label="Package (conservative)"
+          value={formatCurrency(result.low, currency)}
+        />
         <Row
           label="Package (expected)"
           value={formatCurrency(result.expected, currency)}
         />
-        <Row label="Package (high)" value={formatCurrency(result.high, currency)} />
+        <Row
+          label="Package (optimistic)"
+          value={formatCurrency(result.high, currency)}
+        />
       </div>
 
       <p className="text-xs text-slate-500">

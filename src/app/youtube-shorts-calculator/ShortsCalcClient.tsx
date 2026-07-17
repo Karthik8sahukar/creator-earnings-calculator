@@ -97,14 +97,22 @@ export function ShortsCalcClient() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Band label="Low" value={earnings.low.monthly} currency={currency} />
+        <Band
+          label="Conservative"
+          value={earnings.low.monthly}
+          currency={currency}
+        />
         <Band
           label="Expected monthly"
           value={earnings.expected.monthly}
           currency={currency}
           highlight
         />
-        <Band label="High" value={earnings.high.monthly} currency={currency} />
+        <Band
+          label="Optimistic"
+          value={earnings.high.monthly}
+          currency={currency}
+        />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-3 text-sm">
