@@ -1,0 +1,495 @@
+import "server-only";
+
+import { channelCache, searchCache, videosCache } from "./cache";
+import { serverEnv, youtube } from "./config";
+import { YouTubeApiError } from "./errors";
+import { parseIsoDuration, formatDuration } from "./format";
+import { parseChannelQuery } from "./parseQuery";
+import type {
+  ChannelDetails,
+  ChannelSearchResult,
+  VideoItem,
+} from "@/types/youtube";
+
+export { YouTubeApiError } from "./errors";
+
+/**
+ * Server-only YouTube Data API v3 wrapper.
+ *
+ * Rules:
+ *   - The API key is never sent to the browser.
+ *   - No scraping — only official endpoints.
+ *   - All upstream requests have an abort-based timeout.
+ *   - No sensitive data (URLs containing the key, stack traces, env)
+ *     leaks into thrown errors.
+ *   - Results are cached in-process to protect the daily quota (see
+ *     `lib/cache.ts` and the deployment notes in README).
+ */
+
+const UPSTREAM_TIMEOUT_MS = Number(
+  process.env.YOUTUBE_TIMEOUT_MS ?? 8000,
+);
+
+function assertKey(): string {
+  const key = serverEnv.youtubeApiKey;
+  if (!key) {
+    throw new YouTubeApiError(
+      500,
+      "MISSING_API_KEY",
+      "The YouTube API is not configured on the server.",
+    );
+  }
+  return key;
+}
+
+/**
+ * Map a raw upstream reason string to a stable public error code +
+ * safe user-facing message. We never surface the raw Google error
+ * verbatim to the client — it can contain internal-looking details.
+ */
+function mapUpstreamError(
+  status: number,
+  reason: string | undefined,
+): { code: string; status: number; message: string } {
+  const normalized = (reason ?? "").toLowerCase();
+  if (
+    status === 400 &&
+    (normalized.includes("badrequest") || normalized.includes("keyinvalid"))
+  ) {
+    return {
+      code: "INVALID_API_KEY",
+      status: 500,
+      message:
+        "The YouTube API key is invalid. If you are the operator, check the server configuration.",
+    };
+  }
+  if (status === 401 || status === 403) {
+    if (normalized.includes("quota")) {
+      return {
+        code: "QUOTA_EXCEEDED",
+        status: 429,
+        message:
+          "The daily YouTube API quota has been exceeded. Please try again later.",
+      };
+    }
+    if (
+      normalized.includes("forbidden") ||
+      normalized.includes("keyinvalid") ||
+      normalized.includes("apinotactivated")
+    ) {
+      return {
+        code: "INVALID_API_KEY",
+        status: 500,
+        message:
+          "The YouTube API rejected the request. If you are the operator, check that the key is valid and the API is enabled.",
+      };
+    }
+    return {
+      code: "FORBIDDEN",
+      status: 502,
+      message: "The YouTube API refused the request.",
+    };
+  }
+  if (status === 404) {
+    return {
+      code: "NOT_FOUND",
+      status: 404,
+      message: "The requested resource was not found.",
+    };
+  }
+  if (status >= 500) {
+    return {
+      code: "UPSTREAM_UNAVAILABLE",
+      status: 502,
+      message:
+        "The YouTube API is currently unavailable. Please try again shortly.",
+    };
+  }
+  return {
+    code: "UPSTREAM_ERROR",
+    status: 502,
+    message: "The YouTube API returned an unexpected response.",
+  };
+}
+
+async function ytFetch<T>(
+  path: string,
+  params: Record<string, string | number | undefined>,
+): Promise<T> {
+  const key = assertKey();
+  const url = new URL(`${youtube.apiBase}/${path}`);
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null && v !== "") {
+      url.searchParams.set(k, String(v));
+    }
+  }
+  url.searchParams.set("key", key);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+
+  let res: Response;
+  try {
+    res = await fetch(url.toString(), {
+      signal: controller.signal,
+      // Small revalidate hint for platforms that respect it. Our own cache
+      // layer is the primary guard.
+      next: { revalidate: 300 },
+    });
+  } catch (err) {
+    // The fetch failed at the network level. This includes timeouts.
+    // Do NOT include the request URL — it contains the API key.
+    if ((err as { name?: string }).name === "AbortError") {
+      throw new YouTubeApiError(
+        504,
+        "UPSTREAM_TIMEOUT",
+        "The YouTube API took too long to respond.",
+      );
+    }
+    throw new YouTubeApiError(
+      502,
+      "NETWORK_ERROR",
+      "Could not reach the YouTube API. Please try again shortly.",
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  if (!res.ok) {
+    let reason: string | undefined;
+    try {
+      const body = (await res.json()) as {
+        error?: { errors?: { reason?: string }[] };
+      };
+      reason = body.error?.errors?.[0]?.reason;
+    } catch {
+      // ignore — we already have a status code
+    }
+    const mapped = mapUpstreamError(res.status, reason);
+    throw new YouTubeApiError(mapped.status, mapped.code, mapped.message);
+  }
+
+  try {
+    return (await res.json()) as T;
+  } catch {
+    throw new YouTubeApiError(
+      502,
+      "MALFORMED_UPSTREAM",
+      "The YouTube API returned a malformed response.",
+    );
+  }
+}
+
+// ---------- Raw response shapes ----------
+
+interface YtThumbnail {
+  url: string;
+  width: number;
+  height: number;
+}
+
+interface YtThumbnailSet {
+  default?: YtThumbnail;
+  medium?: YtThumbnail;
+  high?: YtThumbnail;
+  standard?: YtThumbnail;
+  maxres?: YtThumbnail;
+}
+
+interface YtSearchItem {
+  id: { kind: string; channelId?: string };
+  snippet: {
+    title: string;
+    description: string;
+    channelTitle: string;
+    thumbnails: YtThumbnailSet;
+    publishedAt: string;
+  };
+}
+
+interface YtSearchResponse {
+  items: YtSearchItem[];
+}
+
+interface YtChannelItem {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    customUrl?: string;
+    publishedAt: string;
+    country?: string;
+    thumbnails: YtThumbnailSet;
+  };
+  statistics?: {
+    viewCount?: string;
+    subscriberCount?: string;
+    hiddenSubscriberCount?: boolean;
+    videoCount?: string;
+  };
+  contentDetails: {
+    relatedPlaylists: {
+      uploads: string;
+    };
+  };
+  brandingSettings?: {
+    image?: {
+      bannerExternalUrl?: string;
+    };
+  };
+}
+
+interface YtChannelResponse {
+  items: YtChannelItem[];
+}
+
+interface YtPlaylistItem {
+  contentDetails: {
+    videoId: string;
+    videoPublishedAt?: string;
+  };
+}
+
+interface YtPlaylistItemsResponse {
+  items: YtPlaylistItem[];
+}
+
+interface YtVideoItem {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    publishedAt: string;
+    thumbnails: YtThumbnailSet;
+  };
+  contentDetails: {
+    duration: string;
+  };
+  statistics?: {
+    viewCount?: string;
+    likeCount?: string;
+    commentCount?: string;
+  };
+}
+
+interface YtVideosResponse {
+  items: YtVideoItem[];
+}
+
+// ---------- Helpers ----------
+
+function pickThumb(thumbs?: YtThumbnailSet): string {
+  return (
+    thumbs?.high?.url ??
+    thumbs?.medium?.url ??
+    thumbs?.default?.url ??
+    thumbs?.standard?.url ??
+    thumbs?.maxres?.url ??
+    ""
+  );
+}
+
+function toNumber(value: string | undefined): number {
+  if (!value) return 0;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function extractHandle(customUrl?: string | null): string | null {
+  if (!customUrl) return null;
+  const s = customUrl.trim();
+  if (!s) return null;
+  return s.startsWith("@") ? s : `@${s}`;
+}
+
+function channelUrl(channelId: string, handle: string | null): string {
+  if (handle) {
+    return `${youtube.handleUrlPrefix}${handle.replace(/^@/, "")}`;
+  }
+  return `${youtube.channelUrlPrefix}${channelId}`;
+}
+
+// ---------- Mappers (exported for tests) ----------
+
+export function mapChannel(c: YtChannelItem): ChannelDetails {
+  const handle = extractHandle(c.snippet.customUrl);
+  const stats = c.statistics ?? {};
+  return {
+    channelId: c.id,
+    title: c.snippet.title,
+    handle,
+    description: c.snippet.description,
+    thumbnail: pickThumb(c.snippet.thumbnails),
+    bannerUrl: c.brandingSettings?.image?.bannerExternalUrl ?? null,
+    subscriberCount: stats.hiddenSubscriberCount
+      ? null
+      : toNumber(stats.subscriberCount),
+    hiddenSubscriberCount: Boolean(stats.hiddenSubscriberCount),
+    viewCount: toNumber(stats.viewCount),
+    videoCount: toNumber(stats.videoCount),
+    publishedAt: c.snippet.publishedAt,
+    country: c.snippet.country ?? null,
+    uploadsPlaylistId: c.contentDetails.relatedPlaylists.uploads,
+    channelUrl: channelUrl(c.id, handle),
+    customUrl: c.snippet.customUrl ?? null,
+  };
+}
+
+export function mapChannelSearchResult(
+  c: YtChannelItem,
+): ChannelSearchResult {
+  const stats = c.statistics ?? {};
+  return {
+    channelId: c.id,
+    title: c.snippet.title,
+    handle: extractHandle(c.snippet.customUrl),
+    description: c.snippet.description,
+    thumbnail: pickThumb(c.snippet.thumbnails),
+    subscriberCount: stats.hiddenSubscriberCount
+      ? null
+      : toNumber(stats.subscriberCount),
+    hiddenSubscriberCount: Boolean(stats.hiddenSubscriberCount),
+  };
+}
+
+export function mapVideo(v: YtVideoItem): VideoItem {
+  const durationSeconds = parseIsoDuration(v.contentDetails.duration);
+  const isShort = durationSeconds > 0 && durationSeconds <= 60;
+  const stats = v.statistics ?? {};
+  return {
+    videoId: v.id,
+    title: v.snippet.title,
+    description: v.snippet.description,
+    thumbnail: pickThumb(v.snippet.thumbnails),
+    publishedAt: v.snippet.publishedAt,
+    viewCount: toNumber(stats.viewCount),
+    likeCount: toNumber(stats.likeCount),
+    commentCount: toNumber(stats.commentCount),
+    durationSeconds,
+    durationLabel: formatDuration(durationSeconds),
+    isShort,
+    url: isShort
+      ? `${youtube.shortsUrlPrefix}${v.id}`
+      : `${youtube.watchUrlPrefix}${v.id}`,
+  };
+}
+
+// ---------- Public API ----------
+
+/**
+ * Smart search:
+ *   - Recognizes raw channel ids and returns just that channel.
+ *   - Recognizes @handles / channel URLs and resolves them via search.
+ *   - Otherwise runs a free-text `type=channel` search.
+ */
+export async function searchChannels(
+  rawQuery: string,
+): Promise<ChannelSearchResult[]> {
+  const parsed = parseChannelQuery(rawQuery);
+  const cacheKey = `${parsed.kind}:${parsed.value.toLowerCase()}`;
+
+  return (searchCache as {
+    getOrLoad(
+      key: string,
+      loader: () => Promise<ChannelSearchResult[]>,
+    ): Promise<ChannelSearchResult[]>;
+  }).getOrLoad(cacheKey, async () => {
+    if (parsed.kind === "channelId") {
+      const details = await getChannelById(parsed.value);
+      if (!details) return [];
+      return [
+        {
+          channelId: details.channelId,
+          title: details.title,
+          handle: details.handle,
+          description: details.description,
+          thumbnail: details.thumbnail,
+          subscriberCount: details.hiddenSubscriberCount
+            ? null
+            : details.subscriberCount,
+          hiddenSubscriberCount: details.hiddenSubscriberCount,
+        },
+      ];
+    }
+
+    const q = parsed.kind === "handle" ? `@${parsed.value}` : parsed.value;
+    if (!q.trim()) return [];
+
+    const search = await ytFetch<YtSearchResponse>("search", {
+      part: "snippet",
+      type: "channel",
+      q,
+      maxResults: youtube.searchMaxResults,
+    });
+
+    const ids = search.items
+      .map((it) => it.id.channelId)
+      .filter((v): v is string => Boolean(v));
+    if (ids.length === 0) return [];
+
+    const enriched = await ytFetch<YtChannelResponse>("channels", {
+      part: "snippet,statistics",
+      id: ids.join(","),
+      maxResults: ids.length,
+    });
+
+    return enriched.items.map(mapChannelSearchResult);
+  });
+}
+
+export async function getChannelById(
+  channelId: string,
+): Promise<ChannelDetails | null> {
+  return (channelCache as {
+    getOrLoad(
+      key: string,
+      loader: () => Promise<ChannelDetails | null>,
+    ): Promise<ChannelDetails | null>;
+  }).getOrLoad(`channel:${channelId}`, async () => {
+    const res = await ytFetch<YtChannelResponse>("channels", {
+      part: "snippet,statistics,contentDetails,brandingSettings",
+      id: channelId,
+      maxResults: 1,
+    });
+    const c = res.items[0];
+    if (!c) return null;
+    return mapChannel(c);
+  });
+}
+
+export async function getRecentVideos(
+  uploadsPlaylistId: string,
+  limit: number = youtube.recentVideosCount,
+): Promise<VideoItem[]> {
+  const safeLimit = Math.min(Math.max(Math.floor(limit || 0), 1), 50);
+  return (videosCache as {
+    getOrLoad(
+      key: string,
+      loader: () => Promise<VideoItem[]>,
+    ): Promise<VideoItem[]>;
+  }).getOrLoad(`videos:${uploadsPlaylistId}:${safeLimit}`, async () => {
+    const playlist = await ytFetch<YtPlaylistItemsResponse>("playlistItems", {
+      part: "contentDetails",
+      playlistId: uploadsPlaylistId,
+      maxResults: safeLimit,
+    });
+
+    const videoIds = playlist.items
+      .map((it) => it.contentDetails.videoId)
+      .filter(Boolean);
+    if (videoIds.length === 0) return [];
+
+    const videos = await ytFetch<YtVideosResponse>("videos", {
+      part: "snippet,contentDetails,statistics",
+      id: videoIds.join(","),
+      maxResults: videoIds.length,
+    });
+
+    const byId = new Map(videos.items.map((v) => [v.id, v]));
+
+    return videoIds
+      .map((id) => byId.get(id))
+      .filter((v): v is YtVideoItem => Boolean(v))
+      .map(mapVideo);
+  });
+}
