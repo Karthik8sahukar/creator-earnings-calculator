@@ -12,8 +12,12 @@
 
 import { publicEnv } from "./env.public";
 
+/**
+ * Meta description used across metadata (Open Graph, Twitter, and any
+ * page that doesn't override it). Kept in sync with the branding guide.
+ */
 const description =
-  "Search any YouTube channel and estimate creator earnings using public statistics from the YouTube Data API v3.";
+  "Estimate YouTube channel earnings using public statistics. Calculate potential monthly income, RPM, CPM, Shorts revenue, sponsorship value, and more with our free YouTube Money Calculator.";
 
 export const publicConfig = Object.freeze({
   siteName: publicEnv.siteName,

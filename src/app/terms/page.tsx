@@ -5,7 +5,7 @@ import { StaticPage } from "@/components/StaticPage";
 export const metadata: Metadata = {
   title: "Terms",
   description:
-    "The terms under which Creator Earnings Calculator is offered. No affiliation with YouTube or Google. Estimates only; not financial advice.",
+    "The terms under which YouTube Money Calculator is offered. No affiliation with YouTube or Google. Estimates only; not financial advice.",
   alternates: { canonical: "/terms" },
 };
 

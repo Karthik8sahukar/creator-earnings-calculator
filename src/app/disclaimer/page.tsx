@@ -5,7 +5,7 @@ import { StaticPage } from "@/components/StaticPage";
 export const metadata: Metadata = {
   title: "Disclaimer",
   description:
-    "Creator Earnings Calculator is an independent tool. Estimates only — not affiliated with YouTube or Google. No guarantee of income.",
+    "YouTube Money Calculator is an independent tool. Estimates only — not affiliated with YouTube or Google. No guarantee of income.",
   alternates: { canonical: "/disclaimer" },
 };
 
@@ -17,6 +17,31 @@ export default function DisclaimerPage() {
         see on this site. It has not been reviewed by a lawyer. It is not
         legal advice.
       </p>
+
+      <aside
+        role="note"
+        aria-label="Key disclaimer"
+        className="not-prose rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 space-y-2"
+      >
+        <p className="font-semibold">Please read before relying on any figure:</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            Every earnings figure shown on this site is an{" "}
+            <strong>estimate</strong>, not an actual number.
+          </li>
+          <li>
+            This site is <strong>not affiliated with or endorsed by
+            YouTube or Google</strong>. YouTube is a trademark of
+            Google LLC.
+          </li>
+          <li>
+            Actual creator revenue varies by <strong>RPM, CPM, audience
+            location, watch time, niche, ads, memberships,
+            sponsorships</strong>, and other monetization methods that
+            this tool cannot see.
+          </li>
+        </ul>
+      </aside>
 
       <h2 className="text-xl font-semibold text-slate-900">
         Independent tool, not YouTube
@@ -64,6 +89,15 @@ export default function DisclaimerPage() {
         ). Actual creator earnings are private and known only to the
         creator, YouTube, and — where applicable — their tax authorities.
         The estimates are not verified by YouTube, Google, or the creator.
+      </p>
+      <p>
+        A creator&apos;s real revenue is driven by many factors that this
+        tool cannot observe: their effective RPM and CPM, the geographic
+        distribution of their viewers, average watch time, niche, the mix
+        of ad formats, channel memberships, brand sponsorships, affiliate
+        income, and other monetization methods. Two channels with
+        identical view counts can earn very different amounts. Treat every
+        number here as a rough starting point, not a target.
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">

@@ -70,7 +70,7 @@ export async function generateMetadata({
     return {
       title: "Channel not found",
       description:
-        "This YouTube channel could not be found. Search for another channel to view its public statistics and an independent creator earnings estimate.",
+        "This YouTube channel could not be found. Search for another channel to view its public statistics and an independent monthly earnings estimate.",
       alternates: { canonical: "/" },
       robots: { index: false, follow: true },
     };

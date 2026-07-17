@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ShareSection } from "../ShareSection";
 
-const URL = "https://creator-earnings.example/channel/UCXXXXXXXXXXXXXXXXXXXXXX";
+const URL = "https://youtube-money-calculator.example/channel/UCXXXXXXXXXXXXXXXXXXXXXX";
 const TITLE = "Some Channel";
 
 describe("ShareSection", () => {
@@ -61,7 +61,7 @@ describe("ShareSection", () => {
     expect(shareSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         title: TITLE,
-        text: expect.stringContaining("independent creator earnings estimate"),
+        text: expect.stringContaining("independent monthly earnings estimate"),
         url: URL,
       }),
     );

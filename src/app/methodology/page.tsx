@@ -6,7 +6,7 @@ import { legalLastUpdatedIso } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Methodology",
   description:
-    "How Creator Earnings Calculator estimates YouTube revenue: data sources, RPM/CPM definitions, country and niche assumptions, Shorts vs. long-form, and known limitations.",
+    "How YouTube Money Calculator estimates YouTube revenue: data sources, RPM/CPM definitions, country and niche assumptions, Shorts vs. long-form, and known limitations.",
   alternates: { canonical: "/methodology" },
 };
 

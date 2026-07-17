@@ -7,17 +7,25 @@ import { publicConfig } from "@/lib/config";
 
 import "./globals.css";
 
+/**
+ * Root metadata.
+ *
+ * The homepage overrides `title.default` and `description` with the
+ * spec-mandated SEO strings; see `src/app/page.tsx`. Child pages fall
+ * back to the template + this description.
+ */
 export const metadata: Metadata = {
   metadataBase: new URL(publicConfig.siteUrl),
   title: {
-    default: `${publicConfig.siteName} — Estimate YouTube creator earnings`,
+    default: `${publicConfig.siteName} | Estimate Channel Earnings, RPM & CPM`,
     template: `%s · ${publicConfig.siteName}`,
   },
   description: publicConfig.description,
   applicationName: publicConfig.siteName,
   keywords: [
     "YouTube",
-    "creator earnings",
+    "YouTube money calculator",
+    "YouTube earnings calculator",
     "YouTube calculator",
     "channel analytics",
     "RPM",
@@ -25,7 +33,6 @@ export const metadata: Metadata = {
     "YouTube revenue",
     "Shorts RPM",
     "sponsorship rate",
-    "creator economy",
   ],
   authors: [{ name: publicConfig.siteName }],
   creator: publicConfig.siteName,
@@ -43,13 +50,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: publicConfig.siteUrl,
-    title: `${publicConfig.siteName} — Estimate YouTube creator earnings`,
+    title: `${publicConfig.siteName} | Estimate Channel Earnings, RPM & CPM`,
     description: publicConfig.description,
     siteName: publicConfig.siteName,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${publicConfig.siteName} — Estimate YouTube creator earnings`,
+    title: `${publicConfig.siteName} | Estimate Channel Earnings, RPM & CPM`,
     description: publicConfig.description,
   },
   alternates: {

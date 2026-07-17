@@ -8,15 +8,15 @@ import {
 } from "../share";
 
 const CHANNEL_URL =
-  "https://creator-earnings.example/channel/UCXXXXXXXXXXXXXXXXXXXXXX";
+  "https://youtube-money-calculator.example/channel/UCXXXXXXXXXXXXXXXXXXXXXX";
 const TEXT =
-  "View public channel statistics and an independent creator earnings estimate for Kurzgesagt – In a Nutshell.";
+  "View public channel statistics and an independent monthly earnings estimate for Kurzgesagt – In a Nutshell.";
 
 describe("defaultChannelShareText", () => {
   it("builds the canonical wording without claiming verification", () => {
     const t = defaultChannelShareText("MrBeast");
     expect(t).toBe(
-      "View public channel statistics and an independent creator earnings estimate for MrBeast.",
+      "View public channel statistics and an independent monthly earnings estimate for MrBeast.",
     );
     expect(t.toLowerCase()).not.toMatch(/verified|official|endorse/);
   });

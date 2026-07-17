@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Playwright configuration for Creator Earnings Calculator.
+ * Playwright configuration for YouTube Money Calculator.
  *
  * We run the Next.js server in E2E mock mode (`E2E_MOCK_MODE=1`) so the
  * suite never touches the real YouTube API. See `src/lib/e2eFixtures.ts`
@@ -80,7 +80,7 @@ export default defineConfig({
     env: {
       E2E_MOCK_MODE: "1",
       NEXT_PUBLIC_SITE_URL: BASE_URL,
-      NEXT_PUBLIC_SITE_NAME: "Creator Earnings Calculator",
+      NEXT_PUBLIC_SITE_NAME: "YouTube Money Calculator",
       // The mock never touches YouTube — but the env schema requires
       // a non-empty key when the code path expects one. We pass a
       // placeholder so `isYoutubeApiConfigured()` is true in tests

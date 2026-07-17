@@ -9,7 +9,7 @@ test("/api/health returns 200 with the expected shape and never leaks env values
   const body = (await res.json()) as Record<string, unknown>;
   expect(body).toMatchObject({
     status: "ok",
-    service: "creator-earnings-calculator",
+    service: "youtube-money-calculator",
     youtubeApiConfigured: true, // set to true in playwright.config webServer env
   });
   expect(typeof body.timestamp).toBe("string");

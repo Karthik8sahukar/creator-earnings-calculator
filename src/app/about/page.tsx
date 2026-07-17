@@ -6,7 +6,7 @@ import { publicConfig } from "@/lib/config";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "What Creator Earnings Calculator is, what it is not, and what public data sources power it.",
+    "What YouTube Money Calculator is, what it is not, and what public data sources power it.",
   alternates: { canonical: "/about" },
 };
 
@@ -24,7 +24,7 @@ export default function AboutPage() {
 
       <h2 className="text-xl font-semibold text-slate-900">Why we built it</h2>
       <p>
-        Creator earnings numbers on the internet are all over the map.
+        YouTube earnings numbers on the internet are all over the map.
         Different sites use wildly different assumptions and rarely explain
         them. We wanted a tool that (1) uses only the official YouTube API,
         (2) shows its work, and (3) lets you tune the assumptions yourself.

@@ -11,7 +11,7 @@ export function Footer() {
             {publicConfig.siteName}
           </h3>
           <p className="mt-2 leading-relaxed">
-            An independent tool that estimates YouTube creator earnings using
+            An independent tool that estimates YouTube channel earnings using
             public statistics. Not affiliated with, endorsed by, or verified by
             YouTube or Google.
           </p>

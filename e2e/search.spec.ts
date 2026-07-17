@@ -12,7 +12,7 @@ test.describe("channel search workflow", () => {
 
     // 1. Homepage
     await expect(
-      page.getByRole("heading", { name: /search any youtube channel/i }),
+      page.getByRole("heading", { level: 1, name: /youtube money calculator/i }),
     ).toBeVisible();
 
     // 2. Enter a channel name
