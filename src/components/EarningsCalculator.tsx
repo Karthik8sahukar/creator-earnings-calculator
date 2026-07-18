@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
 import { CopyShareLink } from "./CopyShareLink";
@@ -28,31 +29,12 @@ import type { PerformanceAnalysis } from "@/types/youtube";
 
 interface Props {
   analysis: PerformanceAnalysis;
-  /**
-   * Partial seed state (typically decoded from a URL). Only the keys
-   * the URL actually provided are present here — anything absent falls
-   * back to the analysis-derived defaults computed below.
-   */
   initialState?: Partial<CalculatorState>;
-  /** Called every time the calculator state changes (URL sync). */
   onStateChange?: (state: CalculatorState) => void;
-  /** Absolute origin + path used to build the share link. */
   shareOrigin?: string;
   sharePathname?: string;
   channelId?: string | null;
 }
-
-/**
- * Human-readable labels for the scenario tabs. The internal enum stays
- * `low | expected | high` so shareable URLs (`?eb=low`) remain stable,
- * but the UI reads as "Conservative / Expected / Optimistic" — the
- * industry-standard framing for an earnings range.
- */
-const BAND_LABELS: Record<EstimateBand, string> = {
-  low: "Conservative",
-  expected: "Expected",
-  high: "Optimistic",
-};
 
 function pickDefaultContentType(shorts: number): CalculatorState["contentType"] {
   if (shorts >= 70) return "shorts";
@@ -60,33 +42,6 @@ function pickDefaultContentType(shorts: number): CalculatorState["contentType"] 
   return "long";
 }
 
-/**
- * Compute the initial calculator state.
- *
- * Design rules:
- *
- *  • The scenario band (`estimateBand`) is purely a *revenue*
- *    uncertainty knob. It never touches `monthlyViews`.
- *  • `monthlyViews` is always seeded from the analysis's *expected*
- *    view estimate — the single best guess of the channel's actual
- *    monthly views. Users can then adjust it manually (their input is
- *    preserved), and the low/high traffic bands remain visible on the
- *    performance card as a separate uncertainty axis.
- *  • This gives us one clear, non-compound source of uncertainty:
- *    switching Conservative → Expected → Optimistic multiplies the
- *    result by exactly `BAND_FACTORS.conservative / .expected /
- *    .optimistic` (0.6 / 1.0 / 1.5) and nothing else.
- *
- * Order of precedence (last wins):
- *   1. Baseline defaults (DEFAULT_CALCULATOR_STATE) — including
- *      estimateBand = "expected".
- *   2. Analysis-derived defaults (auto-estimated `monthlyViews` from
- *      `analysis.monthlyViewEstimate.expected`, sensible content type
- *      from the Shorts share).
- *   3. URL-provided partial state — only fields the URL actually
- *      included; anything absent lets the analysis default stand.
- *   4. `channelId` from the route — always wins, ignores URL/legacy.
- */
 function computeInitialState({
   analysis,
   initialState,
@@ -106,7 +61,6 @@ function computeInitialState({
     ...analysisDerived,
     ...(initialState ?? {}),
     channelId,
-    // Defense-in-depth: never allow estimateBand to become undefined.
     estimateBand: initialState?.estimateBand ?? DEFAULT_SCENARIO,
   };
 }
@@ -119,6 +73,7 @@ export function EarningsCalculator({
   sharePathname = "/",
   channelId = null,
 }: Props) {
+  const t = useTranslations("earnings");
   const initialViews = analysis.monthlyViewEstimate.expected || 0;
 
   const [state, setState] = useState<CalculatorState>(() =>
@@ -127,10 +82,6 @@ export function EarningsCalculator({
 
   const estimateBand = state.estimateBand;
 
-  // Debounce URL writes so a run of keystrokes (e.g. typing "1000000")
-  // doesn't push a new history entry per character. The visible UI
-  // updates immediately because it reads from `state`; only the URL
-  // sync callback is throttled.
   useEffect(() => {
     if (!onStateChange) return;
     const timer = setTimeout(() => {
@@ -148,11 +99,6 @@ export function EarningsCalculator({
   const active = earnings[estimateBand];
 
   function applyBand(band: EstimateBand) {
-    // Scenario tabs represent RPM uncertainty (BAND_FACTORS in
-    // earnings.ts), NOT view-count uncertainty. Deliberately do NOT
-    // touch `monthlyViews` here — a manually-entered value would get
-    // clobbered, and stacking a view-band adjustment on top of the
-    // RPM band would compound two uncertainties invisibly.
     setState((s) => ({ ...s, estimateBand: band }));
     track({ name: "calculator.assumption_changed", field: "estimateBand" });
   }
@@ -162,7 +108,6 @@ export function EarningsCalculator({
     value: CalculatorState[K],
   ) {
     setState((s) => ({ ...s, [field]: value }));
-    // Analytics — only the field name, never the value.
     track({ name: "calculator.assumption_changed", field: String(field) });
   }
 
@@ -183,6 +128,12 @@ export function EarningsCalculator({
     return buildShareUrl(origin, sharePathname, state);
   }, [shareOrigin, sharePathname, state]);
 
+  const bandLabels: Record<EstimateBand, string> = {
+    low: t("bands.low"),
+    expected: t("bands.expected"),
+    high: t("bands.high"),
+  };
+
   return (
     <div className="space-y-6">
       <section
@@ -194,7 +145,7 @@ export function EarningsCalculator({
           <div className="flex items-center gap-2">
             <DollarIcon className="text-brand-600" />
             <h2 id="earn-title" className="text-lg font-semibold text-slate-900">
-              Earnings estimator
+              {t("sectionTitle")}
             </h2>
           </div>
           <div className="flex items-center gap-2">
@@ -203,7 +154,8 @@ export function EarningsCalculator({
               onClick={reset}
               className="btn-secondary text-xs sm:text-sm"
             >
-              Reset
+              {/* Common: Reset */}
+              <ResetLabel />
             </button>
             <CopyShareLink url={shareUrl} />
           </div>
@@ -211,7 +163,7 @@ export function EarningsCalculator({
 
         <div
           role="tablist"
-          aria-label="Estimate scenario"
+          aria-label={t("tabsLabel")}
           className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm mb-6"
         >
           {(["low", "expected", "high"] as const).map((band) => (
@@ -228,7 +180,7 @@ export function EarningsCalculator({
                   : "text-slate-500 hover:text-slate-900"
               }`}
             >
-              {BAND_LABELS[band]}
+              {bandLabels[band]}
             </button>
           ))}
         </div>
@@ -237,39 +189,42 @@ export function EarningsCalculator({
           <div className="lg:col-span-3 space-y-4">
             <FieldGroup>
               <NumberField
-                label="Monthly views"
+                label={t("fields.monthlyViews")}
                 name={CALCULATOR_PARAM_KEYS.monthlyViews}
                 value={state.monthlyViews}
                 onChange={(v) => update("monthlyViews", clampNumber(v))}
-                hint={`Auto-estimated: ${formatCompact(initialViews)} (${formatNumber(initialViews)})`}
+                hint={t("fields.monthlyViewsHint", {
+                  compact: formatCompact(initialViews),
+                  full: formatNumber(initialViews),
+                })}
                 min={0}
                 step={1000}
               />
               <SelectField
-                label="Content type"
+                label={t("fields.contentType")}
                 name={CALCULATOR_PARAM_KEYS.contentType}
                 value={state.contentType}
                 onChange={(v) =>
                   update("contentType", v as CalculatorState["contentType"])
                 }
                 options={[
-                  { value: "long", label: "Long-form" },
-                  { value: "shorts", label: "Shorts" },
-                  { value: "mixed", label: "Mixed" },
+                  { value: "long", label: t("contentTypeOptions.long") },
+                  { value: "shorts", label: t("contentTypeOptions.shorts") },
+                  { value: "mixed", label: t("contentTypeOptions.mixed") },
                 ]}
               />
             </FieldGroup>
 
             <FieldGroup>
               <SelectField
-                label="Country / audience"
+                label={t("fields.country")}
                 name={CALCULATOR_PARAM_KEYS.country}
                 value={state.country}
                 onChange={(v) => update("country", v)}
                 options={COUNTRIES.map((c) => ({ value: c.id, label: c.label }))}
               />
               <SelectField
-                label="Niche"
+                label={t("fields.niche")}
                 name={CALCULATOR_PARAM_KEYS.niche}
                 value={state.niche}
                 onChange={(v) => update("niche", v)}
@@ -280,30 +235,29 @@ export function EarningsCalculator({
             <FieldGroup>
               <div className="grid grid-cols-2 gap-3">
                 <SelectField
-                  label="RPM mode"
+                  label={t("fields.rpmMode")}
                   name={CALCULATOR_PARAM_KEYS.rpmMode}
                   value={state.rpmMode}
                   onChange={(v) =>
                     update("rpmMode", v as CalculatorState["rpmMode"])
                   }
                   options={[
-                    { value: "auto", label: "Auto" },
-                    { value: "custom", label: "Custom" },
+                    { value: "auto", label: t("rpmModeOptions.auto") },
+                    { value: "custom", label: t("rpmModeOptions.custom") },
                   ]}
                 />
                 <NumberField
-                  label="Custom RPM (USD)"
+                  label={t("fields.customRpm")}
                   name={CALCULATOR_PARAM_KEYS.customRpm}
                   value={state.customRpm}
                   onChange={(v) => update("customRpm", clampNumber(v))}
                   min={0}
                   step={0.1}
                   disabled={state.rpmMode !== "custom"}
-                  placeholder="Auto"
                 />
               </div>
               <SelectField
-                label="Display currency"
+                label={t("fields.displayCurrency")}
                 name={CALCULATOR_PARAM_KEYS.currency}
                 value={state.currency}
                 onChange={(v) => update("currency", v)}
@@ -316,7 +270,7 @@ export function EarningsCalculator({
 
             <FieldGroup>
               <SliderField
-                label="Monetized views %"
+                label={t("fields.monetizedPercent")}
                 name={CALCULATOR_PARAM_KEYS.monetizedPercentage}
                 value={state.monetizedPercentage}
                 onChange={(v) => update("monetizedPercentage", clampPct(v))}
@@ -324,16 +278,16 @@ export function EarningsCalculator({
                 max={100}
                 step={1}
                 suffix="%"
-                hint="Relative to a typical channel (~90%). 90% matches YouTube Studio's RPM formula; drag up for a well-monetized channel or down for COPPA/Premium-heavy audiences."
+                hint={t("fields.monetizedHint")}
               />
             </FieldGroup>
 
             <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <legend className="label mb-2 col-span-full">
-                Additional monthly income (in {currencyMeta.code})
+                {t("fields.extrasLegend", { currency: currencyMeta.code })}
               </legend>
               <NumberField
-                label="Sponsorships"
+                label={t("fields.sponsorships")}
                 name={CALCULATOR_PARAM_KEYS.sponsorship}
                 value={state.sponsorship}
                 onChange={(v) => update("sponsorship", clampNumber(v))}
@@ -341,7 +295,7 @@ export function EarningsCalculator({
                 step={50}
               />
               <NumberField
-                label="Affiliate"
+                label={t("fields.affiliate")}
                 name={CALCULATOR_PARAM_KEYS.affiliate}
                 value={state.affiliate}
                 onChange={(v) => update("affiliate", clampNumber(v))}
@@ -349,7 +303,7 @@ export function EarningsCalculator({
                 step={50}
               />
               <NumberField
-                label="Memberships"
+                label={t("fields.memberships")}
                 name={CALCULATOR_PARAM_KEYS.membership}
                 value={state.membership}
                 onChange={(v) => update("membership", clampNumber(v))}
@@ -357,7 +311,7 @@ export function EarningsCalculator({
                 step={50}
               />
               <NumberField
-                label="Other"
+                label={t("fields.other")}
                 name={CALCULATOR_PARAM_KEYS.other}
                 value={state.other}
                 onChange={(v) => update("other", clampNumber(v))}
@@ -370,7 +324,7 @@ export function EarningsCalculator({
           <div className="lg:col-span-2">
             <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 text-white p-6 shadow-pop">
               <p className="text-xs uppercase tracking-wide text-brand-100">
-                {BAND_LABELS[estimateBand]} monthly total
+                {t("monthlyTotal", { band: bandLabels[estimateBand] })}
               </p>
               <p
                 className="mt-1 text-4xl font-bold tracking-tight"
@@ -379,45 +333,72 @@ export function EarningsCalculator({
                 {formatCurrency(active.monthly, state.currency)}
               </p>
               <p className="text-brand-100 text-sm mt-1">
-                at {formatCompact(state.monthlyViews)} monthly views
+                {t("atViews", { views: formatCompact(state.monthlyViews) })}
               </p>
 
               <dl className="mt-6 grid grid-cols-2 gap-3 text-sm">
-                <Kpi label="Daily" value={formatCurrency(active.daily, state.currency)} />
-                <Kpi label="Weekly" value={formatCurrency(active.weekly, state.currency)} />
-                <Kpi label="Monthly" value={formatCurrency(active.monthly, state.currency)} />
-                <Kpi label="Annual" value={formatCurrency(active.annual, state.currency)} />
+                <Kpi
+                  label={t("kpi.daily")}
+                  value={formatCurrency(active.daily, state.currency)}
+                />
+                <Kpi
+                  label={t("kpi.weekly")}
+                  value={formatCurrency(active.weekly, state.currency)}
+                />
+                <Kpi
+                  label={t("kpi.monthly")}
+                  value={formatCurrency(active.monthly, state.currency)}
+                />
+                <Kpi
+                  label={t("kpi.annual")}
+                  value={formatCurrency(active.annual, state.currency)}
+                />
               </dl>
             </div>
 
             <div className="mt-4 rounded-xl border border-slate-100 bg-white p-4 text-sm">
-              <h3 className="font-medium text-slate-900">Breakdown (monthly)</h3>
+              <h3 className="font-medium text-slate-900">
+                {t("breakdown.title")}
+              </h3>
               <ul className="mt-3 space-y-2 text-slate-600">
                 <BreakdownRow
-                  label="Ad revenue"
-                  value={formatCurrency(earnings.monthlyAdRevenue.monthly, state.currency)}
+                  label={t("breakdown.adRevenue")}
+                  value={formatCurrency(
+                    earnings.monthlyAdRevenue.monthly,
+                    state.currency,
+                  )}
                 />
                 <BreakdownRow
-                  label="Sponsorships"
-                  value={formatCurrency(earnings.extras.sponsorship, state.currency)}
+                  label={t("breakdown.sponsorships")}
+                  value={formatCurrency(
+                    earnings.extras.sponsorship,
+                    state.currency,
+                  )}
                 />
                 <BreakdownRow
-                  label="Affiliate"
-                  value={formatCurrency(earnings.extras.affiliate, state.currency)}
+                  label={t("breakdown.affiliate")}
+                  value={formatCurrency(
+                    earnings.extras.affiliate,
+                    state.currency,
+                  )}
                 />
                 <BreakdownRow
-                  label="Memberships"
-                  value={formatCurrency(earnings.extras.membership, state.currency)}
+                  label={t("breakdown.memberships")}
+                  value={formatCurrency(
+                    earnings.extras.membership,
+                    state.currency,
+                  )}
                 />
                 <BreakdownRow
-                  label="Other"
-                  value={formatCurrency(state.other * findCurrency(state.currency).usdRate, state.currency)}
+                  label={t("breakdown.other")}
+                  value={formatCurrency(
+                    state.other * findCurrency(state.currency).usdRate,
+                    state.currency,
+                  )}
                 />
               </ul>
               <p className="mt-4 text-xs text-slate-500 leading-relaxed">
-                Estimates only. Actual earnings depend on many factors we
-                can&apos;t observe — fill rate, seasonality, ad category mix,
-                YouTube share, refunds, and taxes.
+                {t("disclaimer")}
               </p>
             </div>
           </div>
@@ -432,7 +413,10 @@ export function EarningsCalculator({
 
       {/* Machine-readable state for tests and share tooling. */}
       <div className="sr-only" data-testid="calculator-state-json">
-        {JSON.stringify({ state, params: encodeCalculatorState(state).toString() })}
+        {JSON.stringify({
+          state,
+          params: encodeCalculatorState(state).toString(),
+        })}
       </div>
     </div>
   );
@@ -445,6 +429,12 @@ function clampNumber(v: number | ""): number {
 function clampPct(v: number): number {
   if (!Number.isFinite(v)) return 0;
   return Math.min(Math.max(v, 0), 100);
+}
+
+/** Small helper so we can use `useTranslations` for a nested string. */
+function ResetLabel() {
+  const t = useTranslations("common.actions");
+  return <>{t("reset")}</>;
 }
 
 function FieldGroup({ children }: { children: React.ReactNode }) {
@@ -499,7 +489,9 @@ function NumberField({
         aria-label={label}
         className="input mt-1 disabled:bg-slate-50 disabled:text-slate-400"
       />
-      {hint && <span className="mt-1 block text-[11px] text-slate-500">{hint}</span>}
+      {hint && (
+        <span className="mt-1 block text-[11px] text-slate-500">{hint}</span>
+      )}
     </label>
   );
 }

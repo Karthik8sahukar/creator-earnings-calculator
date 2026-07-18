@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
+import { Link } from "@/i18n/navigation";
 import { publicConfig } from "@/lib/config";
 import { Logo } from "./Logo";
 
@@ -14,26 +15,26 @@ import { Logo } from "./Logo";
  *   - No social icons — we do not have real profile URLs configured
  *     yet, so we omit the row entirely rather than emit placeholders.
  *
- * `publicConfig.siteName` is still used in the copyright line and the
- * "independent tool" disclaimer because those legal-adjacent strings
- * must match the canonical product name used in metadata and JSON-LD.
+ * `publicConfig.siteName` is still used in the copyright suffix
+ * because that legal-adjacent string must match the canonical product
+ * name used in metadata and JSON-LD.
  */
 export function Footer() {
+  const t = useTranslations("footer");
+  const tCommon = useTranslations("common.labels");
+  const year = new Date().getFullYear();
+
   return (
     <footer className="mt-24 border-t border-slate-200/70 bg-white/60 dark:border-slate-800/70 dark:bg-slate-950/40">
       <div className="container-page py-12 grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1fr] text-sm text-slate-600 dark:text-slate-400">
         <div className="space-y-4 max-w-sm">
           <Logo size="md" withTagline />
-          <p className="leading-relaxed">
-            An independent tool that estimates YouTube channel earnings from
-            public statistics. Not affiliated with, endorsed by, or verified
-            by YouTube or Google.
-          </p>
+          <p className="leading-relaxed">{t("brandBlurb")}</p>
         </div>
 
         <div>
           <h4 className="font-semibold text-slate-900 dark:text-slate-100">
-            Calculators
+            {t("calculators")}
           </h4>
           <ul className="mt-3 space-y-2">
             <li>
@@ -41,7 +42,7 @@ export function Footer() {
                 href="/#find-channel"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                Money Calculator
+                {t("moneyCalculator")}
               </Link>
             </li>
             <li>
@@ -49,7 +50,7 @@ export function Footer() {
                 href="/youtube-rpm-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                RPM Calculator
+                {t("rpmCalculator")}
               </Link>
             </li>
             <li>
@@ -57,7 +58,7 @@ export function Footer() {
                 href="/youtube-cpm-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                CPM Calculator
+                {t("cpmCalculator")}
               </Link>
             </li>
             <li>
@@ -65,7 +66,7 @@ export function Footer() {
                 href="/youtube-shorts-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                Shorts Calculator
+                {t("shortsCalculator")}
               </Link>
             </li>
             <li>
@@ -73,7 +74,7 @@ export function Footer() {
                 href="/youtube-sponsorship-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                Sponsorship Calculator
+                {t("sponsorshipCalculator")}
               </Link>
             </li>
           </ul>
@@ -81,7 +82,7 @@ export function Footer() {
 
         <div>
           <h4 className="font-semibold text-slate-900 dark:text-slate-100">
-            Company
+            {t("company")}
           </h4>
           <ul className="mt-3 space-y-2">
             <li>
@@ -89,7 +90,7 @@ export function Footer() {
                 href="/about"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                About
+                {t("about")}
               </Link>
             </li>
             <li>
@@ -97,7 +98,7 @@ export function Footer() {
                 href="/methodology"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                Methodology
+                {t("methodology")}
               </Link>
             </li>
             <li>
@@ -105,10 +106,9 @@ export function Footer() {
               <span
                 aria-disabled="true"
                 className="inline-flex items-center gap-2 text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
-                title="Blog is coming soon"
               >
-                Blog
-                <span className="chip">Soon</span>
+                {t("blog")}
+                <span className="chip">{tCommon("soon")}</span>
               </span>
             </li>
           </ul>
@@ -116,7 +116,7 @@ export function Footer() {
 
         <div>
           <h4 className="font-semibold text-slate-900 dark:text-slate-100">
-            Legal
+            {t("legal")}
           </h4>
           <ul className="mt-3 space-y-2">
             <li>
@@ -124,7 +124,7 @@ export function Footer() {
                 href="/privacy"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                Privacy
+                {t("privacy")}
               </Link>
             </li>
             <li>
@@ -132,7 +132,7 @@ export function Footer() {
                 href="/terms"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                Terms
+                {t("terms")}
               </Link>
             </li>
             <li>
@@ -140,7 +140,7 @@ export function Footer() {
                 href="/disclaimer"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                Disclaimer
+                {t("disclaimer")}
               </Link>
             </li>
           </ul>
@@ -148,7 +148,7 @@ export function Footer() {
 
         <div>
           <h4 className="font-semibold text-slate-900 dark:text-slate-100">
-            Resources
+            {t("resources")}
           </h4>
           <ul className="mt-3 space-y-2">
             <li>
@@ -158,13 +158,12 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                YouTube Data API v3
+                {t("dataSourceLink")}
               </a>
             </li>
           </ul>
           <p className="mt-4 text-xs leading-relaxed text-slate-500 dark:text-slate-500">
-            Revenue figures on this site are independently calculated
-            estimates.
+            {t("estimatesBlurb")}
           </p>
         </div>
       </div>
@@ -172,12 +171,10 @@ export function Footer() {
       <div className="border-t border-slate-200/70 dark:border-slate-800/70">
         <div className="container-page py-6 text-xs text-slate-500 dark:text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <span>
-            &copy; {new Date().getFullYear()} BeHumler. Independent tool —{" "}
-            <span className="whitespace-nowrap">{publicConfig.siteName}</span>.
+            {t("copyright", { year })}{" "}
+            <span className="whitespace-nowrap">— {publicConfig.siteName}.</span>
           </span>
-          <span className="whitespace-nowrap">
-            Estimates only. Not financial advice.
-          </span>
+          <span className="whitespace-nowrap">{t("notFinancialAdvice")}</span>
         </div>
       </div>
     </footer>

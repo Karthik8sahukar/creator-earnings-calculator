@@ -1,15 +1,31 @@
+import { useTranslations } from "next-intl";
+
 import { ChartIcon, EyeIcon, FilmIcon, SparklesIcon } from "./icons";
 import { formatCompact, formatNumber } from "@/lib/format";
 import type { PerformanceAnalysis } from "@/types/youtube";
 
 export function PerformanceCard({ analysis }: { analysis: PerformanceAnalysis }) {
+  const t = useTranslations("performance");
+
   const rows: [string, string, string?][] = [
-    ["Average recent views", formatCompact(analysis.averageRecentViews), formatNumber(analysis.averageRecentViews)],
-    ["Median recent views", formatCompact(analysis.medianRecentViews), formatNumber(analysis.medianRecentViews)],
-    ["Uploads (last 30 days)", `${analysis.uploadsLast30Days}`],
-    ["Uploads (last 90 days)", `${analysis.uploadsLast90Days}`],
-    ["Recent observed views", formatCompact(analysis.recentObservedViews), formatNumber(analysis.recentObservedViews)],
-    ["Sample size", `${analysis.sampleSize} videos`],
+    [
+      t("rows.averageRecent"),
+      formatCompact(analysis.averageRecentViews),
+      formatNumber(analysis.averageRecentViews),
+    ],
+    [
+      t("rows.medianRecent"),
+      formatCompact(analysis.medianRecentViews),
+      formatNumber(analysis.medianRecentViews),
+    ],
+    [t("rows.uploads30"), `${analysis.uploadsLast30Days}`],
+    [t("rows.uploads90"), `${analysis.uploadsLast90Days}`],
+    [
+      t("rows.recentObserved"),
+      formatCompact(analysis.recentObservedViews),
+      formatNumber(analysis.recentObservedViews),
+    ],
+    [t("rows.sampleSize"), t("rows.sampleSizeValue", { count: analysis.sampleSize })],
   ];
 
   return (
@@ -17,27 +33,27 @@ export function PerformanceCard({ analysis }: { analysis: PerformanceAnalysis })
       <header className="flex items-center gap-2 mb-4">
         <ChartIcon className="text-brand-600" />
         <h2 id="perf-title" className="text-lg font-semibold text-slate-900">
-          Performance analysis
+          {t("title")}
         </h2>
       </header>
       <p className="text-sm text-slate-500 mb-6">
-        Based on the {analysis.sampleSize} most recent uploads.
+        {t("sampleNote", { count: analysis.sampleSize })}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-3 mb-6">
         <Estimate
-          label="Low"
+          label={t("estimateLow")}
           value={formatCompact(analysis.monthlyViewEstimate.low)}
           tone="low"
         />
         <Estimate
-          label="Expected monthly views"
+          label={t("estimateExpected")}
           value={formatCompact(analysis.monthlyViewEstimate.expected)}
           tone="expected"
           highlight
         />
         <Estimate
-          label="High"
+          label={t("estimateHigh")}
           value={formatCompact(analysis.monthlyViewEstimate.high)}
           tone="high"
         />
@@ -103,12 +119,19 @@ function Estimate({
   );
 }
 
-function ContentMix({ shorts, longForm }: { shorts: number; longForm: number }) {
+function ContentMix({
+  shorts,
+  longForm,
+}: {
+  shorts: number;
+  longForm: number;
+}) {
+  const t = useTranslations("performance");
   return (
     <div className="rounded-lg border border-slate-100 bg-white p-4">
       <div className="flex items-center gap-2 text-slate-500">
         <SparklesIcon width={16} height={16} className="text-brand-600" />
-        <p className="text-sm font-medium">Content mix</p>
+        <p className="text-sm font-medium">{t("contentMix")}</p>
       </div>
       <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-slate-100">
         <div
@@ -120,14 +143,14 @@ function ContentMix({ shorts, longForm }: { shorts: number; longForm: number }) 
       <ul className="mt-3 grid grid-cols-2 gap-2 text-sm">
         <li className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-brand-500" />
-          <span className="text-slate-500">Long-form</span>
+          <span className="text-slate-500">{t("longForm")}</span>
           <span className="ml-auto font-semibold text-slate-900">{longForm}%</span>
         </li>
         <li className="flex items-center gap-2">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-slate-300" />
           <span className="text-slate-500 inline-flex items-center gap-1">
             <FilmIcon width={12} height={12} />
-            Shorts
+            {t("shorts")}
           </span>
           <span className="ml-auto font-semibold text-slate-900">{shorts}%</span>
         </li>

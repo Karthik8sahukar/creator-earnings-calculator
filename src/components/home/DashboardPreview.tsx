@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import {
   ChartIcon,
   DollarIcon,
@@ -6,30 +8,29 @@ import {
   UsersIcon,
 } from "../icons";
 
-interface Stat {
-  label: string;
-  value: string;
-  delta?: string;
-  Icon: (props: { width?: number; height?: number }) => React.ReactElement;
-}
-
-const STATS: readonly Stat[] = [
-  { label: "Subscribers", value: "1.2M", delta: "+2.4%", Icon: UsersIcon },
-  { label: "Monthly Views", value: "8.5M", delta: "+11.3%", Icon: EyeIcon },
-  { label: "Estimated Revenue", value: "$12,800", delta: "+7.1%", Icon: DollarIcon },
-  { label: "RPM", value: "$2.65", delta: "+0.4%", Icon: TrendingUpIcon },
-] as const;
-
 /**
- * Illustrative analytics preview card shown next to the hero on
- * `lg+` screens. Every number here is a static example — it is NOT
- * derived from any live channel, is `aria-hidden` from assistive tech,
- * and carries a visible "Illustrative preview" label so a sighted
- * reader can never mistake it for real data.
+ * Illustrative analytics preview card shown next to the hero on `lg+`
+ * screens. Every number here is a static example — it is NOT derived
+ * from any live channel, is `aria-hidden` from assistive tech, and
+ * carries a visible "Illustrative preview" label so a sighted reader
+ * can never mistake it for real data.
  *
  * These figures MUST NOT appear in metadata or structured data.
+ *
+ * The illustrative NUMBERS (1.2M, 8.5M, $12,800, $2.65) are the same
+ * across every locale — they are examples, not translated content.
+ * Labels around them ARE translated.
  */
 export function DashboardPreview() {
+  const t = useTranslations("dashboardPreview");
+
+  const stats = [
+    { labelKey: "stats.subscribers", value: "1.2M", delta: "+2.4%", Icon: UsersIcon },
+    { labelKey: "stats.monthlyViews", value: "8.5M", delta: "+11.3%", Icon: EyeIcon },
+    { labelKey: "stats.estimatedRevenue", value: "$12,800", delta: "+7.1%", Icon: DollarIcon },
+    { labelKey: "stats.rpm", value: "$2.65", delta: "+0.4%", Icon: TrendingUpIcon },
+  ] as const;
+
   return (
     <aside
       aria-hidden="true"
@@ -46,25 +47,25 @@ export function DashboardPreview() {
             </span>
             <div>
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                Channel snapshot
+                {t("channelSnapshot")}
               </p>
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                Sample creator
+                {t("sampleCreator")}
               </p>
             </div>
           </div>
-          <span className="chip">Illustrative preview</span>
+          <span className="chip">{t("illustrativePreview")}</span>
         </div>
 
         <dl className="mt-5 grid grid-cols-2 gap-3">
-          {STATS.map((s) => (
+          {stats.map((s) => (
             <div
-              key={s.label}
+              key={s.labelKey}
               className="rounded-xl border border-slate-200/70 bg-white/70 p-3 dark:border-slate-800/70 dark:bg-slate-900/50"
             >
               <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
                 <dt className="text-[11px] font-medium uppercase tracking-wider">
-                  {s.label}
+                  {t(s.labelKey)}
                 </dt>
                 <s.Icon width={14} height={14} />
               </div>
@@ -72,11 +73,9 @@ export function DashboardPreview() {
                 <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                   {s.value}
                 </span>
-                {s.delta && (
-                  <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                    {s.delta}
-                  </span>
-                )}
+                <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                  {s.delta}
+                </span>
               </dd>
             </div>
           ))}
@@ -84,14 +83,13 @@ export function DashboardPreview() {
 
         <div className="mt-4">
           <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Views · last 6 months
+            {t("viewsLast6Months")}
           </p>
           <SparkBars />
         </div>
 
         <p className="mt-4 text-[11px] text-slate-500 dark:text-slate-500">
-          Example estimate — actual figures are calculated from a real
-          channel once you search above.
+          {t("exampleCaption")}
         </p>
       </div>
     </aside>

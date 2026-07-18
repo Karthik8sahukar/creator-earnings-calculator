@@ -1,3 +1,5 @@
+import createNextIntlPlugin from "next-intl/plugin";
+
 /** @type {import('next').NextConfig} */
 
 /**
@@ -58,4 +60,9 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Wrap the config with the next-intl plugin so per-request messages
+// are loaded through src/i18n/request.ts. This must come last so any
+// future wrappers (Sentry, etc.) can layer on top.
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+export default withNextIntl(nextConfig);

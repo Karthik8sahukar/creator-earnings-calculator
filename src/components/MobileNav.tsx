@@ -1,34 +1,30 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { CALCULATORS } from "./CalculatorsMenu";
+import { CALCULATOR_LINKS } from "./CalculatorsMenu";
 import { LanguageSelector } from "./LanguageSelector";
+import { Link } from "@/i18n/navigation";
 import { MenuIcon, XIcon } from "./icons";
 import { ThemeToggle } from "./ThemeToggle";
 
-interface SimpleLink {
-  href: string;
-  label: string;
-}
-
-const PRIMARY: SimpleLink[] = [
-  { href: "/methodology", label: "Methodology" },
-  { href: "/about", label: "About" },
-];
+const PRIMARY_LINKS = [
+  { href: "/methodology", labelKey: "nav.methodology" },
+  { href: "/about", labelKey: "nav.about" },
+] as const;
 
 /**
  * Mobile-only slide-in nav.
  *
- * Accessibility:
+ * A11y:
  *   - Trigger button has `aria-label`, `aria-expanded`, `aria-controls`.
  *   - Sheet is `role="dialog"` `aria-modal="true"` with a labelled heading.
  *   - Focus is trapped inside the sheet while it's open. Focus returns
  *     to the trigger on close.
- *   - Closes on: Escape, click on the backdrop, and after any nav
- *     link click.
+ *   - Closes on: Escape, click on the backdrop, and after any nav link.
  *   - Body scroll is locked while open.
+ *   - All visible text is translated per locale.
  */
 export function MobileNav({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
@@ -37,14 +33,13 @@ export function MobileNav({ className = "" }: { className?: string }) {
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const dialogId = useId();
   const titleId = `${dialogId}-title`;
+  const t = useTranslations();
 
   const close = useCallback(() => {
     setOpen(false);
-    // Return focus to the trigger on close.
     requestAnimationFrame(() => triggerRef.current?.focus());
   }, []);
 
-  // Escape to close.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -57,7 +52,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [open, close]);
 
-  // Body scroll lock.
+  // Body scroll lock while the sheet is open.
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -67,13 +62,10 @@ export function MobileNav({ className = "" }: { className?: string }) {
     };
   }, [open]);
 
-  // Focus trap: keep focus inside the sheet while open, initial focus
-  // on the close button.
+  // Focus trap.
   useEffect(() => {
     if (!open) return;
-
     requestAnimationFrame(() => closeBtnRef.current?.focus());
-
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Tab" || !sheetRef.current) return;
       const focusables = getFocusable(sheetRef.current);
@@ -98,7 +90,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
       <button
         ref={triggerRef}
         type="button"
-        aria-label="Open menu"
+        aria-label={t("common.actions.openMenu")}
         aria-expanded={open}
         aria-controls={open ? dialogId : undefined}
         onClick={() => setOpen(true)}
@@ -118,7 +110,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
           {/* Backdrop — clicking closes. */}
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t("common.actions.closeMenu")}
             tabIndex={-1}
             onClick={close}
             className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm animate-fade-in cursor-default"
@@ -133,12 +125,12 @@ export function MobileNav({ className = "" }: { className?: string }) {
                 id={titleId}
                 className="text-sm font-semibold text-slate-900 dark:text-slate-100"
               >
-                Menu
+                {t("nav.menu")}
               </span>
               <button
                 ref={closeBtnRef}
                 type="button"
-                aria-label="Close menu"
+                aria-label={t("common.actions.closeMenu")}
                 onClick={close}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
               >
@@ -146,20 +138,23 @@ export function MobileNav({ className = "" }: { className?: string }) {
               </button>
             </div>
 
-            <nav aria-label="Mobile primary" className="flex-1 overflow-y-auto p-3">
+            <nav
+              aria-label={t("nav.mobilePrimary")}
+              className="flex-1 overflow-y-auto p-3"
+            >
               <div>
                 <p className="px-3 pt-1 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Calculators
+                  {t("nav.calculators")}
                 </p>
                 <ul className="mb-4 space-y-0.5">
-                  {CALCULATORS.map((c) => (
+                  {CALCULATOR_LINKS.map((c) => (
                     <li key={c.href}>
                       <Link
                         href={c.href}
                         onClick={close}
                         className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
                       >
-                        {c.label}
+                        {t(c.labelKey)}
                       </Link>
                     </li>
                   ))}
@@ -168,7 +163,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
 
               <div>
                 <p className="px-3 pt-1 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Company
+                  {t("footer.company")}
                 </p>
                 <ul className="space-y-0.5">
                   <li>
@@ -176,18 +171,18 @@ export function MobileNav({ className = "" }: { className?: string }) {
                       aria-disabled="true"
                       className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
                     >
-                      Blog
-                      <span className="chip">Soon</span>
+                      {t("nav.blog")}
+                      <span className="chip">{t("common.labels.soon")}</span>
                     </span>
                   </li>
-                  {PRIMARY.map((l) => (
+                  {PRIMARY_LINKS.map((l) => (
                     <li key={l.href}>
                       <Link
                         href={l.href}
                         onClick={close}
                         className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
                       >
-                        {l.label}
+                        {t(l.labelKey)}
                       </Link>
                     </li>
                   ))}

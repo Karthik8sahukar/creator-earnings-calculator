@@ -1,4 +1,6 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+
+import { Link } from "@/i18n/navigation";
 
 interface Props {
   eyebrow: string;
@@ -17,18 +19,28 @@ export function SimpleCalcLayout({
   faq,
   breadcrumbs,
 }: Props) {
+  const t = useTranslations();
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       {breadcrumbs && (
-        <nav aria-label="Breadcrumb" className="text-xs text-slate-500">
+        <nav
+          aria-label={t("channelPage.breadcrumbAria")}
+          className="text-xs text-slate-500"
+        >
           <ol className="flex flex-wrap items-center gap-1">
             <li>
-              <Link href="/" className="hover:text-slate-900">Home</Link>
+              <Link href="/" className="hover:text-slate-900">
+                {t("common.breadcrumbs.home")}
+              </Link>
             </li>
             {breadcrumbs.map((b) => (
               <li key={b.href} className="flex items-center gap-1">
                 <span aria-hidden>›</span>
-                <Link href={b.href} className="hover:text-slate-900">
+                <Link
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  href={b.href as any}
+                  className="hover:text-slate-900"
+                >
                   {b.label}
                 </Link>
               </li>
@@ -50,9 +62,12 @@ export function SimpleCalcLayout({
       {children}
 
       {faq && faq.length > 0 && (
-        <section aria-labelledby="faq-title" className="card p-6 sm:p-8 space-y-4">
+        <section
+          aria-labelledby="faq-title"
+          className="card p-6 sm:p-8 space-y-4"
+        >
           <h2 id="faq-title" className="text-xl font-semibold text-slate-900">
-            FAQ
+            {t("calculators.shared.faqTitle")}
           </h2>
           <dl className="space-y-4">
             {faq.map((item) => (

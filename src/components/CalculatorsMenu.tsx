@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
+import { Link } from "@/i18n/navigation";
 import {
   ChartIcon,
   ChevronDownIcon,
@@ -12,22 +13,18 @@ import {
   TrendingUpIcon,
 } from "./icons";
 
-interface CalculatorLink {
-  href: string;
-  label: string;
-  description: string;
-  Icon: (props: { width?: number; height?: number }) => React.ReactElement;
-}
-
 /**
  * Calculators dropdown for the desktop header.
  *
- * All five items exist as real routes/anchors — no placeholders.
- *   - Money Calculator ⇒ homepage (`/#find-channel`) so it scrolls to
- *     the search box on the home page.
+ * All five items resolve to real routes:
+ *   - Money Calculator ⇒ homepage (`/#find-channel`) so it scrolls
+ *     to the search box on the home page.
  *   - RPM / CPM / Shorts / Sponsorship ⇒ existing calculator routes.
  *
- * Accessibility:
+ * Labels are translated per locale. Links use `@/i18n/navigation` so
+ * the active locale prefix is applied automatically.
+ *
+ * A11y:
  *   - `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`.
  *   - ArrowDown from the trigger focuses the first item.
  *   - ArrowUp/ArrowDown roves focus. Escape closes and restores focus.
@@ -39,6 +36,8 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const menuId = useId();
+
+  const t = useTranslations();
 
   useEffect(() => {
     if (!open) return;
@@ -113,7 +112,7 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
         onKeyDown={onTriggerKey}
         className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-200 dark:hover:text-white dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
       >
-        Calculators
+        {t("nav.calculators")}
         <ChevronDownIcon
           width={14}
           height={14}
@@ -126,12 +125,12 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
           ref={menuRef}
           id={menuId}
           role="menu"
-          aria-label="Calculators"
+          aria-label={t("nav.calculators")}
           onKeyDown={onMenuKey}
           className="absolute left-0 mt-2 w-80 rounded-xl bg-white shadow-pop border border-slate-200 dark:bg-slate-900 dark:border-slate-800 z-50 overflow-hidden animate-fade-in"
         >
           <ul className="p-1.5">
-            {CALCULATORS.map(({ href, label, description, Icon }) => (
+            {CALCULATOR_LINKS.map(({ href, labelKey, descriptionKey, Icon }) => (
               <li key={href} role="none">
                 <Link
                   href={href}
@@ -145,10 +144,10 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
                   </span>
                   <span className="flex flex-col">
                     <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {label}
+                      {t(labelKey)}
                     </span>
                     <span className="text-xs text-slate-500 dark:text-slate-400">
-                      {description}
+                      {t(descriptionKey)}
                     </span>
                   </span>
                 </Link>
@@ -161,35 +160,47 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
   );
 }
 
-export const CALCULATORS: CalculatorLink[] = [
+/**
+ * Menu items. Labels are message-key references (resolved at render
+ * time) — the array itself is a pure data structure that can be
+ * imported and reused by `MobileNav` without duplication.
+ */
+export interface CalculatorLink {
+  href: "/#find-channel" | "/youtube-rpm-calculator" | "/youtube-cpm-calculator" | "/youtube-shorts-calculator" | "/youtube-sponsorship-calculator";
+  labelKey: string;
+  descriptionKey: string;
+  Icon: (props: { width?: number; height?: number }) => React.ReactElement;
+}
+
+export const CALCULATOR_LINKS: CalculatorLink[] = [
   {
     href: "/#find-channel",
-    label: "YouTube Money Calculator",
-    description: "Estimate a channel's monthly revenue.",
+    labelKey: "calculatorsMenu.money.label",
+    descriptionKey: "calculatorsMenu.money.description",
     Icon: DollarIcon,
   },
   {
     href: "/youtube-rpm-calculator",
-    label: "RPM Calculator",
-    description: "Revenue per 1,000 monetized views.",
+    labelKey: "calculatorsMenu.rpm.label",
+    descriptionKey: "calculatorsMenu.rpm.description",
     Icon: TrendingUpIcon,
   },
   {
     href: "/youtube-cpm-calculator",
-    label: "CPM Calculator",
-    description: "Advertiser cost per 1,000 impressions.",
+    labelKey: "calculatorsMenu.cpm.label",
+    descriptionKey: "calculatorsMenu.cpm.description",
     Icon: ChartIcon,
   },
   {
     href: "/youtube-shorts-calculator",
-    label: "Shorts Calculator",
-    description: "Estimate Shorts Creator Pool payouts.",
+    labelKey: "calculatorsMenu.shorts.label",
+    descriptionKey: "calculatorsMenu.shorts.description",
     Icon: FilmIcon,
   },
   {
     href: "/youtube-sponsorship-calculator",
-    label: "Sponsorship Calculator",
-    description: "Estimate brand deal rates.",
+    labelKey: "calculatorsMenu.sponsorship.label",
+    descriptionKey: "calculatorsMenu.sponsorship.description",
     Icon: ShareIcon,
   },
 ];
