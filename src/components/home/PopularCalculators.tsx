@@ -10,7 +10,13 @@ import {
 } from "../icons";
 
 interface Card {
-  href: "/#find-channel" | "/youtube-rpm-calculator" | "/youtube-cpm-calculator" | "/youtube-shorts-calculator" | "/youtube-sponsorship-calculator";
+  href:
+    | "/#find-channel"
+    | "/youtube-rpm-calculator"
+    | "/youtube-cpm-calculator"
+    | "/youtube-shorts-calculator"
+    | "/youtube-sponsorship-calculator"
+    | "/instagram-money-calculator";
   titleKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -22,6 +28,12 @@ const CARDS: readonly Card[] = [
     titleKey: "popularCalculators.cards.money.title",
     descriptionKey: "popularCalculators.cards.money.description",
     Icon: DollarIcon,
+  },
+  {
+    href: "/instagram-money-calculator",
+    titleKey: "popularCalculators.cards.instagram.title",
+    descriptionKey: "popularCalculators.cards.instagram.description",
+    Icon: ShareIcon,
   },
   {
     href: "/youtube-rpm-calculator",
@@ -49,6 +61,11 @@ const CARDS: readonly Card[] = [
   },
 ] as const;
 
+/** Derive a stable test id from a card href. */
+function normalizeHref(href: string): string {
+  return href.replace(/^\/?#?/, "").replace(/[^a-z0-9-]/gi, "-") || "home";
+}
+
 export function PopularCalculators() {
   const t = useTranslations();
   return (
@@ -65,12 +82,20 @@ export function PopularCalculators() {
         </div>
       </div>
 
+      {/*
+        Every card is a full-clickable Link with a visible "Open →"
+        CTA. The CTA used to appear only on hover — that concealed the
+        affordance on touch devices and made the primary action less
+        discoverable — so it's now always rendered, with the arrow
+        translating on hover for polish.
+      */}
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CARDS.map(({ href, titleKey, descriptionKey, Icon }) => (
           <li key={href}>
             <Link
               href={href}
               className="group card block h-full p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-pop focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+              data-testid={`popular-card-${normalizeHref(href)}`}
             >
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500/15 to-accent-500/15 text-brand-700 dark:text-brand-200">
                 <Icon width={20} height={20} />
@@ -81,9 +106,14 @@ export function PopularCalculators() {
               <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 {t(descriptionKey)}
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-300 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition">
-                {t("common.actions.open")}
-                <span aria-hidden>→</span>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-300 transition">
+                {t("popularCalculators.openCta")}
+                <span
+                  aria-hidden
+                  className="transition-transform group-hover:translate-x-0.5"
+                >
+                  →
+                </span>
               </span>
             </Link>
           </li>

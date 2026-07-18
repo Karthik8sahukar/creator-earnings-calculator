@@ -39,6 +39,23 @@ export function Header() {
         >
           <CalculatorsMenu />
 
+          {/*
+            Direct, always-visible link to the Instagram Money Calculator.
+            The calculator also lives inside the CalculatorsMenu dropdown
+            above, but we surface it here as a top-level link so first-
+            time visitors can reach it in one click without knowing the
+            dropdown exists. Uses `@/i18n/navigation` so the current
+            locale prefix is applied automatically.
+          */}
+          <Link
+            href="/instagram-money-calculator"
+            aria-label={t("nav.instagramCalculatorAria")}
+            className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+            data-testid="header-instagram-link"
+          >
+            {t("nav.instagramCalculator")}
+          </Link>
+
           <Link
             href="/blog"
             className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"

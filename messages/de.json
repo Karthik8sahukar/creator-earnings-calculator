@@ -38,7 +38,9 @@
     "blog": "Blog",
     "blogSoonTitle": "Der Blog kommt bald",
     "menu": "Menü",
-    "mobilePrimary": "Hauptnavigation"
+    "mobilePrimary": "Hauptnavigation",
+    "instagramCalculator": "Instagram Calculator",
+    "instagramCalculatorAria": "Instagram Money Calculator"
   },
   "languageSelector": {
     "trigger": "Sprache",
@@ -69,7 +71,8 @@
     "copyright": "© {year} BeHumler. Unabhängiges Tool.",
     "notFinancialAdvice": "Nur Schätzungen. Keine Finanzberatung.",
     "blog": "Blog",
-    "estimatesBlurb": "Die Umsatzzahlen auf dieser Seite sind unabhängig berechnete Schätzungen."
+    "estimatesBlurb": "Die Umsatzzahlen auf dieser Seite sind unabhängig berechnete Schätzungen.",
+    "instagramCalculator": "Instagram Money Calculator"
   },
   "home": {
     "chip": "Basierend auf der YouTube Data API v3",
@@ -454,6 +457,10 @@
     "sponsorship": {
       "label": "Sponsoring-Rechner",
       "description": "Schätze Sponsoring-Preise für Brand Deals."
+    },
+    "instagram": {
+      "label": "Instagram Money Calculator",
+      "description": "Estimate Instagram creator earnings."
     }
   },
   "popularCalculators": {
@@ -479,8 +486,13 @@
       "sponsorship": {
         "title": "Sponsoring-Rechner",
         "description": "Groben Preis für Brand Deals aus Abonnenten und Engagement schätzen."
+      },
+      "instagram": {
+        "title": "Instagram Money Calculator",
+        "description": "Estimate Instagram earnings from sponsored posts, Reels, Stories, affiliate income, engagement, reach, niche, and audience market."
       }
-    }
+    },
+    "openCta": "Open"
   },
   "whyBeHumler": {
     "eyebrow": "Warum BeHumler",
@@ -638,6 +650,298 @@
       "eyebrow": "Tag",
       "pageTitle": "Mit #{tag} getaggte Artikel",
       "pageDescription": "Alle BeHumler-Artikel unter dem Tag #{tag}."
+    }
+  },
+  "instagramCalculator": {
+    "breadcrumb": "Instagram Money Calculator",
+    "meta": {
+      "title": "Instagram Money Calculator — Estimate Creator Earnings",
+      "description": "Free Instagram Money Calculator. Estimate potential monthly and yearly Instagram creator earnings from followers, reach, reel views, story views, engagement, niche and country. Independent estimates, never guaranteed income.",
+      "ogDescription": "Independent Instagram Money Calculator. Estimate sponsored post, reel, story, affiliate and subscription earnings for any creator — all figures are estimates."
+    },
+    "hero": {
+      "eyebrow": "Calculator · Instagram",
+      "title": "Instagram Money Calculator",
+      "subtitle": "Estimate potential Instagram creator earnings from your reach, reels, stories, engagement, niche and country. Independent, transparent, and free. All numbers are estimates — never a promise of income.",
+      "badges": {
+        "free": "Free & no login",
+        "noLogin": "No account needed",
+        "estimatesOnly": "Estimates only"
+      }
+    },
+    "form": {
+      "title": "Your Instagram audience",
+      "subtitle": "Enter what you know. Missing fields fall back to sensible defaults so you always get a range.",
+      "audienceLegend": "Audience & content performance",
+      "contentLegend": "Content frequency (per month)",
+      "monetizationLegend": "Monetization methods",
+      "customRatesLegend": "Custom brand-deal rates",
+      "affiliateLegend": "Affiliate marketing assumptions",
+      "subscriptionsLegend": "Instagram Subscriptions",
+      "followers": "Followers",
+      "avgReelViews": "Average reel views",
+      "avgPostReach": "Average post reach",
+      "avgStoryViews": "Average story views",
+      "engagementRate": "Engagement rate",
+      "country": "Country / market",
+      "niche": "Niche",
+      "currency": "Display currency",
+      "currencyNote": "Converted using latest configured exchange rates. USD is the internal calculation unit.",
+      "feedPostsPerMonth": "Feed posts / month",
+      "reelsPerMonth": "Reels / month",
+      "storiesPerMonth": "Stories / month",
+      "enableSponsoredPosts": "Sponsored posts",
+      "enableSponsoredReels": "Sponsored reels",
+      "enableSponsoredStories": "Sponsored stories",
+      "enableAffiliate": "Affiliate marketing",
+      "enableSubscriptions": "Instagram Subscriptions",
+      "showAdvanced": "Show advanced settings",
+      "hideAdvanced": "Hide advanced settings",
+      "customRatesHelp": "Have a brand-deal rate card? Enter your own per-1,000-reach USD rate below and we'll use it instead of our niche/country blend. Leave blank to use the derived rate.",
+      "leaveBlankHint": "Leave 0 to use the derived rate.",
+      "customPostRate": "Custom post rate (USD / 1k reach)",
+      "customReelRate": "Custom reel rate (USD / 1k views)",
+      "customStoryRate": "Custom story rate (USD / 1k views)",
+      "affiliateConversionPct": "Conversion rate",
+      "affiliateAov": "Average order value (USD)",
+      "affiliateCommissionPct": "Commission %",
+      "paidSubscribers": "Paid subscribers",
+      "subscriptionPrice": "Monthly subscription price (USD)"
+    },
+    "results": {
+      "title": "Estimated monthly earnings",
+      "subtitle": "Low / Expected / High bands. Every number is an estimate — actual creator earnings depend on many factors we can't see.",
+      "low": "Low estimate",
+      "expected": "Expected estimate",
+      "high": "High estimate",
+      "month": "mo",
+      "monthlyEarnings": "Monthly earnings",
+      "yearlyEarnings": "Yearly earnings",
+      "avgBrandDeal": "Average brand deal value",
+      "revenuePerThousandReach": "Revenue per 1,000 reach",
+      "engagementQuality": "Estimated engagement quality",
+      "largestSource": "Largest revenue source",
+      "confidence": "Confidence level",
+      "followerTier": "Follower tier",
+      "usdExchangeRate": "Exchange rate",
+      "engagementQualityValues": {
+        "belowAverage": "Below average",
+        "average": "Average",
+        "good": "Good",
+        "excellent": "Excellent"
+      },
+      "confidenceValues": {
+        "low": "Low",
+        "moderate": "Moderate",
+        "high": "High"
+      },
+      "followerBuckets": {
+        "nano": "Nano (< 10k)",
+        "micro": "Micro (10k – 50k)",
+        "mid": "Mid (50k – 250k)",
+        "macro": "Macro (250k – 1M)",
+        "mega": "Mega (1M+)"
+      },
+      "currencyNote": "Approximate {monthlyCompact} / month in {currency}. ≈ Converted using latest configured exchange rates.",
+      "disclaimer": "Estimates only. This tool is not affiliated with Instagram or Meta and does not guarantee any level of income. Real earnings depend on the specific brand, campaign, audience quality, seasonality and negotiation.",
+      "copyResults": "Copy results",
+      "copiedResults": "Copied ✓",
+      "copyShareLink": "Copy share link",
+      "copiedLink": "Link copied ✓",
+      "copyHeadline": "Instagram Money Calculator — estimated monthly earnings"
+    },
+    "breakdown": {
+      "title": "Revenue breakdown",
+      "subtitle": "How your expected monthly earnings split across each stream.",
+      "sponsoredPosts": "Sponsored posts",
+      "sponsoredReels": "Sponsored reels",
+      "sponsoredStories": "Sponsored stories",
+      "affiliate": "Affiliate revenue",
+      "subscriptions": "Subscriptions"
+    },
+    "chart": {
+      "title": "Income breakdown chart",
+      "subtitle": "Percentage contribution from each monetization stream. Hover for exact amounts.",
+      "totalLabel": "Monthly total",
+      "empty": "Enable at least one monetization stream and enter your reach / views to see the breakdown chart."
+    },
+    "how": {
+      "title": "How we estimate Instagram earnings",
+      "intro": "The estimator combines seven signals into one Low / Expected / High band. We deliberately avoid the follower-count-only approach used by many free tools, because follower count is a weak proxy for real audience value.",
+      "steps": {
+        "reach": {
+          "title": "Reach & views drive sponsored rates",
+          "body": "Sponsored fees are priced against the audience the brand actually gets in front of. Post reach, reel views and story views each feed a per-1,000-audience USD rate."
+        },
+        "engagement": {
+          "title": "Engagement modifies the rate",
+          "body": "Higher engagement multiplies the base rate; low engagement pulls it down. We use 3% as the reference baseline and cap the multiplier between 0.5× and 3.0×."
+        },
+        "niche": {
+          "title": "Niche changes pricing",
+          "body": "Luxury, finance, business and tech niches command premium rates. Comedy and gaming compress below average. Every niche has a documented multiplier."
+        },
+        "country": {
+          "title": "Country changes pricing",
+          "body": "Brand budgets are set locally. US and UK creators command premium rates; markets with lower digital ad spend see meaningfully lower rates for the same reach."
+        },
+        "cadence": {
+          "title": "Posting cadence sets volume",
+          "body": "Monthly earnings scale with how many sponsored feed posts, reels and stories you publish. We cap sponsored volume at plausible ceilings so a typo can't blow up the estimate."
+        },
+        "affiliate": {
+          "title": "Affiliate is modelled as a funnel",
+          "body": "Engaged reach → clicks (~3%) → conversions (your conversion rate) × average order value × commission %. All parameters are editable in the advanced section."
+        },
+        "subscriptions": {
+          "title": "Subscriptions are flat",
+          "body": "Paid subscribers × monthly price. Subscription revenue is contractual, not negotiated per campaign, so it stays the same across Low / Expected / High bands."
+        }
+      }
+    },
+    "factors": {
+      "title": "Factors that affect real Instagram income",
+      "items": {
+        "audienceQuality": {
+          "title": "Audience quality",
+          "body": "Real, in-market followers pay a huge premium over inflated follower counts. Brands increasingly audit follower authenticity before signing deals."
+        },
+        "postingConsistency": {
+          "title": "Posting consistency",
+          "body": "Consistent creators compound reach; inconsistent ones lose audience relevance and see per-piece rates fall."
+        },
+        "brandFit": {
+          "title": "Brand fit",
+          "body": "The strongest deals go to creators whose content already aligns with the sponsor's product — no forced-integration discount."
+        },
+        "seasonality": {
+          "title": "Seasonality",
+          "body": "Q4 (Nov–Dec) can more than double per-post rates in retail-heavy niches; Q1 typically softens."
+        },
+        "algorithmChanges": {
+          "title": "Algorithm changes",
+          "body": "Instagram's reach algorithm shifts frequently. Estimates assume roughly current reach behaviour — a large algorithm change can move a channel's economics quickly."
+        },
+        "geographyMix": {
+          "title": "Geography mix",
+          "body": "Even the same follower count is worth very different amounts depending on where the audience actually lives."
+        },
+        "disclosureCompliance": {
+          "title": "Disclosure compliance",
+          "body": "Every sponsored post must be clearly labelled (#ad / paid partnership). Non-compliant creators lose brand access and long-term rate power."
+        },
+        "categoryDemand": {
+          "title": "Category demand",
+          "body": "Advertiser budgets rise and fall by category. A cooling in one vertical (e.g. crypto) can drop rates across even top-tier creators there."
+        }
+      }
+    },
+    "faq": {
+      "title": "Instagram Money Calculator — FAQ",
+      "items": {
+        "howMuchDoesInstagramPay": {
+          "q": "How much does Instagram pay?",
+          "a": "Instagram itself pays very little directly to most creators. The ad-share Reels Play bonus programme has been paused in many markets. The overwhelming majority of creator earnings come from brand sponsorships, affiliate marketing, and subscriptions — this calculator estimates those streams."
+        },
+        "howMuchCan100k": {
+          "q": "How much can 100k followers earn?",
+          "a": "There is no single answer. A well-engaged 100k-follower finance creator in the US can earn thousands per sponsored reel; a lightly-engaged 100k-follower general-lifestyle account might earn under a hundred dollars per post. Engagement, niche, country and posting cadence drive the difference — hence this calculator."
+        },
+        "howMuchShouldICharge": {
+          "q": "How much should influencers charge?",
+          "a": "Use the calculator's Expected band as a defensible starting point, then adjust for usage rights, exclusivity, and rush timelines. Real rate cards are always negotiated case by case — the calculator gives you a range you can back with your public metrics."
+        },
+        "howDoSponsoredPostsWork": {
+          "q": "How do sponsored posts work?",
+          "a": "A brand pays a creator to publish content featuring their product. Rates are set per piece (feed post, reel or story) and vary with reach, engagement, niche and usage rights. Every sponsored post must be clearly labelled — see our disclosure section."
+        },
+        "doReelsEarnMore": {
+          "q": "Do Reels earn more than posts?",
+          "a": "Typically yes, per unit of audience. Reels attract the largest brand budgets right now because the algorithm amplifies them to non-followers. This calculator uses a higher per-1,000-views rate for reels than for feed posts."
+        },
+        "howMuchDoStoriesPay": {
+          "q": "How much do Stories pay?",
+          "a": "Stories pay less per view than feed posts or reels because they disappear after 24 hours and are consumed passively. They are still valuable — creators often bundle a story slot into a bigger campaign at a much lower per-view rate."
+        },
+        "howIsEngagementUsed": {
+          "q": "How is engagement used?",
+          "a": "Engagement rate is a multiplier on top of the per-view / per-reach rate. Higher engagement means an audience is more likely to actually buy from the sponsor, which brands are willing to pay more for. We use 3% as the reference baseline and cap the multiplier between 0.5× and 3.0×."
+        },
+        "doesInstagramPayDirectly": {
+          "q": "Does Instagram pay you directly?",
+          "a": "Only in narrow cases — badges in live videos, some regional bonus programmes, and now Subscriptions. The bulk of creator income moves outside of Instagram, from brand to creator directly, so this calculator focuses on those streams."
+        },
+        "reachVsFollowers": {
+          "q": "What's the difference between reach and followers?",
+          "a": "Followers is how many people have chosen to see your content in their feed. Reach is how many actually saw a given post. Reach is far more predictive of sponsorship value — a big follower count with low reach is worth less than a small follower count with strong reach."
+        }
+      }
+    },
+    "related": {
+      "title": "Related calculators",
+      "subtitle": "Explore other free creator-economy tools built on the same transparent methodology.",
+      "links": {
+        "money": {
+          "title": "YouTube Money Calculator",
+          "description": "Estimate a YouTube channel's monthly revenue from public statistics."
+        },
+        "rpm": {
+          "title": "YouTube RPM Calculator",
+          "description": "Revenue per 1,000 views — the creator-side earnings metric."
+        },
+        "cpm": {
+          "title": "YouTube CPM Calculator",
+          "description": "Advertiser cost per 1,000 ad impressions."
+        },
+        "shorts": {
+          "title": "YouTube Shorts Calculator",
+          "description": "Estimate Shorts payouts from the Creator Pool."
+        },
+        "sponsorship": {
+          "title": "YouTube Sponsorship Calculator",
+          "description": "Ballpark brand deal rates for YouTube integrations."
+        },
+        "methodology": {
+          "title": "Methodology",
+          "description": "How every BeHumler estimate is calculated, sourced and limited."
+        }
+      }
+    },
+    "methodology": {
+      "title": "Methodology & limitations",
+      "body": "This calculator uses public creator-economy benchmarks, published sponsorship rate cards, and audience-quality signals to produce a defensible earnings range. It does NOT connect to Instagram's private analytics — there is no way for any third-party tool to see a creator's actual paid deals, DM pitches, or media kit. Treat every number as a starting point for negotiation, not truth.",
+      "linkText": "Read the full methodology →",
+      "disclaimer": "This tool is not affiliated with, endorsed by, or verified by Instagram or Meta. Estimates only. Not financial advice."
+    }
+  },
+  "creatorPlatforms": {
+    "eyebrow": "Choose your platform",
+    "title": "Creator earnings calculators",
+    "subtitle": "Estimate creator income across YouTube and Instagram using transparent, configurable assumptions.",
+    "cards": {
+      "youtube": {
+        "title": "YouTube Money Calculator",
+        "description": "Estimate a YouTube channel's monthly earnings from long-form views, Shorts payouts, sponsorships, and RPM by country and niche.",
+        "cta": "Open YouTube calculator",
+        "features": {
+          "adRevenue": "Long-form ad revenue",
+          "shorts": "Shorts Creator Pool",
+          "sponsorships": "Sponsorship rate cards",
+          "rpmCpm": "RPM and CPM benchmarks"
+        }
+      },
+      "instagram": {
+        "title": "Instagram Money Calculator",
+        "description": "Estimate Instagram creator earnings from reach, engagement, niche, and audience market — plus every real income stream.",
+        "cta": "Open Instagram calculator",
+        "features": {
+          "sponsoredPosts": "Sponsored posts",
+          "reels": "Reels",
+          "stories": "Stories",
+          "affiliate": "Affiliate revenue",
+          "subscriptions": "Subscriptions"
+        }
+      }
     }
   }
 }

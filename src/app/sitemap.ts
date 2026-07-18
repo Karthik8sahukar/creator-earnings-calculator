@@ -42,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/youtube-cpm-calculator",
     "/youtube-shorts-calculator",
     "/youtube-sponsorship-calculator",
+    "/instagram-money-calculator",
     "/blog",
   ];
 

@@ -37,6 +37,12 @@ export function Footer() {
           <h4 className="font-semibold text-slate-900 dark:text-slate-100">
             {t("calculators")}
           </h4>
+          {/*
+            Order: Money → Instagram → RPM → CPM → Shorts → Sponsorship.
+            Instagram is elevated to the second position (immediately
+            below YouTube Money Calculator) so it's visible without
+            scrolling on any viewport that shows the footer.
+          */}
           <ul className="mt-3 space-y-2">
             <li>
               <Link
@@ -44,6 +50,15 @@ export function Footer() {
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
                 {t("moneyCalculator")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/instagram-money-calculator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+                data-testid="footer-instagram-link"
+              >
+                {t("instagramCalculator")}
               </Link>
             </li>
             <li>

@@ -142,6 +142,26 @@ export function MobileNav({ className = "" }: { className?: string }) {
               aria-label={t("nav.mobilePrimary")}
               className="flex-1 overflow-y-auto p-3"
             >
+              {/*
+                Pinned Instagram entry — visible at the very top of the
+                mobile menu so touch visitors reach it in one tap
+                without scanning the full calculator list. The same
+                target is still available inside the "Calculators"
+                section below, but this pin makes the primary CTA
+                impossible to miss.
+              */}
+              <div className="mb-4">
+                <Link
+                  href="/instagram-money-calculator"
+                  onClick={close}
+                  data-testid="mobile-instagram-link"
+                  className="flex items-center justify-between rounded-xl border border-brand-200 bg-gradient-to-br from-brand-500/10 to-accent-500/10 px-3 py-3 text-sm font-semibold text-brand-800 hover:from-brand-500/15 hover:to-accent-500/15 dark:border-brand-500/30 dark:text-brand-100"
+                >
+                  <span>{t("nav.instagramCalculatorAria")}</span>
+                  <span aria-hidden>→</span>
+                </Link>
+              </div>
+
               <div>
                 <p className="px-3 pt-1 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {t("nav.calculators")}

@@ -137,6 +137,52 @@ export default async function MethodologyPage({
       </p>
 
       <h2 className="text-xl font-semibold text-slate-900">
+        Instagram Money Calculator
+      </h2>
+      <p>
+        The Instagram Money Calculator uses a separate model tailored to
+        Instagram&apos;s economics. It does NOT use RPM/CPM because
+        Instagram creators are not paid an ad-revenue share on organic
+        feed content the way YouTube long-form creators are. Instead we
+        model five real revenue streams:
+      </p>
+      <ul className="list-disc pl-6 space-y-1">
+        <li>
+          <strong>Sponsored feed posts</strong>: priced per 1,000 post
+          reach, adjusted for niche, country, follower tier and
+          engagement.
+        </li>
+        <li>
+          <strong>Sponsored reels</strong>: priced per 1,000 reel views;
+          reels command the highest per-unit brand rates on Instagram.
+        </li>
+        <li>
+          <strong>Sponsored stories</strong>: priced per 1,000 story
+          views; substantially lower per view than posts or reels.
+        </li>
+        <li>
+          <strong>Affiliate marketing</strong>: modelled as a funnel
+          (engaged reach → clicks → conversions × AOV × commission).
+        </li>
+        <li>
+          <strong>Instagram Subscriptions</strong>: paid subscribers ×
+          monthly price.
+        </li>
+      </ul>
+      <p>
+        Base rates, niche multipliers, country multipliers, follower
+        tiers and affiliate defaults are all documented in{" "}
+        <code>src/lib/instagram/config.ts</code> in the repository, so
+        anyone can audit the model. The Low / Expected / High bands
+        (0.6× / 1.0× / 1.55×) reflect the wide real-world variance in
+        Instagram sponsorship pricing.
+      </p>
+      <p>
+        The calculator never claims guaranteed income. Every result is
+        clearly labelled as an estimate.
+      </p>
+
+      <h2 className="text-xl font-semibold text-slate-900">
         Known limitations
       </h2>
       <ul className="list-disc pl-6 space-y-1">
