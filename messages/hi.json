@@ -1,0 +1,452 @@
+{
+  "brand": {
+    "name": "BeHumler",
+    "tagline": "क्रिएटर एनालिटिक्स प्लेटफ़ॉर्म",
+    "logoAlt": "BeHumler"
+  },
+
+  "common": {
+    "actions": {
+      "tryAgain": "फिर से कोशिश करें",
+      "backToHome": "होम पर लौटें",
+      "backToSearch": "खोज पर लौटें",
+      "reset": "रीसेट",
+      "clear": "साफ़ करें",
+      "openMenu": "मेन्यू खोलें",
+      "closeMenu": "मेन्यू बंद करें",
+      "openInNewTab": "नए टैब में खुलता है"
+    },
+    "labels": {
+      "loading": "लोड हो रहा है",
+      "loadingCalculator": "कैलकुलेटर लोड हो रहा है…",
+      "loadingChannel": "चैनल लोड हो रहा है…",
+      "auto": "ऑटो"
+    },
+    "breadcrumbs": {
+      "home": "होम"
+    },
+    "estimatesOnly": "केवल अनुमान। यह वित्तीय सलाह नहीं है।"
+  },
+
+  "nav": {
+    "primary": "मुख्य",
+    "calculators": "कैलकुलेटर",
+    "methodology": "पद्धति",
+    "about": "हमारे बारे में",
+    "home": "होम",
+    "homeAria": "BeHumler — होम"
+  },
+
+  "languageSelector": {
+    "trigger": "भाषा",
+    "menuHeading": "भाषा",
+    "current": "{name} चुनी गई",
+    "ariaLabel": "भाषा बदलें",
+    "shortLabel": "भाषा"
+  },
+
+  "footer": {
+    "brandBlurb": "एक स्वतंत्र टूल जो सार्वजनिक आँकड़ों से YouTube चैनल की कमाई का अनुमान लगाता है। यह YouTube या Google से संबद्ध, समर्थित या सत्यापित नहीं है।",
+    "calculators": "कैलकुलेटर",
+    "resources": "संसाधन",
+    "company": "कंपनी",
+    "legal": "क़ानूनी",
+    "dataSource": "डेटा स्रोत",
+    "moneyCalculator": "मनी कैलकुलेटर",
+    "rpmCalculator": "RPM कैलकुलेटर",
+    "cpmCalculator": "CPM कैलकुलेटर",
+    "shortsCalculator": "Shorts कैलकुलेटर",
+    "sponsorshipCalculator": "स्पॉन्सरशिप कैलकुलेटर",
+    "about": "हमारे बारे में",
+    "methodology": "पद्धति",
+    "disclaimer": "अस्वीकरण",
+    "privacy": "गोपनीयता",
+    "terms": "शर्तें",
+    "dataSourceBody": "सार्वजनिक चैनल आँकड़े {link} से प्राप्त किए जाते हैं। कमाई के अनुमान स्वतंत्र रूप से गणना किए जाते हैं।",
+    "dataSourceLink": "YouTube Data API v3",
+    "copyright": "© {year} BeHumler। एक स्वतंत्र टूल।",
+    "notFinancialAdvice": "केवल अनुमान। वित्तीय सलाह नहीं।"
+  },
+
+  "home": {
+    "chip": "YouTube Data API v3 पर आधारित",
+    "title": "YouTube Money Calculator",
+    "subtitle": "सार्वजनिक YouTube डेटा, अनुमानित RPM, CPM और व्यू विश्लेषण के आधार पर किसी YouTube चैनल की संभावित मासिक कमाई का अनुमान लगाएँ।",
+    "workspaceHint": "ऊपर टाइप करना शुरू करें: चैनल का नाम, @handle, URL या चैनल ID।",
+    "trustBadges": {
+      "poweredBy": "YouTube Data API पर आधारित",
+      "free": "हमेशा मुफ़्त",
+      "noLogin": "लॉगिन ज़रूरी नहीं"
+    }
+  },
+
+  "search": {
+    "srLabel": "चैनल खोजें",
+    "placeholder": "चैनल के नाम, @handle, URL या चैनल ID से खोजें",
+    "clearAria": "खोज साफ़ करें",
+    "loading": "खोजा जा रहा है…",
+    "empty": "कोई चैनल नहीं मिला। कोई और नाम आज़माएँ या चैनल का URL पेस्ट करें।",
+    "error": "कुछ ग़लत हुआ।",
+    "subsSuffix": "सब्सक्राइबर",
+    "subsHidden": "छिपा हुआ"
+  },
+
+  "recent": {
+    "title": "हाल की खोजें",
+    "hint": "सिर्फ़ आपके ब्राउज़र में सहेजी गईं। कभी भी किसी सर्वर पर नहीं भेजी जातीं।",
+    "clearHistory": "इतिहास मिटाएँ"
+  },
+
+  "transparency": {
+    "aria": "पारदर्शिता सूचना",
+    "prefix": "पारदर्शिता:",
+    "body": "सार्वजनिक चैनल आँकड़े YouTube Data API से प्राप्त किए जाते हैं। कमाई के अनुमान स्वतंत्र रूप से गणना किए जाते हैं और ये YouTube या Google द्वारा उपलब्ध कराए या सत्यापित नहीं हैं।"
+  },
+
+  "profile": {
+    "subscribers": "सब्सक्राइबर",
+    "totalViews": "कुल व्यूज़",
+    "videos": "वीडियो",
+    "joined": "जुड़े",
+    "hidden": "छिपा हुआ",
+    "subscriberCount": "{count, number} सब्सक्राइबर",
+    "viewCount": "{count, number} व्यूज़",
+    "videoCount": "{count, number} वीडियो",
+    "subscribersHiddenTitle": "चैनल ने सब्सक्राइबर संख्या छिपा रखी है।",
+    "profilePictureAlt": "{title} की प्रोफ़ाइल तस्वीर",
+    "viewOnYouTube": "YouTube पर देखें",
+    "viewOnYouTubeAria": "{title} को YouTube पर देखें (नए टैब में खुलता है)"
+  },
+
+  "performance": {
+    "title": "प्रदर्शन विश्लेषण",
+    "sampleNote": "पिछले {count} अपलोड के आधार पर।",
+    "estimateLow": "कम",
+    "estimateExpected": "अनुमानित मासिक व्यूज़",
+    "estimateHigh": "अधिक",
+    "rows": {
+      "averageRecent": "हाल के व्यूज़ (औसत)",
+      "medianRecent": "हाल के व्यूज़ (मध्यमान)",
+      "uploads30": "अपलोड (पिछले 30 दिन)",
+      "uploads90": "अपलोड (पिछले 90 दिन)",
+      "recentObserved": "हाल में देखे गए व्यूज़",
+      "sampleSize": "नमूना आकार",
+      "sampleSizeValue": "{count} वीडियो"
+    },
+    "contentMix": "कंटेंट मिक्स",
+    "longForm": "लॉन्ग-फ़ॉर्म",
+    "shorts": "Shorts"
+  },
+
+  "videos": {
+    "sectionTitle": "हाल के वीडियो",
+    "empty": "इस चैनल के लिए अभी कोई सार्वजनिक वीडियो उपलब्ध नहीं है।",
+    "emptyShort": "इस चैनल के लिए हाल के वीडियो उपलब्ध नहीं हैं।",
+    "shortBadge": "Short",
+    "views": "व्यूज़",
+    "likes": "लाइक्स",
+    "comments": "टिप्पणियाँ",
+    "watchAria": "देखें: {title} ({newTab})"
+  },
+
+  "share": {
+    "sectionTitle": "यह चैनल शेयर करें",
+    "description": "केवल सार्वजनिक आँकड़े — अनुमान स्वतंत्र हैं और चैनल के मालिक, YouTube या Google द्वारा उपलब्ध या सत्यापित नहीं हैं।",
+    "share": "शेयर करें",
+    "shareVia": "{title} को डिवाइस से शेयर करें",
+    "copyLink": "लिंक कॉपी करें",
+    "copyLinkAria": "{title} का लिंक कॉपी करें",
+    "linkCopied": "लिंक कॉपी हो गया ✓",
+    "linkCopiedStatus": "लिंक क्लिपबोर्ड पर कॉपी हो गया है।",
+    "copyError": "कॉपी नहीं हो सका — आप एड्रेस बार से URL कॉपी कर सकते हैं।",
+    "shareOnX": "X पर शेयर करें",
+    "shareOnLinkedIn": "LinkedIn पर शेयर करें",
+    "shareOnWhatsApp": "WhatsApp पर शेयर करें",
+    "shareOnSocialAria": "{title} को {network} पर शेयर करें ({newTab})"
+  },
+
+  "copyShare": {
+    "label": "शेयर लिंक कॉपी करें",
+    "copied": "लिंक कॉपी हो गया ✓",
+    "copiedStatus": "लिंक क्लिपबोर्ड पर कॉपी हो गया है।",
+    "error": "कॉपी नहीं हो सका — आप एड्रेस बार से URL कॉपी कर सकते हैं।"
+  },
+
+  "channelPage": {
+    "backToSearch": "← खोज पर लौटें",
+    "breadcrumbAria": "ब्रेडक्रम्ब",
+    "notFoundCode": "404",
+    "notFoundTitle": "चैनल नहीं मिला",
+    "notFoundBody": "हम वह YouTube चैनल नहीं ढूँढ पाए। हो सकता है इसे हटा दिया गया हो, नाम बदल दिया गया हो, या चैनल ID अमान्य हो। होमपेज से चैनल का नाम खोजकर देखें।",
+    "errorTitle": "चैनल लोड नहीं हो सका",
+    "errorBody": "इस चैनल को लोड करते समय कुछ ग़लत हुआ। ऐसा तब हो सकता है जब YouTube API अस्थायी रूप से अनुपलब्ध हो या दर सीमा पार कर गई हो।",
+    "loadingSr": "चैनल लोड हो रहा है…"
+  },
+
+  "rootError": {
+    "title": "कुछ ग़लत हुआ",
+    "body": "एक अनपेक्षित त्रुटि हुई। कृपया दोबारा कोशिश करें।"
+  },
+
+  "notFound": {
+    "code": "404",
+    "title": "पेज नहीं मिला",
+    "body": "आप जो पेज खोज रहे हैं वह मौजूद नहीं है।"
+  },
+
+  "earnings": {
+    "sectionTitle": "कमाई अनुमानक",
+    "tabsLabel": "अनुमान परिदृश्य",
+    "bands": {
+      "low": "रूढ़िवादी",
+      "expected": "अपेक्षित",
+      "high": "आशावादी"
+    },
+    "monthlyTotal": "मासिक कुल ({band})",
+    "atViews": "{views} मासिक व्यूज़ पर",
+    "kpi": {
+      "daily": "दैनिक",
+      "weekly": "साप्ताहिक",
+      "monthly": "मासिक",
+      "annual": "वार्षिक"
+    },
+    "fields": {
+      "monthlyViews": "मासिक व्यूज़",
+      "monthlyViewsHint": "स्वतः अनुमानित: {compact} ({full})",
+      "contentType": "कंटेंट प्रकार",
+      "country": "देश / दर्शक",
+      "niche": "निच",
+      "rpmMode": "RPM मोड",
+      "customRpm": "कस्टम RPM (USD)",
+      "displayCurrency": "प्रदर्शित मुद्रा",
+      "monetizedPercent": "मॉनेटाइज़्ड व्यूज़ %",
+      "monetizedHint": "एक सामान्य चैनल (~90%) की तुलना में। 90% YouTube Studio के RPM फ़ॉर्मूला से मेल खाता है; अच्छे मॉनेटाइज़्ड चैनल के लिए बढ़ाएँ या COPPA/Premium-भारी दर्शकों के लिए घटाएँ।",
+      "extrasLegend": "अतिरिक्त मासिक आय ({currency} में)",
+      "sponsorships": "स्पॉन्सरशिप",
+      "affiliate": "एफ़िलिएट",
+      "memberships": "मेम्बरशिप",
+      "other": "अन्य"
+    },
+    "contentTypeOptions": {
+      "long": "लॉन्ग-फ़ॉर्म",
+      "shorts": "Shorts",
+      "mixed": "मिश्रित"
+    },
+    "rpmModeOptions": {
+      "auto": "ऑटो",
+      "custom": "कस्टम"
+    },
+    "breakdown": {
+      "title": "विभाजन (मासिक)",
+      "adRevenue": "विज्ञापन आय",
+      "sponsorships": "स्पॉन्सरशिप",
+      "affiliate": "एफ़िलिएट",
+      "memberships": "मेम्बरशिप",
+      "other": "अन्य"
+    },
+    "disclaimer": "केवल अनुमान। वास्तविक कमाई कई कारकों पर निर्भर करती है जिन्हें हम नहीं देख सकते — फ़िल रेट, मौसम, विज्ञापन श्रेणी, YouTube का हिस्सा, रिफ़ंड और टैक्स।"
+  },
+
+  "calculators": {
+    "shared": {
+      "revenue": "आय",
+      "revenueAria": "आय राशि",
+      "totalViews": "कुल व्यूज़",
+      "totalViewsAria": "कुल व्यूज़",
+      "grossAdRevenue": "कुल विज्ञापन आय",
+      "grossAdRevenueAria": "कुल विज्ञापन आय राशि",
+      "monetizedImpressions": "मॉनेटाइज़्ड इंप्रेशन",
+      "monetizedImpressionsAria": "मॉनेटाइज़्ड इंप्रेशन",
+      "monthlyShortsViews": "मासिक Shorts व्यूज़",
+      "audienceCountry": "दर्शकों का देश",
+      "niche": "निच",
+      "customShortsRpm": "कस्टम Shorts RPM (USD)",
+      "customShortsRpmAria": "कस्टम Shorts RPM",
+      "sponsorshipMonthly": "स्पॉन्सरशिप आय (मासिक)",
+      "affiliateMonthly": "एफ़िलिएट आय (मासिक)",
+      "currency": "मुद्रा",
+      "currencyAria": "मुद्रा",
+      "conservative": "रूढ़िवादी",
+      "expectedMonthly": "अपेक्षित मासिक",
+      "optimistic": "आशावादी",
+      "daily": "दैनिक (अपेक्षित)",
+      "monthly": "मासिक (अपेक्षित)",
+      "annual": "वार्षिक (अपेक्षित)",
+      "formula": "फ़ॉर्मूला:",
+      "faqTitle": "अक्सर पूछे जाने वाले प्रश्न",
+      "estimatedForShorts": "{views} मासिक Shorts व्यूज़ के लिए अनुमानित। Shorts का डिफ़ॉल्ट RPM लॉन्ग-फ़ॉर्म से काफ़ी कम है।"
+    },
+    "rpm": {
+      "eyebrow": "कैलकुलेटर · RPM",
+      "title": "YouTube RPM कैलकुलेटर",
+      "intro": "RPM (Revenue Per Mille) YouTube के हिस्से के बाद प्रति 1,000 व्यूज़ आपकी कमाई है। अपनी कुल विज्ञापन आय और कुल व्यूज़ डालकर RPM निकालें। यह टूल स्वतंत्र है — पद्धति पेज देखें।",
+      "breadcrumb": "RPM कैलकुलेटर",
+      "resultLabel": "RPM",
+      "formulaText": "RPM = आय / कुल व्यूज़ × 1000",
+      "faq": {
+        "q1": "RPM क्या है?",
+        "a1": "RPM का मतलब Revenue Per Mille है — YouTube का हिस्सा जाने के बाद प्रति 1,000 व्यूज़ पर आपकी कमाई। यह क्रिएटर की तरफ़ का मापदंड है।",
+        "q2": "RPM और CPM में क्या फ़र्क़ है?",
+        "a2": "CPM वह राशि है जो विज्ञापनदाता 1,000 इंप्रेशन के लिए YouTube के हिस्से से पहले देते हैं। RPM वह है जो क्रिएटर को मिलता है और यह सभी व्यूज़ पर लागू होता है (सिर्फ़ मॉनेटाइज़्ड पर नहीं)। RPM हमेशा CPM से कम होता है।",
+        "q3": "क्या यह आधिकारिक YouTube टूल है?",
+        "a3": "नहीं। यह एक स्वतंत्र कैलकुलेटर है। गणित बस RPM = आय / व्यूज़ × 1000 है; आँकड़े आपके अपने डेटा से आते हैं।"
+      },
+      "meta": {
+        "title": "YouTube RPM कैलकुलेटर",
+        "description": "किसी भी आय + व्यूज़ जोड़ी से अपना YouTube RPM (प्रति 1,000 व्यूज़ आय) निकालें। शून्य से भाग को सुरक्षित तरीक़े से संभालता है।",
+        "ogDescription": "स्वतंत्र RPM कैलकुलेटर — अपनी आय और कुल व्यूज़ डालें और RPM पाएँ।"
+      }
+    },
+    "cpm": {
+      "eyebrow": "कैलकुलेटर · CPM",
+      "title": "YouTube CPM कैलकुलेटर",
+      "intro": "CPM (Cost Per Mille) वह राशि है जो विज्ञापनदाता 1,000 इंप्रेशन के लिए YouTube को देते हैं — YouTube के हिस्से से पहले। CPM निकालने के लिए कुल विज्ञापन आय और मॉनेटाइज़्ड इंप्रेशन डालें।",
+      "breadcrumb": "CPM कैलकुलेटर",
+      "resultLabel": "CPM",
+      "formulaText": "CPM = कुल विज्ञापन आय / मॉनेटाइज़्ड इंप्रेशन × 1000",
+      "notRpmNotice": "CPM, RPM नहीं है। CPM बताता है कि विज्ञापनदाता 1,000 मॉनेटाइज़्ड इंप्रेशन के लिए क्या देते हैं (YouTube के हिस्से से पहले)। RPM बताता है कि क्रिएटर को 1,000 कुल व्यूज़ पर क्या मिलता है (YouTube के हिस्से के बाद)। ऊँचा CPM ज़रूरी नहीं कि ज़्यादा नेट कमाई हो।",
+      "faq": {
+        "q1": "CPM क्या है?",
+        "a1": "CPM (Cost Per Mille) वह राशि है जो एक विज्ञापनदाता 1,000 विज्ञापन इंप्रेशन के लिए देता है। यह विज्ञापनदाता की तरफ़ का मापदंड है।",
+        "q2": "मेरा CPM मेरे RPM से ज़्यादा क्यों है?",
+        "a2": "CPM YouTube के हिस्से से पहले होता है और सिर्फ़ मॉनेटाइज़्ड इंप्रेशन गिनता है। RPM YouTube के हिस्से के बाद होता है और आपके सभी व्यूज़ (मॉनेटाइज़्ड और नॉन-मॉनेटाइज़्ड) से विभाजित होता है। RPM हमेशा CPM से कम होता है।",
+        "q3": "क्या यह आधिकारिक YouTube टूल है?",
+        "a3": "नहीं। यह एक स्वतंत्र कैलकुलेटर है।"
+      },
+      "meta": {
+        "title": "YouTube CPM कैलकुलेटर",
+        "description": "कुल विज्ञापन आय और मॉनेटाइज़्ड इंप्रेशन से YouTube CPM निकालें। शून्य से भाग को सुरक्षित तरीक़े से संभालता है।",
+        "ogDescription": "स्वतंत्र CPM कैलकुलेटर — कुल विज्ञापन आय और मॉनेटाइज़्ड इंप्रेशन डालें।"
+      }
+    },
+    "shorts": {
+      "eyebrow": "कैलकुलेटर · Shorts",
+      "title": "YouTube Shorts कैलकुलेटर",
+      "intro": "YouTube Shorts से मासिक, दैनिक और वार्षिक कमाई का अनुमान लगाएँ। Shorts का मॉनेटाइज़ेशन लॉन्ग-फ़ॉर्म से काफ़ी अलग है: अपेक्षित Shorts RPM समान लॉन्ग-फ़ॉर्म RPM का सिर्फ़ एक छोटा अंश होता है।",
+      "breadcrumb": "Shorts कैलकुलेटर",
+      "faq": {
+        "q1": "Shorts का RPM लॉन्ग-फ़ॉर्म से इतना कम क्यों है?",
+        "a1": "Shorts एक वैश्विक विज्ञापन पूल साझा करते हैं जो व्यू शेयर के आधार पर सभी Shorts क्रिएटर के बीच बाँटा जाता है। प्रति-व्यू कमाई आमतौर पर लॉन्ग-फ़ॉर्म वीडियो की तुलना में एक क्रम कम होती है।",
+        "q2": "क्या यह वही आय है जो मुझे मिलेगी?",
+        "a2": "नहीं। असल कमाई आपके ख़ास दर्शक, विज्ञापन मिक्स, मौसम और देशवार बँटवारे पर निर्भर करती है। इसे एक सूचित अनुमान मानें।"
+      },
+      "meta": {
+        "title": "YouTube Shorts कैलकुलेटर",
+        "description": "दर्शक देश, निच और मासिक व्यूज़ का उपयोग कर YouTube Shorts से विज्ञापन आय का अनुमान लगाएँ। Shorts का मॉनेटाइज़ेशन लॉन्ग-फ़ॉर्म से बहुत अलग है।",
+        "ogDescription": "स्वतंत्र Shorts कमाई अनुमानक। Shorts RPM लॉन्ग-फ़ॉर्म से काफ़ी कम है।"
+      }
+    },
+    "sponsorship": {
+      "eyebrow": "कैलकुलेटर · स्पॉन्सरशिप",
+      "title": "YouTube स्पॉन्सरशिप कैलकुलेटर",
+      "intro": "अपने सब्सक्राइबर, औसत व्यूज़, एंगेजमेंट दर, निच, डिलीवरेबल प्रकार, उपयोग अधिकार और एक्सक्लूसिविटी के आधार पर YouTube ब्रांड डील के लिए उचित स्पॉन्सरशिप दर का अनुमान लगाएँ। सभी परिणाम बातचीत योग्य हैं — असल दरें ब्रांड, अभियान और क्रिएटर पर निर्भर करती हैं।",
+      "breadcrumb": "स्पॉन्सरशिप कैलकुलेटर",
+      "fields": {
+        "subscribers": "सब्सक्राइबर",
+        "averageViews": "प्रति वीडियो औसत व्यूज़",
+        "engagementRate": "एंगेजमेंट दर (%)",
+        "audienceCountry": "दर्शकों का देश",
+        "deliverable": "डिलीवरेबल",
+        "usageRights": "उपयोग अधिकार",
+        "exclusivity": "एक्सक्लूसिविटी",
+        "videoCount": "स्पॉन्सर्ड वीडियो की संख्या"
+      },
+      "deliverableOptions": {
+        "integration": "इंटीग्रेशन (30–90 सेकंड)",
+        "dedicated": "समर्पित वीडियो",
+        "shortsMention": "Shorts में उल्लेख",
+        "productPlacement": "प्रोडक्ट प्लेसमेंट"
+      },
+      "usageRightsOptions": {
+        "standard": "मानक (केवल आपका चैनल)",
+        "extended": "विस्तारित (सशुल्क विज्ञापन, 6 महीने)",
+        "perpetual": "स्थायी"
+      },
+      "exclusivityOptions": {
+        "none": "कोई नहीं",
+        "partial": "आंशिक (श्रेणी)",
+        "full": "पूर्ण (सभी ब्रांड, अवधि)"
+      },
+      "results": {
+        "conservativeRate": "रूढ़िवादी दर",
+        "expectedRate": "अपेक्षित दर (प्रति वीडियो)",
+        "optimisticRate": "आशावादी दर",
+        "packageConservative": "पैकेज (रूढ़िवादी)",
+        "packageExpected": "पैकेज (अपेक्षित)",
+        "packageOptimistic": "पैकेज (आशावादी)"
+      },
+      "disclaimer": "केवल अनुमान। स्पॉन्सरशिप की क़ीमतें हमेशा बातचीत योग्य होती हैं और ब्रांड, अभियान और क्रिएटर के रिश्ते पर निर्भर करती हैं।",
+      "faq": {
+        "q1": "क्या ये दरें आधिकारिक हैं?",
+        "a1": "नहीं। स्पॉन्सरशिप दरें निजी होती हैं और क्रिएटर व ब्रांड के बीच तय होती हैं। यह टूल एक संकेतक अनुमान देता है।",
+        "q2": "समर्पित वीडियो की क़ीमत क्या होती है?",
+        "a2": "एक समर्पित वीडियो (जो पूरी तरह से स्पॉन्सर के इर्द-गिर्द बना हो) आमतौर पर किसी असंबंधित वीडियो में छोटे इंटीग्रेशन की दर का 2–3 गुना होता है।",
+        "q3": "विस्तारित और स्थायी उपयोग अधिकार क्या हैं?",
+        "a3": "मानक उपयोग अधिकार आपके चैनल तक सीमित होते हैं। विस्तारित ब्रांड को एक निश्चित समय तक विज्ञापनों में सामग्री दोबारा उपयोग करने देता है। स्थायी का मतलब ब्रांड इसे हमेशा दोबारा उपयोग कर सकता है। हर स्तर पर क़ीमत बढ़ती है।"
+      },
+      "meta": {
+        "title": "YouTube स्पॉन्सरशिप कैलकुलेटर",
+        "description": "सब्सक्राइबर, औसत व्यूज़, एंगेजमेंट, निच, डिलीवरेबल प्रकार, उपयोग अधिकार और एक्सक्लूसिविटी के आधार पर YouTube स्पॉन्सरशिप दरों का अनुमान लगाएँ। दरें हमेशा बातचीत योग्य होती हैं।",
+        "ogDescription": "स्वतंत्र स्पॉन्सरशिप दर अनुमानक। परिणाम संकेतक हैं — हर डील बातचीत योग्य है।"
+      }
+    }
+  },
+
+  "translationPending": {
+    "title": "अंग्रेज़ी में उपलब्ध",
+    "body": "यह पेज फ़िलहाल केवल अंग्रेज़ी में उपलब्ध है। स्थानीय संस्करण जल्द ही आ रहे हैं — हम क़ानूनी, पद्धति और About पेज को प्रकाशित करने से पहले मूल भाषा के समीक्षकों से जँचवाते हैं।",
+    "readInEnglish": "अंग्रेज़ी में पढ़ें",
+    "backToHome": "होम पर लौटें"
+  },
+
+  "static": {
+    "about": {
+      "title": "हमारे बारे में",
+      "description": "YouTube Money Calculator क्या है, क्या नहीं है, और यह किन सार्वजनिक डेटा स्रोतों का उपयोग करता है।",
+      "heading": "BeHumler के बारे में",
+      "subheading": "यह टूल क्या है और क्या नहीं है।"
+    },
+    "methodology": {
+      "title": "पद्धति",
+      "description": "YouTube Money Calculator YouTube की आय का अनुमान कैसे लगाता है: डेटा स्रोत, RPM/CPM परिभाषाएँ, देश और निच धारणाएँ, Shorts बनाम लॉन्ग-फ़ॉर्म, और ज्ञात सीमाएँ।",
+      "heading": "पद्धति",
+      "subheading": "इस साइट के आँकड़े कैसे बनते हैं और हमारी धारणाएँ कहाँ से आती हैं।"
+    },
+    "privacy": {
+      "title": "गोपनीयता",
+      "description": "YouTube Money Calculator डेटा कैसे संभालता है: कोई अकाउंट लॉगिन नहीं, कोई ट्रैकिंग कुकीज़ नहीं, डिफ़ॉल्ट रूप से कोई एनालिटिक्स नहीं, और हम YouTube Data API v3 का उपयोग कैसे करते हैं।",
+      "heading": "गोपनीयता",
+      "subheading": "जब आप इस टूल का उपयोग करते हैं तब हम आपके डेटा को कैसे संभालते हैं।"
+    },
+    "terms": {
+      "title": "शर्तें",
+      "description": "जिन शर्तों पर YouTube Money Calculator पेश किया जाता है। YouTube या Google से कोई संबद्धता नहीं। केवल अनुमान; वित्तीय सलाह नहीं।",
+      "heading": "उपयोग की शर्तें",
+      "subheading": "जिन शर्तों पर यह टूल पेश किया जाता है।"
+    },
+    "disclaimer": {
+      "title": "अस्वीकरण",
+      "description": "YouTube Money Calculator एक स्वतंत्र टूल है। केवल अनुमान — YouTube या Google से संबद्ध नहीं। आय की कोई गारंटी नहीं।",
+      "heading": "अस्वीकरण",
+      "subheading": ""
+    },
+    "backToHome": "← होम पर लौटें",
+    "lastUpdated": "अंतिम अपडेट:"
+  },
+
+  "staticPage": {
+    "backToHome": "← होम पर लौटें"
+  },
+
+  "homeMeta": {
+    "title": "YouTube Money Calculator | चैनल की कमाई, RPM और CPM का अनुमान लगाएँ",
+    "description": "सार्वजनिक आँकड़ों का उपयोग कर YouTube चैनल की कमाई का अनुमान लगाएँ। संभावित मासिक आय, RPM, CPM, Shorts आय, स्पॉन्सरशिप मूल्य और अधिक की गणना हमारे मुफ़्त YouTube Money Calculator से करें।"
+  },
+
+  "layoutMeta": {
+    "titleDefault": "YouTube Money Calculator | चैनल की कमाई, RPM और CPM का अनुमान लगाएँ",
+    "titleTemplate": "%s · YouTube Money Calculator",
+    "description": "सार्वजनिक आँकड़ों का उपयोग कर YouTube चैनल की कमाई का अनुमान लगाएँ। संभावित मासिक आय, RPM, CPM, Shorts आय, स्पॉन्सरशिप मूल्य और अधिक की गणना हमारे मुफ़्त YouTube Money Calculator से करें।",
+    "skipToContent": "मुख्य सामग्री पर जाएँ"
+  }
+}

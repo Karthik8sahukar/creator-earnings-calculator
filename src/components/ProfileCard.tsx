@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
+
 import {
   CalendarIcon,
   EyeIcon,
@@ -7,7 +9,7 @@ import {
   GlobeIcon,
   UsersIcon,
 } from "./icons";
-import { formatCompact, formatDate, formatNumber } from "@/lib/format";
+import { formatCompact, formatDate } from "@/lib/format";
 import type { ChannelDetails } from "@/types/youtube";
 
 interface Props {
@@ -15,6 +17,7 @@ interface Props {
 }
 
 export function ProfileCard({ channel }: Props) {
+  const t = useTranslations("profile");
   return (
     <section aria-labelledby="channel-title" className="card overflow-hidden">
       <div className="bg-gradient-to-br from-brand-100 via-white to-accent-400/20 h-24 sm:h-32" />
@@ -24,7 +27,7 @@ export function ProfileCard({ channel }: Props) {
             {channel.thumbnail ? (
               <Image
                 src={channel.thumbnail}
-                alt={`${channel.title} profile picture`}
+                alt={t("profilePictureAlt", { title: channel.title })}
                 fill
                 sizes="128px"
                 className="object-cover"
@@ -55,9 +58,9 @@ export function ProfileCard({ channel }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary self-start sm:self-end"
-            aria-label={`View ${channel.title} on YouTube (opens in a new tab)`}
+            aria-label={t("viewOnYouTubeAria", { title: channel.title })}
           >
-            View on YouTube
+            {t("viewOnYouTube")}
             <ExternalIcon width={16} height={16} aria-hidden />
           </a>
         </div>
@@ -71,33 +74,33 @@ export function ProfileCard({ channel }: Props) {
         <dl className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <Stat
             icon={<UsersIcon />}
-            label="Subscribers"
+            label={t("subscribers")}
             value={
               channel.hiddenSubscriberCount
-                ? "Hidden"
+                ? t("hidden")
                 : formatCompact(channel.subscriberCount ?? 0)
             }
             title={
               channel.hiddenSubscriberCount
-                ? "Subscriber count is hidden by the channel."
-                : `${formatNumber(channel.subscriberCount ?? 0)} subscribers`
+                ? t("subscribersHiddenTitle")
+                : t("subscriberCount", { count: channel.subscriberCount ?? 0 })
             }
           />
           <Stat
             icon={<EyeIcon />}
-            label="Total views"
+            label={t("totalViews")}
             value={formatCompact(channel.viewCount)}
-            title={`${formatNumber(channel.viewCount)} views`}
+            title={t("viewCount", { count: channel.viewCount })}
           />
           <Stat
             icon={<FilmIcon />}
-            label="Videos"
+            label={t("videos")}
             value={formatCompact(channel.videoCount)}
-            title={`${formatNumber(channel.videoCount)} videos`}
+            title={t("videoCount", { count: channel.videoCount })}
           />
           <Stat
             icon={<CalendarIcon />}
-            label="Joined"
+            label={t("joined")}
             value={formatDate(channel.publishedAt)}
           />
         </dl>

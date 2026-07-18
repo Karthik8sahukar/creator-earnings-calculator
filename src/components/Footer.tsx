@@ -1,101 +1,102 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
+import { Link } from "@/i18n/navigation";
 import { publicConfig } from "@/lib/config";
 
+/**
+ * Site footer with 4 columns of navigation + a legal footer row.
+ *
+ * All visible strings are translated via next-intl. `publicConfig.siteName`
+ * appears only in the machine-readable copyright suffix (kept English
+ * because it's a brand string).
+ */
 export function Footer() {
+  const t = useTranslations("footer");
+  const year = new Date().getFullYear();
+
   return (
     <footer className="mt-20 border-t border-slate-200/70 bg-white/60">
       <div className="container-page py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-sm text-slate-600">
         <div>
-          <h3 className="font-semibold text-slate-900">
-            {publicConfig.siteName}
-          </h3>
-          <p className="mt-2 leading-relaxed">
-            An independent tool that estimates YouTube channel earnings using
-            public statistics. Not affiliated with, endorsed by, or verified by
-            YouTube or Google.
-          </p>
+          <h3 className="font-semibold text-slate-900">BeHumler</h3>
+          <p className="mt-2 leading-relaxed">{t("brandBlurb")}</p>
         </div>
 
         <div>
-          <h4 className="font-semibold text-slate-900">Calculators</h4>
+          <h4 className="font-semibold text-slate-900">{t("calculators")}</h4>
           <ul className="mt-3 space-y-2">
             <li>
               <Link href="/youtube-rpm-calculator" className="hover:text-slate-900">
-                RPM calculator
+                {t("rpmCalculator")}
               </Link>
             </li>
             <li>
               <Link href="/youtube-cpm-calculator" className="hover:text-slate-900">
-                CPM calculator
+                {t("cpmCalculator")}
               </Link>
             </li>
             <li>
               <Link href="/youtube-shorts-calculator" className="hover:text-slate-900">
-                Shorts calculator
+                {t("shortsCalculator")}
               </Link>
             </li>
             <li>
-              <Link
-                href="/youtube-sponsorship-calculator"
-                className="hover:text-slate-900"
-              >
-                Sponsorship calculator
+              <Link href="/youtube-sponsorship-calculator" className="hover:text-slate-900">
+                {t("sponsorshipCalculator")}
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-semibold text-slate-900">Resources</h4>
+          <h4 className="font-semibold text-slate-900">{t("resources")}</h4>
           <ul className="mt-3 space-y-2">
             <li>
               <Link href="/methodology" className="hover:text-slate-900">
-                Methodology
+                {t("methodology")}
               </Link>
             </li>
             <li>
               <Link href="/disclaimer" className="hover:text-slate-900">
-                Disclaimer
+                {t("disclaimer")}
               </Link>
             </li>
             <li>
               <Link href="/about" className="hover:text-slate-900">
-                About
+                {t("about")}
               </Link>
             </li>
             <li>
               <Link href="/privacy" className="hover:text-slate-900">
-                Privacy
+                {t("privacy")}
               </Link>
             </li>
             <li>
               <Link href="/terms" className="hover:text-slate-900">
-                Terms
+                {t("terms")}
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-semibold text-slate-900">Data source</h4>
+          <h4 className="font-semibold text-slate-900">{t("dataSource")}</h4>
           <p className="mt-3 leading-relaxed">
-            Public channel statistics are retrieved using the{" "}
             <a
               href="https://developers.google.com/youtube/v3"
               className="underline hover:text-slate-900"
               target="_blank"
               rel="noopener noreferrer"
             >
-              YouTube Data API v3
+              {t("dataSourceLink")}
             </a>
-            . Revenue estimates are independently calculated.
+            {" — "}
+            {t("brandBlurb")}
           </p>
         </div>
       </div>
       <div className="container-page pb-8 text-xs text-slate-500">
-        &copy; {new Date().getFullYear()} {publicConfig.siteName}. Independent
-        tool.
+        {t("copyright", { year })} · {publicConfig.siteName}.
       </div>
     </footer>
   );

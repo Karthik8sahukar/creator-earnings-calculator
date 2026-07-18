@@ -1,4 +1,6 @@
+import { useTranslations } from "next-intl";
 import Image from "next/image";
+
 import { ChatIcon, ClockIcon, EyeIcon, ThumbsUpIcon } from "./icons";
 import { formatCompact, formatRelativeDate } from "@/lib/format";
 import type { VideoItem } from "@/types/youtube";
@@ -8,12 +10,11 @@ interface Props {
 }
 
 export function VideosGrid({ videos }: Props) {
+  const t = useTranslations("videos");
+  const tCommon = useTranslations("common.actions");
+
   if (videos.length === 0) {
-    return (
-      <p className="text-sm text-slate-500">
-        No recent videos are available for this channel.
-      </p>
-    );
+    return <p className="text-sm text-slate-500">{t("emptyShort")}</p>;
   }
 
   return (
@@ -24,7 +25,10 @@ export function VideosGrid({ videos }: Props) {
             href={v.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Watch: ${v.title} (opens in a new tab)`}
+            aria-label={t("watchAria", {
+              title: v.title,
+              newTab: tCommon("openInNewTab"),
+            })}
             className="relative block aspect-video bg-slate-100 group"
           >
             {v.thumbnail ? (
@@ -43,7 +47,7 @@ export function VideosGrid({ videos }: Props) {
             </span>
             {v.isShort && (
               <span className="absolute top-2 left-2 rounded-md bg-brand-600/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                Short
+                {t("shortBadge")}
               </span>
             )}
           </a>
@@ -64,17 +68,17 @@ export function VideosGrid({ videos }: Props) {
             <dl className="mt-3 grid grid-cols-3 gap-2 text-xs text-slate-600">
               <Meta
                 icon={<EyeIcon width={14} height={14} />}
-                label="views"
+                label={t("views")}
                 value={formatCompact(v.viewCount)}
               />
               <Meta
                 icon={<ThumbsUpIcon width={14} height={14} />}
-                label="likes"
+                label={t("likes")}
                 value={formatCompact(v.likeCount)}
               />
               <Meta
                 icon={<ChatIcon width={14} height={14} />}
-                label="comments"
+                label={t("comments")}
                 value={formatCompact(v.commentCount)}
               />
             </dl>

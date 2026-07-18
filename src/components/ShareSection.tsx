@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -18,27 +19,15 @@ import {
 } from "@/lib/share";
 
 interface Props {
-  /** Absolute URL to share (channel page). */
   url: string;
-  /** Human-readable channel name — used in the share text. */
   channelTitle: string;
 }
 
 type CopyState = "idle" | "copied" | "error";
 
-/**
- * Social-share card for a channel result.
- *
- * We include:
- *   - Native Web Share API (only rendered when `navigator.share` exists).
- *   - Copy link (with success/failure feedback via an ARIA live region).
- *   - Share to X, LinkedIn, WhatsApp — each opens in a new tab with
- *     `noopener noreferrer`.
- *
- * The default share text is generic; we never include exact estimates
- * or private data in the share message.
- */
 export function ShareSection({ url, channelTitle }: Props) {
+  const t = useTranslations("share");
+  const tCommon = useTranslations("common.actions");
   const shareText = useMemo(
     () => defaultChannelShareText(channelTitle),
     [channelTitle],
@@ -99,7 +88,7 @@ export function ShareSection({ url, channelTitle }: Props) {
       });
       track({ name: "share.native_shared" });
     } catch {
-      // AbortError (user cancelled) or unsupported — no-op.
+      /* aborted or unsupported */
     }
   }, [channelTitle, shareText, url]);
 
@@ -114,14 +103,13 @@ export function ShareSection({ url, channelTitle }: Props) {
     () => buildXShareUrl({ url, text: shareText }),
     [url, shareText],
   );
-  const linkedInUrl = useMemo(
-    () => buildLinkedInShareUrl({ url }),
-    [url],
-  );
+  const linkedInUrl = useMemo(() => buildLinkedInShareUrl({ url }), [url]);
   const whatsAppUrl = useMemo(
     () => buildWhatsAppShareUrl({ url, text: shareText }),
     [url, shareText],
   );
+
+  const newTabLabel = tCommon("openInNewTab");
 
   return (
     <section
@@ -132,13 +120,10 @@ export function ShareSection({ url, channelTitle }: Props) {
       <header className="flex items-center gap-2 mb-3">
         <ShareIcon className="text-brand-600" />
         <h2 id="share-title" className="text-base font-semibold text-slate-900">
-          Share this channel
+          {t("sectionTitle")}
         </h2>
       </header>
-      <p className="text-sm text-slate-500 mb-4">
-        Public statistics only — estimates are independent and are not
-        provided or verified by the channel owner, YouTube, or Google.
-      </p>
+      <p className="text-sm text-slate-500 mb-4">{t("description")}</p>
 
       <div className="flex flex-wrap items-center gap-2">
         {supportsWebShare && (
@@ -146,10 +131,10 @@ export function ShareSection({ url, channelTitle }: Props) {
             type="button"
             onClick={onNativeShare}
             className="btn-primary text-sm"
-            aria-label={`Share ${channelTitle} via device sharing`}
+            aria-label={t("shareVia", { title: channelTitle })}
           >
             <ShareIcon width={16} height={16} aria-hidden />
-            Share
+            {t("share")}
           </button>
         )}
 
@@ -158,11 +143,11 @@ export function ShareSection({ url, channelTitle }: Props) {
           onClick={onCopy}
           className="btn-secondary text-sm"
           aria-describedby="share-copy-status"
-          aria-label={`Copy link to ${channelTitle}`}
+          aria-label={t("copyLinkAria", { title: channelTitle })}
           data-testid="share-copy-link"
         >
           <LinkIcon width={16} height={16} aria-hidden />
-          {copyState === "copied" ? "Link copied ✓" : "Copy link"}
+          {copyState === "copied" ? t("linkCopied") : t("copyLink")}
         </button>
 
         <a
@@ -171,11 +156,15 @@ export function ShareSection({ url, channelTitle }: Props) {
           rel="noopener noreferrer"
           onClick={() => trackSocial("x")}
           className="btn-secondary text-sm"
-          aria-label={`Share ${channelTitle} on X (opens in a new tab)`}
+          aria-label={t("shareOnSocialAria", {
+            title: channelTitle,
+            network: "X",
+            newTab: newTabLabel,
+          })}
           data-testid="share-x"
         >
           <XLogoIcon />
-          Share on X
+          {t("shareOnX")}
         </a>
 
         <a
@@ -184,11 +173,15 @@ export function ShareSection({ url, channelTitle }: Props) {
           rel="noopener noreferrer"
           onClick={() => trackSocial("linkedin")}
           className="btn-secondary text-sm"
-          aria-label={`Share ${channelTitle} on LinkedIn (opens in a new tab)`}
+          aria-label={t("shareOnSocialAria", {
+            title: channelTitle,
+            network: "LinkedIn",
+            newTab: newTabLabel,
+          })}
           data-testid="share-linkedin"
         >
           <LinkedInIcon />
-          Share on LinkedIn
+          {t("shareOnLinkedIn")}
         </a>
 
         <a
@@ -197,11 +190,15 @@ export function ShareSection({ url, channelTitle }: Props) {
           rel="noopener noreferrer"
           onClick={() => trackSocial("whatsapp")}
           className="btn-secondary text-sm"
-          aria-label={`Share ${channelTitle} on WhatsApp (opens in a new tab)`}
+          aria-label={t("shareOnSocialAria", {
+            title: channelTitle,
+            network: "WhatsApp",
+            newTab: newTabLabel,
+          })}
           data-testid="share-whatsapp"
         >
           <WhatsAppIcon />
-          Share on WhatsApp
+          {t("shareOnWhatsApp")}
         </a>
       </div>
 
@@ -211,9 +208,8 @@ export function ShareSection({ url, channelTitle }: Props) {
         aria-live="polite"
         className="mt-3 text-xs text-slate-500 min-h-[1em]"
       >
-        {copyState === "copied" && "Link copied to your clipboard."}
-        {copyState === "error" &&
-          "Couldn't copy — you can copy the URL from the address bar."}
+        {copyState === "copied" && t("linkCopiedStatus")}
+        {copyState === "error" && t("copyError")}
       </p>
     </section>
   );

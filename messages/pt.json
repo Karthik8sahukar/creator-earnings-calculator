@@ -1,0 +1,452 @@
+{
+  "brand": {
+    "name": "BeHumler",
+    "tagline": "Plataforma de análise para criadores",
+    "logoAlt": "BeHumler"
+  },
+
+  "common": {
+    "actions": {
+      "tryAgain": "Tentar de novo",
+      "backToHome": "Voltar ao início",
+      "backToSearch": "Voltar à pesquisa",
+      "reset": "Redefinir",
+      "clear": "Limpar",
+      "openMenu": "Abrir menu",
+      "closeMenu": "Fechar menu",
+      "openInNewTab": "abre numa nova aba"
+    },
+    "labels": {
+      "loading": "A carregar",
+      "loadingCalculator": "A carregar calculadora…",
+      "loadingChannel": "A carregar canal…",
+      "auto": "Auto"
+    },
+    "breadcrumbs": {
+      "home": "Início"
+    },
+    "estimatesOnly": "Apenas estimativas. Não constitui aconselhamento financeiro."
+  },
+
+  "nav": {
+    "primary": "Principal",
+    "calculators": "Calculadoras",
+    "methodology": "Metodologia",
+    "about": "Sobre",
+    "home": "Início",
+    "homeAria": "BeHumler — início"
+  },
+
+  "languageSelector": {
+    "trigger": "Idioma",
+    "menuHeading": "Idioma",
+    "current": "{name} selecionado",
+    "ariaLabel": "Mudar idioma",
+    "shortLabel": "Idioma"
+  },
+
+  "footer": {
+    "brandBlurb": "Uma ferramenta independente que estima os rendimentos de canais do YouTube com base em estatísticas públicas. Não é afiliada, apoiada nem verificada pelo YouTube ou pela Google.",
+    "calculators": "Calculadoras",
+    "resources": "Recursos",
+    "company": "Empresa",
+    "legal": "Legal",
+    "dataSource": "Fonte de dados",
+    "moneyCalculator": "Calculadora de rendimentos",
+    "rpmCalculator": "Calculadora de RPM",
+    "cpmCalculator": "Calculadora de CPM",
+    "shortsCalculator": "Calculadora de Shorts",
+    "sponsorshipCalculator": "Calculadora de patrocínios",
+    "about": "Sobre",
+    "methodology": "Metodologia",
+    "disclaimer": "Aviso",
+    "privacy": "Privacidade",
+    "terms": "Termos",
+    "dataSourceBody": "As estatísticas públicas dos canais são obtidas através da {link}. As estimativas de rendimento são calculadas de forma independente.",
+    "dataSourceLink": "YouTube Data API v3",
+    "copyright": "© {year} BeHumler. Ferramenta independente.",
+    "notFinancialAdvice": "Apenas estimativas. Não é aconselhamento financeiro."
+  },
+
+  "home": {
+    "chip": "Com dados da YouTube Data API v3",
+    "title": "YouTube Money Calculator",
+    "subtitle": "Estima os rendimentos mensais potenciais de um canal do YouTube usando dados públicos, RPM e CPM estimados e análises de visualizações.",
+    "workspaceHint": "Começa a escrever acima: nome do canal, @handle, URL ou ID de canal.",
+    "trustBadges": {
+      "poweredBy": "Com a YouTube Data API",
+      "free": "Gratuito para sempre",
+      "noLogin": "Sem registo"
+    }
+  },
+
+  "search": {
+    "srLabel": "Pesquisar canal",
+    "placeholder": "Pesquisa por nome, @handle, URL ou ID de canal",
+    "clearAria": "Limpar pesquisa",
+    "loading": "A pesquisar…",
+    "empty": "Nenhum canal encontrado. Tenta outro nome ou cola o URL do canal.",
+    "error": "Algo correu mal.",
+    "subsSuffix": "subs",
+    "subsHidden": "Oculto"
+  },
+
+  "recent": {
+    "title": "Pesquisas recentes",
+    "hint": "Guardadas apenas no teu navegador. Nunca enviadas a nenhum servidor.",
+    "clearHistory": "Limpar histórico"
+  },
+
+  "transparency": {
+    "aria": "Aviso de transparência",
+    "prefix": "Transparência:",
+    "body": "As estatísticas públicas dos canais são obtidas através da YouTube Data API. As estimativas de rendimento são calculadas de forma independente e não são fornecidas nem verificadas pelo YouTube ou pela Google."
+  },
+
+  "profile": {
+    "subscribers": "Subscritores",
+    "totalViews": "Visualizações totais",
+    "videos": "Vídeos",
+    "joined": "Entrou em",
+    "hidden": "Oculto",
+    "subscriberCount": "{count, number} subscritores",
+    "viewCount": "{count, number} visualizações",
+    "videoCount": "{count, number} vídeos",
+    "subscribersHiddenTitle": "O canal ocultou o número de subscritores.",
+    "profilePictureAlt": "Foto de perfil de {title}",
+    "viewOnYouTube": "Ver no YouTube",
+    "viewOnYouTubeAria": "Ver {title} no YouTube (abre numa nova aba)"
+  },
+
+  "performance": {
+    "title": "Análise de desempenho",
+    "sampleNote": "Baseado nos {count} vídeos mais recentes.",
+    "estimateLow": "Baixo",
+    "estimateExpected": "Visualizações mensais esperadas",
+    "estimateHigh": "Alto",
+    "rows": {
+      "averageRecent": "Visualizações recentes (média)",
+      "medianRecent": "Visualizações recentes (mediana)",
+      "uploads30": "Vídeos (últimos 30 dias)",
+      "uploads90": "Vídeos (últimos 90 dias)",
+      "recentObserved": "Visualizações observadas",
+      "sampleSize": "Tamanho da amostra",
+      "sampleSizeValue": "{count} vídeos"
+    },
+    "contentMix": "Tipo de conteúdo",
+    "longForm": "Formato longo",
+    "shorts": "Shorts"
+  },
+
+  "videos": {
+    "sectionTitle": "Vídeos recentes",
+    "empty": "Não há vídeos públicos disponíveis para este canal neste momento.",
+    "emptyShort": "Não há vídeos recentes disponíveis para este canal.",
+    "shortBadge": "Short",
+    "views": "visualizações",
+    "likes": "gostos",
+    "comments": "comentários",
+    "watchAria": "Ver: {title} ({newTab})"
+  },
+
+  "share": {
+    "sectionTitle": "Partilha este canal",
+    "description": "Apenas estatísticas públicas — as estimativas são independentes e não são fornecidas nem verificadas pelo criador do canal, pelo YouTube ou pela Google.",
+    "share": "Partilhar",
+    "shareVia": "Partilhar {title} através do dispositivo",
+    "copyLink": "Copiar link",
+    "copyLinkAria": "Copiar link de {title}",
+    "linkCopied": "Link copiado ✓",
+    "linkCopiedStatus": "Link copiado para a área de transferência.",
+    "copyError": "Não foi possível copiar — podes copiar o URL da barra de endereços.",
+    "shareOnX": "Partilhar no X",
+    "shareOnLinkedIn": "Partilhar no LinkedIn",
+    "shareOnWhatsApp": "Partilhar no WhatsApp",
+    "shareOnSocialAria": "Partilhar {title} no {network} ({newTab})"
+  },
+
+  "copyShare": {
+    "label": "Copiar link para partilhar",
+    "copied": "Link copiado ✓",
+    "copiedStatus": "Link copiado para a área de transferência.",
+    "error": "Não foi possível copiar — podes copiar o URL da barra de endereços."
+  },
+
+  "channelPage": {
+    "backToSearch": "← Voltar à pesquisa",
+    "breadcrumbAria": "Trilho de navegação",
+    "notFoundCode": "404",
+    "notFoundTitle": "Canal não encontrado",
+    "notFoundBody": "Não conseguimos encontrar esse canal do YouTube. Pode ter sido removido, renomeado ou o ID pode ser inválido. Tenta pesquisar o canal pelo nome na página inicial.",
+    "errorTitle": "Não foi possível carregar o canal",
+    "errorBody": "Ocorreu um erro ao carregar este canal. Isto pode acontecer quando a API do YouTube está temporariamente indisponível ou com o limite excedido.",
+    "loadingSr": "A carregar canal…"
+  },
+
+  "rootError": {
+    "title": "Algo correu mal",
+    "body": "Ocorreu um erro inesperado. Por favor, tenta de novo."
+  },
+
+  "notFound": {
+    "code": "404",
+    "title": "Página não encontrada",
+    "body": "A página que procuras não existe."
+  },
+
+  "earnings": {
+    "sectionTitle": "Estimador de rendimentos",
+    "tabsLabel": "Cenário de estimativa",
+    "bands": {
+      "low": "Conservador",
+      "expected": "Esperado",
+      "high": "Otimista"
+    },
+    "monthlyTotal": "Total mensal ({band})",
+    "atViews": "com {views} visualizações mensais",
+    "kpi": {
+      "daily": "Diário",
+      "weekly": "Semanal",
+      "monthly": "Mensal",
+      "annual": "Anual"
+    },
+    "fields": {
+      "monthlyViews": "Visualizações mensais",
+      "monthlyViewsHint": "Estimativa automática: {compact} ({full})",
+      "contentType": "Tipo de conteúdo",
+      "country": "País / audiência",
+      "niche": "Nicho",
+      "rpmMode": "Modo de RPM",
+      "customRpm": "RPM personalizado (USD)",
+      "displayCurrency": "Moeda de visualização",
+      "monetizedPercent": "% de visualizações monetizadas",
+      "monetizedHint": "Relativo a um canal típico (~90%). 90% corresponde à fórmula de RPM do YouTube Studio; aumenta para canais bem monetizados ou reduz para audiências COPPA ou com forte peso de Premium.",
+      "extrasLegend": "Rendimentos mensais adicionais (em {currency})",
+      "sponsorships": "Patrocínios",
+      "affiliate": "Afiliação",
+      "memberships": "Membros",
+      "other": "Outros"
+    },
+    "contentTypeOptions": {
+      "long": "Formato longo",
+      "shorts": "Shorts",
+      "mixed": "Misto"
+    },
+    "rpmModeOptions": {
+      "auto": "Auto",
+      "custom": "Personalizado"
+    },
+    "breakdown": {
+      "title": "Detalhe (mensal)",
+      "adRevenue": "Rendimento de anúncios",
+      "sponsorships": "Patrocínios",
+      "affiliate": "Afiliação",
+      "memberships": "Membros",
+      "other": "Outros"
+    },
+    "disclaimer": "Apenas estimativas. Os rendimentos reais dependem de muitos fatores que não observamos — taxa de preenchimento, sazonalidade, categoria de anúncios, quota do YouTube, reembolsos e impostos."
+  },
+
+  "calculators": {
+    "shared": {
+      "revenue": "Rendimento",
+      "revenueAria": "Valor do rendimento",
+      "totalViews": "Visualizações totais",
+      "totalViewsAria": "Visualizações totais",
+      "grossAdRevenue": "Rendimento bruto de anúncios",
+      "grossAdRevenueAria": "Valor bruto do rendimento de anúncios",
+      "monetizedImpressions": "Impressões monetizadas",
+      "monetizedImpressionsAria": "Impressões monetizadas",
+      "monthlyShortsViews": "Visualizações mensais de Shorts",
+      "audienceCountry": "País da audiência",
+      "niche": "Nicho",
+      "customShortsRpm": "RPM personalizado de Shorts (USD)",
+      "customShortsRpmAria": "RPM personalizado de Shorts",
+      "sponsorshipMonthly": "Rendimento de patrocínios (mensal)",
+      "affiliateMonthly": "Rendimento de afiliação (mensal)",
+      "currency": "Moeda",
+      "currencyAria": "Moeda",
+      "conservative": "Conservador",
+      "expectedMonthly": "Mensal esperado",
+      "optimistic": "Otimista",
+      "daily": "Diário (esperado)",
+      "monthly": "Mensal (esperado)",
+      "annual": "Anual (esperado)",
+      "formula": "Fórmula:",
+      "faqTitle": "Perguntas frequentes",
+      "estimatedForShorts": "Estimativa para {views} visualizações mensais de Shorts. O RPM predefinido dos Shorts é muito inferior ao do formato longo."
+    },
+    "rpm": {
+      "eyebrow": "Calculadora · RPM",
+      "title": "Calculadora de RPM do YouTube",
+      "intro": "RPM (Revenue Per Mille) é quanto ganhas por cada 1.000 visualizações após a quota do YouTube. Introduz o total de rendimentos de anúncios e o total de visualizações para calcular o teu RPM. Esta ferramenta é independente — consulta a página de metodologia.",
+      "breadcrumb": "Calculadora de RPM",
+      "resultLabel": "RPM",
+      "formulaText": "RPM = rendimento / visualizações totais × 1000",
+      "faq": {
+        "q1": "O que é o RPM?",
+        "a1": "RPM significa Revenue Per Mille — o valor que ganhas por cada 1.000 visualizações após a quota do YouTube. É uma métrica do lado do criador.",
+        "q2": "Qual a diferença entre RPM e CPM?",
+        "a2": "O CPM é o que os anunciantes pagam por 1.000 impressões, antes da quota do YouTube. O RPM é o que fica para o criador e aplica-se a TODAS as visualizações (não só às monetizadas). O RPM é sempre inferior ao CPM.",
+        "q3": "É uma ferramenta oficial do YouTube?",
+        "a3": "Não. É uma calculadora independente. A matemática é simples: RPM = rendimento / visualizações × 1000; os números que introduzes são os teus."
+      },
+      "meta": {
+        "title": "Calculadora de RPM do YouTube",
+        "description": "Calcula o teu RPM do YouTube (rendimento por 1.000 visualizações) a partir de qualquer par rendimento + visualizações. Gere com segurança a divisão por zero.",
+        "ogDescription": "Calculadora de RPM independente — introduz o teu rendimento e visualizações totais para obter o RPM."
+      }
+    },
+    "cpm": {
+      "eyebrow": "Calculadora · CPM",
+      "title": "Calculadora de CPM do YouTube",
+      "intro": "CPM (Cost Per Mille) é o que os anunciantes pagam ao YouTube por 1.000 impressões — antes da quota do YouTube. Introduz o rendimento bruto de anúncios e as impressões monetizadas para calcular o teu CPM.",
+      "breadcrumb": "Calculadora de CPM",
+      "resultLabel": "CPM",
+      "formulaText": "CPM = rendimento bruto de anúncios / impressões monetizadas × 1000",
+      "notRpmNotice": "CPM não é RPM. O CPM mede o que os anunciantes pagam por 1.000 impressões monetizadas (antes da quota do YouTube). O RPM mede o que o criador ganha por 1.000 visualizações totais (após a quota do YouTube). Um CPM mais alto não significa automaticamente um rendimento líquido superior.",
+      "faq": {
+        "q1": "O que é o CPM?",
+        "a1": "O CPM (Cost Per Mille) é o valor que um anunciante paga por 1.000 impressões de anúncios. É uma métrica do lado do anunciante.",
+        "q2": "Porque é que o meu CPM é maior que o RPM?",
+        "a2": "O CPM é antes da quota do YouTube e conta apenas as impressões monetizadas. O RPM é após a quota e divide-se por todas as tuas visualizações (incluindo as não monetizadas). O RPM é sempre inferior ao CPM.",
+        "q3": "É uma ferramenta oficial do YouTube?",
+        "a3": "Não. É uma calculadora independente."
+      },
+      "meta": {
+        "title": "Calculadora de CPM do YouTube",
+        "description": "Calcula o CPM do YouTube a partir do rendimento bruto de anúncios e das impressões monetizadas. Gere com segurança a divisão por zero.",
+        "ogDescription": "Calculadora de CPM independente — introduz o rendimento bruto de anúncios e as impressões monetizadas."
+      }
+    },
+    "shorts": {
+      "eyebrow": "Calculadora · Shorts",
+      "title": "Calculadora de Shorts do YouTube",
+      "intro": "Estima rendimentos mensais, diários e anuais gerados pelo YouTube Shorts. A monetização dos Shorts é muito diferente da do formato longo: o RPM esperado dos Shorts é apenas uma pequena fração do RPM equivalente em formato longo.",
+      "breadcrumb": "Calculadora de Shorts",
+      "faq": {
+        "q1": "Porque é que o RPM dos Shorts é tão mais baixo que o do formato longo?",
+        "a1": "Os Shorts partilham um fundo global de rendimento publicitário que é distribuído por todos os criadores conforme a sua quota de visualizações. O ganho por visualização é normalmente uma ordem de grandeza inferior ao dos vídeos longos.",
+        "q2": "Este é o rendimento exato que vou receber?",
+        "a2": "Não. O rendimento real depende da tua audiência específica, do mix de anúncios, da sazonalidade e da distribuição por país. Encara isto como uma estimativa fundamentada."
+      },
+      "meta": {
+        "title": "Calculadora de Shorts do YouTube",
+        "description": "Estima o rendimento de anúncios dos YouTube Shorts a partir do país da audiência, do nicho e das visualizações mensais. Os Shorts monetizam de forma muito diferente do formato longo.",
+        "ogDescription": "Estimador independente de rendimentos de Shorts. O RPM dos Shorts é muito inferior ao do formato longo."
+      }
+    },
+    "sponsorship": {
+      "eyebrow": "Calculadora · Patrocínios",
+      "title": "Calculadora de patrocínios do YouTube",
+      "intro": "Estima um valor justo para um patrocínio no YouTube com base nos teus subscritores, visualizações médias, taxa de interação, nicho, tipo de entregável, direitos de utilização e exclusividade. Todos os resultados são negociáveis — os valores reais dependem da marca, da campanha e do criador.",
+      "breadcrumb": "Calculadora de patrocínios",
+      "fields": {
+        "subscribers": "Subscritores",
+        "averageViews": "Visualizações médias por vídeo",
+        "engagementRate": "Taxa de interação (%)",
+        "audienceCountry": "País da audiência",
+        "deliverable": "Entregável",
+        "usageRights": "Direitos de utilização",
+        "exclusivity": "Exclusividade",
+        "videoCount": "Número de vídeos patrocinados"
+      },
+      "deliverableOptions": {
+        "integration": "Integração (30–90 s)",
+        "dedicated": "Vídeo dedicado",
+        "shortsMention": "Menção em Shorts",
+        "productPlacement": "Colocação de produto"
+      },
+      "usageRightsOptions": {
+        "standard": "Padrão (apenas o teu canal)",
+        "extended": "Alargado (anúncios pagos, 6 meses)",
+        "perpetual": "Perpétuo"
+      },
+      "exclusivityOptions": {
+        "none": "Nenhuma",
+        "partial": "Parcial (categoria)",
+        "full": "Total (todas as marcas, no prazo)"
+      },
+      "results": {
+        "conservativeRate": "Valor conservador",
+        "expectedRate": "Valor esperado (por vídeo)",
+        "optimisticRate": "Valor otimista",
+        "packageConservative": "Pacote (conservador)",
+        "packageExpected": "Pacote (esperado)",
+        "packageOptimistic": "Pacote (otimista)"
+      },
+      "disclaimer": "Apenas estimativas. Os valores de patrocínio são sempre negociáveis e dependem da marca, da campanha e da relação com o criador.",
+      "faq": {
+        "q1": "Estes valores são oficiais?",
+        "a1": "Não. Os valores de patrocínio são privados e negociados entre o criador e a marca. Esta ferramenta produz uma estimativa indicativa.",
+        "q2": "Quanto vale um vídeo dedicado?",
+        "a2": "Um vídeo dedicado (totalmente construído em torno do patrocinador) costuma valer 2 a 3 vezes o valor de uma integração breve num vídeo não relacionado.",
+        "q3": "O que são direitos de utilização alargados e perpétuos?",
+        "a3": "A utilização padrão mantém os direitos dentro do teu canal. Os direitos alargados permitem à marca reutilizar o conteúdo em anúncios durante um período de tempo. Os direitos perpétuos significam que a marca pode reutilizá-lo para sempre. Cada nível aumenta o preço."
+      },
+      "meta": {
+        "title": "Calculadora de patrocínios do YouTube",
+        "description": "Estima valores de patrocínio no YouTube a partir de subscritores, visualizações médias, interação, nicho, tipo de entregável, direitos de utilização e exclusividade. Os valores são sempre negociáveis.",
+        "ogDescription": "Estimador independente de valores de patrocínio. Os resultados são indicativos — cada acordo é negociável."
+      }
+    }
+  },
+
+  "translationPending": {
+    "title": "Disponível em inglês",
+    "body": "Esta página está disponível apenas em inglês por agora. As versões traduzidas estão a caminho — traduzimos as páginas legais, de metodologia e \"Sobre\" com revisores nativos antes de as publicar.",
+    "readInEnglish": "Ler em inglês",
+    "backToHome": "Voltar ao início"
+  },
+
+  "static": {
+    "about": {
+      "title": "Sobre",
+      "description": "O que é o YouTube Money Calculator, o que não é e quais as fontes públicas de dados que utiliza.",
+      "heading": "Sobre o BeHumler",
+      "subheading": "O que esta ferramenta é e o que não é."
+    },
+    "methodology": {
+      "title": "Metodologia",
+      "description": "Como o YouTube Money Calculator estima os rendimentos do YouTube: fontes de dados, definições de RPM e CPM, pressupostos de país e nicho, Shorts vs. formato longo e limitações conhecidas.",
+      "heading": "Metodologia",
+      "subheading": "Como são produzidos os números deste site e de onde vêm os nossos pressupostos."
+    },
+    "privacy": {
+      "title": "Privacidade",
+      "description": "Como o YouTube Money Calculator trata os dados: sem início de sessão, sem cookies de rastreamento, sem analítica ativada por defeito e como utilizamos a YouTube Data API v3.",
+      "heading": "Privacidade",
+      "subheading": "Como tratamos os teus dados quando utilizas esta ferramenta."
+    },
+    "terms": {
+      "title": "Termos",
+      "description": "Os termos em que o YouTube Money Calculator é oferecido. Sem afiliação com o YouTube ou a Google. Apenas estimativas; não é aconselhamento financeiro.",
+      "heading": "Termos de utilização",
+      "subheading": "Os termos em que esta ferramenta é oferecida."
+    },
+    "disclaimer": {
+      "title": "Aviso",
+      "description": "O YouTube Money Calculator é uma ferramenta independente. Apenas estimativas — sem afiliação com o YouTube ou a Google. Sem garantia de rendimento.",
+      "heading": "Aviso",
+      "subheading": ""
+    },
+    "backToHome": "← Voltar ao início",
+    "lastUpdated": "Última atualização:"
+  },
+
+  "staticPage": {
+    "backToHome": "← Voltar ao início"
+  },
+
+  "homeMeta": {
+    "title": "YouTube Money Calculator | Estima rendimentos, RPM e CPM de canais",
+    "description": "Estima os rendimentos de um canal do YouTube a partir de estatísticas públicas. Calcula rendimentos mensais potenciais, RPM, CPM, receita de Shorts, valor de patrocínios e mais com a nossa YouTube Money Calculator gratuita."
+  },
+
+  "layoutMeta": {
+    "titleDefault": "YouTube Money Calculator | Estima rendimentos, RPM e CPM de canais",
+    "titleTemplate": "%s · YouTube Money Calculator",
+    "description": "Estima os rendimentos de um canal do YouTube a partir de estatísticas públicas. Calcula rendimentos mensais potenciais, RPM, CPM, receita de Shorts, valor de patrocínios e mais com a nossa YouTube Money Calculator gratuita.",
+    "skipToContent": "Saltar para o conteúdo"
+  }
+}

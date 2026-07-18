@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 
+import { useRouter } from "@/i18n/navigation";
 import { EarningsCalculator } from "./EarningsCalculator";
 import { ShareSection } from "./ShareSection";
 import {
@@ -23,24 +23,15 @@ import type {
 interface Props {
   channel: ChannelDetails;
   analysis: PerformanceAnalysis;
-  /**
-   * Calculator state as decoded from the incoming URL. Only fields the
-   * URL actually provided are present here — anything absent lets the
-   * `EarningsCalculator` fall back to its analysis-derived defaults
-   * (auto-estimated monthly views, sensible content type, etc.).
-   */
   initialCalculatorState: Partial<CalculatorState>;
 }
 
 /**
  * Client-side controller for the channel dashboard page.
  *
- * The heavy fetches and static parts (profile, transparency, performance,
- * videos) already ran on the server. This component owns only what has
- * to be interactive:
- *   - the earnings calculator state
- *   - the URL <-> state sync
- *   - the "recent searches" localStorage record
+ * Uses `useRouter` from `@/i18n/navigation` so calculator-state URL
+ * updates preserve the active locale prefix (`/en/channel/...`
+ * stays on `/en`, not falling through to `/channel/...`).
  */
 export function ChannelDashboard({
   channel,
@@ -48,11 +39,7 @@ export function ChannelDashboard({
   initialCalculatorState,
 }: Props) {
   const router = useRouter();
-  const pathname = `/channel/${channel.channelId}`;
 
-  // Pass the URL partial straight through — the calculator layers it
-  // on top of its analysis-derived defaults. We only force the channel
-  // id from the route so the URL can never override it.
   const initialCalculatorSeed = useMemo<Partial<CalculatorState>>(
     () => ({
       ...initialCalculatorState,
@@ -69,7 +56,6 @@ export function ChannelDashboard({
     }
   }, []);
 
-  // Record the visit in the "recent channels" localStorage list.
   useEffect(() => {
     try {
       const updated = addRecent(loadRecent(), {
@@ -84,19 +70,23 @@ export function ChannelDashboard({
     }
   }, [channel.channelId, channel.title, channel.handle, channel.thumbnail]);
 
+  const pathnameForShare = `/channel/${channel.channelId}`;
+
   const onStateChange = useCallback(
     (next: CalculatorState) => {
       const params = encodeCalculatorState(next);
       const q = params.toString();
-      const href = q ? `${pathname}?${q}` : pathname;
+      const href = q
+        ? `/channel/${channel.channelId}?${q}`
+        : `/channel/${channel.channelId}`;
       router.replace(href, { scroll: false });
     },
-    [router, pathname],
+    [router, channel.channelId],
   );
 
-  // The share section uses the canonical channel URL (never the
-  // exact calculator state) — see docs on defaultChannelShareText.
-  const canonicalUrl = `${urlBase || publicConfig.siteUrl}${pathname}`;
+  // The share URL uses the full origin so it can be pasted anywhere.
+  // We build it manually because the ShareSection needs an absolute URL.
+  const canonicalUrl = `${urlBase || publicConfig.siteUrl}${pathnameForShare}`;
 
   return (
     <div className="space-y-8">
@@ -106,7 +96,7 @@ export function ChannelDashboard({
         initialState={initialCalculatorSeed}
         onStateChange={onStateChange}
         shareOrigin={urlBase}
-        sharePathname={pathname}
+        sharePathname={pathnameForShare}
       />
       <ShareSection url={canonicalUrl} channelTitle={channel.title} />
     </div>

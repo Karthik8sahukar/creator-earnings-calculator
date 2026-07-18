@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 
+import { Link } from "@/i18n/navigation";
 import { legalLastUpdatedIso } from "@/lib/config";
 
 interface Props {
@@ -14,10 +15,6 @@ interface Props {
   children: React.ReactNode;
 }
 
-/**
- * Format an ISO date (YYYY-MM-DD) as a locale-friendly string.
- * Deliberately non-localized to keep it stable across SSR / client.
- */
 function formatDate(iso: string): string {
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
@@ -44,11 +41,12 @@ export function StaticPage({
   lastUpdated = legalLastUpdatedIso,
   children,
 }: Props) {
+  const t = useTranslations("static");
   return (
     <article className="prose prose-slate max-w-3xl mx-auto">
       <p className="text-xs text-slate-500 not-prose">
         <Link href="/" className="hover:underline">
-          ← Back to home
+          {t("backToHome")}
         </Link>
       </p>
       <h1 className="mt-4 text-3xl sm:text-4xl font-bold text-slate-900">
@@ -61,7 +59,7 @@ export function StaticPage({
       )}
       {lastUpdated && (
         <p className="mt-3 text-sm text-slate-500 not-prose">
-          Last updated:{" "}
+          {t("lastUpdated")}{" "}
           <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
         </p>
       )}

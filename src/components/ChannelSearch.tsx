@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import { SearchIcon, XIcon, UsersIcon } from "./icons";
 import { track } from "@/lib/analytics";
@@ -10,6 +11,11 @@ import type { ChannelSearchResult } from "@/types/youtube";
 interface Props {
   onSelect: (channelId: string) => void;
   autoFocus?: boolean;
+  /**
+   * Override the translated placeholder. Only supply this when the
+   * caller has its own placeholder (e.g. an alternate label). Prefer
+   * the default translation for consistency across locales.
+   */
   placeholder?: string;
 }
 
@@ -19,7 +25,16 @@ interface State {
   error?: string;
 }
 
+/**
+ * Channel search combobox.
+ *
+ * ARIA structure is preserved verbatim from the pre-i18n version so
+ * every E2E selector (`role="combobox"`, `role="listbox"`,
+ * `role="option"`, `aria-selected`, the "No channels found" empty
+ * state) still matches. Only visible text is now translated.
+ */
 export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Props) {
+  const t = useTranslations("search");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -29,7 +44,6 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Debounced search
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) {
@@ -60,7 +74,6 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
         } else {
           setState({ status: "success", results: body.results });
         }
-        // Analytics — never send raw text, only queryLength + resultCount.
         track({
           name: "search.submitted",
           queryLength: trimmed.length,
@@ -82,7 +95,6 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (!containerRef.current?.contains(e.target as Node)) {
@@ -106,9 +118,7 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
       setActiveIndex((i) => (i + 1) % state.results.length);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActiveIndex((i) =>
-        i <= 0 ? state.results.length - 1 : i - 1,
-      );
+      setActiveIndex((i) => (i <= 0 ? state.results.length - 1 : i - 1));
     } else if (e.key === "Enter") {
       if (activeIndex >= 0 && state.results[activeIndex]) {
         e.preventDefault();
@@ -134,7 +144,7 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
   return (
     <div ref={containerRef} className="relative w-full">
       <label className="sr-only" htmlFor="channel-search-input">
-        Search channel
+        {t("srLabel")}
       </label>
       <div className="relative">
         <SearchIcon
@@ -160,16 +170,13 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query && setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder={
-            placeholder ??
-            "Search by channel name, @handle, channel URL or channel ID"
-          }
+          placeholder={placeholder ?? t("placeholder")}
           className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-12 py-4 text-base sm:text-lg text-slate-900 placeholder:text-slate-400 shadow-card focus:border-brand-400 focus:ring-4 focus:ring-brand-100 focus:outline-none"
         />
         {query && (
           <button
             type="button"
-            aria-label="Clear search"
+            aria-label={t("clearAria")}
             onClick={() => {
               setQuery("");
               setState({ status: "idle", results: [] });
@@ -192,14 +199,12 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
           {state.status === "loading" && <SkeletonRows />}
 
           {state.status === "empty" && (
-            <p className="p-4 text-sm text-slate-500">
-              No channels found. Try a different name or paste a channel URL.
-            </p>
+            <p className="p-4 text-sm text-slate-500">{t("empty")}</p>
           )}
 
           {state.status === "error" && (
             <p className="p-4 text-sm text-rose-600">
-              {state.error ?? "Something went wrong."}
+              {state.error ?? t("error")}
             </p>
           )}
 
@@ -244,8 +249,8 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
                     <span className="inline-flex items-center gap-1">
                       <UsersIcon width={14} height={14} />
                       {r.hiddenSubscriberCount
-                        ? "Hidden"
-                        : `${formatCompact(r.subscriberCount ?? 0)} subs`}
+                        ? t("subsHidden")
+                        : `${formatCompact(r.subscriberCount ?? 0)} ${t("subsSuffix")}`}
                     </span>
                     {r.description && (
                       <span className="truncate">{r.description}</span>

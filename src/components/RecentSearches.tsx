@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics";
@@ -12,15 +13,11 @@ import {
 
 interface Props {
   onSelect: (channelId: string) => void;
-  /** Bump this value from the parent to force the list to reload. */
   refreshToken?: number;
 }
 
-/**
- * A local-only recent-searches list. Reads from localStorage and offers
- * a "Clear" affordance. History never leaves the browser.
- */
 export function RecentSearches({ onSelect, refreshToken = 0 }: Props) {
+  const t = useTranslations("recent");
   const [list, setList] = useState<RecentChannel[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -46,19 +43,17 @@ export function RecentSearches({ onSelect, refreshToken = 0 }: Props) {
           id="recent-searches-title"
           className="text-sm font-semibold text-slate-900"
         >
-          Recent searches
+          {t("title")}
         </h2>
         <button
           type="button"
           onClick={clear}
           className="text-xs text-slate-500 hover:text-slate-900 underline underline-offset-2"
         >
-          Clear history
+          {t("clearHistory")}
         </button>
       </div>
-      <p className="mt-1 text-xs text-slate-500">
-        Stored only in your browser. Never sent to any server.
-      </p>
+      <p className="mt-1 text-xs text-slate-500">{t("hint")}</p>
       <ul className="mt-3 flex flex-wrap gap-2">
         {list.map((r) => (
           <li key={r.channelId}>
