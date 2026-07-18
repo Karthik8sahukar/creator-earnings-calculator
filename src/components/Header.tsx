@@ -1,7 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-
-import { publicConfig } from "@/lib/config";
-import { LogoMark } from "./icons";
 
 const CALCULATORS: { href: string; label: string }[] = [
   { href: "/youtube-rpm-calculator", label: "RPM" },
@@ -16,12 +14,17 @@ export function Header() {
       <div className="container-page flex items-center justify-between gap-4 h-14">
         <Link
           href="/"
-          className="flex items-center gap-2 font-semibold text-slate-900"
+          className="flex items-center"
+          aria-label="BeHumler — home"
         >
-          <LogoMark />
-          <span className="tracking-tight hidden xs:inline sm:inline">
-            {publicConfig.siteName}
-          </span>
+          <Image
+            src="/behumler-logo.png"
+            alt="BeHumler"
+            width={180}
+            height={60}
+            priority
+            className="h-10 w-auto object-contain"
+          />
         </Link>
 
         <nav
