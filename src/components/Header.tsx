@@ -52,14 +52,6 @@ export function Header() {
           >
             About
           </Link>
-          <a
-            className="btn-secondary hidden sm:inline-flex"
-            href="https://console.cloud.google.com/apis/library/youtube.googleapis.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Get API key
-          </a>
         </nav>
       </div>
     </header>
