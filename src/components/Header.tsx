@@ -1,61 +1,68 @@
-import Image from "next/image";
 import Link from "next/link";
 
-const CALCULATORS: { href: string; label: string }[] = [
-  { href: "/youtube-rpm-calculator", label: "RPM" },
-  { href: "/youtube-cpm-calculator", label: "CPM" },
-  { href: "/youtube-shorts-calculator", label: "Shorts" },
-  { href: "/youtube-sponsorship-calculator", label: "Sponsorship" },
-];
+import { CalculatorsMenu } from "./CalculatorsMenu";
+import { LanguageSelector } from "./LanguageSelector";
+import { Logo } from "./Logo";
+import { MobileNav } from "./MobileNav";
+import { ThemeToggle } from "./ThemeToggle";
 
+/**
+ * Site header.
+ *
+ * Layout:
+ *   Logo | (Calculators ▼   Blog·Soon   Methodology   About)     | LanguageSelector · ThemeToggle · MobileNav
+ *
+ * Notes:
+ *   - "BeHumler" is the visible brand text (hardcoded in <Logo/>).
+ *     publicConfig.siteName remains "YouTube Money Calculator" — that
+ *     drives SEO metadata and must not change.
+ *   - "Blog" has no route yet; it renders as a non-interactive span with
+ *     a "Soon" chip so we never emit a link to a 404 page.
+ *   - The mobile nav renders the same links inside a slide-in sheet
+ *     for `< md` viewports.
+ */
 export function Header() {
   return (
-    <header className="border-b border-slate-200/70 bg-white/70 backdrop-blur sticky top-0 z-40">
-      <div className="container-page flex items-center justify-between gap-4 h-14">
-        <Link
-          href="/"
-          className="flex items-center"
-          aria-label="BeHumler — home"
-        >
-          <Image
-            src="/behumler-logo.png"
-            alt="BeHumler"
-            width={180}
-            height={60}
-            priority
-            className="h-10 w-auto object-contain"
-          />
-        </Link>
+    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/75 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/75">
+      <div className="container-page flex items-center justify-between gap-3 h-16">
+        <Logo size="md" />
 
         <nav
           aria-label="Primary"
-          className="flex items-center gap-4 text-sm text-slate-600 overflow-x-auto"
+          className="hidden md:flex items-center gap-1 text-sm text-slate-700 dark:text-slate-200"
         >
-          <div className="hidden md:flex items-center gap-3">
-            {CALCULATORS.map((c) => (
-              <Link
-                key={c.href}
-                href={c.href}
-                className="hover:text-slate-900 transition whitespace-nowrap"
-              >
-                {c.label}
-              </Link>
-            ))}
-            <span className="h-4 w-px bg-slate-200" aria-hidden />
-          </div>
+          <CalculatorsMenu />
+
+          <span
+            aria-disabled="true"
+            className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
+            title="Blog is coming soon"
+          >
+            Blog
+            <span className="chip">Soon</span>
+          </span>
+
           <Link
-            className="hover:text-slate-900 transition whitespace-nowrap"
             href="/methodology"
+            className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
           >
             Methodology
           </Link>
           <Link
-            className="hover:text-slate-900 transition whitespace-nowrap"
             href="/about"
+            className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
           >
             About
           </Link>
         </nav>
+
+        <div className="flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1">
+            <LanguageSelector />
+            <ThemeToggle />
+          </div>
+          <MobileNav className="md:hidden" />
+        </div>
       </div>
     </header>
   );
