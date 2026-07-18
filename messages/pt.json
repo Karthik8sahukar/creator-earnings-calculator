@@ -38,7 +38,9 @@
     "blog": "Blog",
     "blogSoonTitle": "O blog está a caminho",
     "menu": "Menu",
-    "mobilePrimary": "Principal"
+    "mobilePrimary": "Principal",
+    "instagramCalculator": "Instagram Calculator",
+    "instagramCalculatorAria": "Instagram Money Calculator"
   },
   "languageSelector": {
     "trigger": "Idioma",
@@ -487,9 +489,10 @@
       },
       "instagram": {
         "title": "Instagram Money Calculator",
-        "description": "Estimate Instagram creator earnings from reach, reels, stories and engagement."
+        "description": "Estimate Instagram earnings from sponsored posts, Reels, Stories, affiliate income, engagement, reach, niche, and audience market."
       }
-    }
+    },
+    "openCta": "Open"
   },
   "whyBeHumler": {
     "eyebrow": "Porquê BeHumler",
@@ -909,6 +912,36 @@
       "body": "This calculator uses public creator-economy benchmarks, published sponsorship rate cards, and audience-quality signals to produce a defensible earnings range. It does NOT connect to Instagram's private analytics — there is no way for any third-party tool to see a creator's actual paid deals, DM pitches, or media kit. Treat every number as a starting point for negotiation, not truth.",
       "linkText": "Read the full methodology →",
       "disclaimer": "This tool is not affiliated with, endorsed by, or verified by Instagram or Meta. Estimates only. Not financial advice."
+    }
+  },
+  "creatorPlatforms": {
+    "eyebrow": "Choose your platform",
+    "title": "Creator earnings calculators",
+    "subtitle": "Estimate creator income across YouTube and Instagram using transparent, configurable assumptions.",
+    "cards": {
+      "youtube": {
+        "title": "YouTube Money Calculator",
+        "description": "Estimate a YouTube channel's monthly earnings from long-form views, Shorts payouts, sponsorships, and RPM by country and niche.",
+        "cta": "Open YouTube calculator",
+        "features": {
+          "adRevenue": "Long-form ad revenue",
+          "shorts": "Shorts Creator Pool",
+          "sponsorships": "Sponsorship rate cards",
+          "rpmCpm": "RPM and CPM benchmarks"
+        }
+      },
+      "instagram": {
+        "title": "Instagram Money Calculator",
+        "description": "Estimate Instagram creator earnings from reach, engagement, niche, and audience market — plus every real income stream.",
+        "cta": "Open Instagram calculator",
+        "features": {
+          "sponsoredPosts": "Sponsored posts",
+          "reels": "Reels",
+          "stories": "Stories",
+          "affiliate": "Affiliate revenue",
+          "subscriptions": "Subscriptions"
+        }
+      }
     }
   }
 }

@@ -31,6 +31,8 @@
   "nav": {
     "primary": "Primary",
     "calculators": "Calculators",
+    "instagramCalculator": "Instagram Calculator",
+    "instagramCalculatorAria": "Instagram Money Calculator",
     "methodology": "Methodology",
     "about": "About",
     "home": "Home",
@@ -749,7 +751,38 @@
       },
       "instagram": {
         "title": "Instagram Money Calculator",
-        "description": "Estimate Instagram creator earnings from reach, reels, stories and engagement."
+        "description": "Estimate Instagram earnings from sponsored posts, Reels, Stories, affiliate income, engagement, reach, niche, and audience market."
+      }
+    },
+    "openCta": "Open"
+  },
+  "creatorPlatforms": {
+    "eyebrow": "Choose your platform",
+    "title": "Creator earnings calculators",
+    "subtitle": "Estimate creator income across YouTube and Instagram using transparent, configurable assumptions.",
+    "cards": {
+      "youtube": {
+        "title": "YouTube Money Calculator",
+        "description": "Estimate a YouTube channel's monthly earnings from long-form views, Shorts payouts, sponsorships, and RPM by country and niche.",
+        "cta": "Open YouTube calculator",
+        "features": {
+          "adRevenue": "Long-form ad revenue",
+          "shorts": "Shorts Creator Pool",
+          "sponsorships": "Sponsorship rate cards",
+          "rpmCpm": "RPM and CPM benchmarks"
+        }
+      },
+      "instagram": {
+        "title": "Instagram Money Calculator",
+        "description": "Estimate Instagram creator earnings from reach, engagement, niche, and audience market — plus every real income stream.",
+        "cta": "Open Instagram calculator",
+        "features": {
+          "sponsoredPosts": "Sponsored posts",
+          "reels": "Reels",
+          "stories": "Stories",
+          "affiliate": "Affiliate revenue",
+          "subscriptions": "Subscriptions"
+        }
       }
     }
   },

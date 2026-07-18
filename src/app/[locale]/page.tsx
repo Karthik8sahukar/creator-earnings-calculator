@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
+import { CreatorPlatforms } from "@/components/home/CreatorPlatforms";
 import { Faq } from "@/components/home/Faq";
 import { Hero } from "@/components/home/Hero";
 import { PopularCalculators } from "@/components/home/PopularCalculators";
@@ -62,6 +63,7 @@ export default async function HomePage({
       </Hero>
 
       <PopularCalculators />
+      <CreatorPlatforms />
       <WhyBeHumler />
       <Faq />
     </div>
