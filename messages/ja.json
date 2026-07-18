@@ -539,5 +539,105 @@
       "estimatedRevenue": "推定収益",
       "rpm": "RPM"
     }
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "BeHumler ブログ",
+      "title": "クリエイターエコノミーと YouTube 成長",
+      "subtitle": "キーワードで水増ししない、正直で丁寧にリサーチされた記事。クリエイターが実際に YouTube でどう稼いでいるのかを扱います。"
+    },
+    "search": {
+      "srLabel": "記事を検索",
+      "placeholder": "タイトル・タグ・カテゴリで記事を検索",
+      "clearAria": "検索をクリア",
+      "empty": "「{query}」に一致する記事はありません。別のキーワードでお試しください。"
+    },
+    "sections": {
+      "featuredEyebrow": "編集部のおすすめ",
+      "featured": "注目記事",
+      "latestEyebrow": "新着",
+      "latest": "最新記事",
+      "popularEyebrow": "人気",
+      "popular": "人気の記事"
+    },
+    "newsletter": {
+      "title": "クリエイターエコノミー ブリーフィングを受け取る",
+      "description": "読む価値のある記事を公開したときにだけ、短く正直なメールをお送りします。スパムや売り込みなし、ワンクリックで購読解除。",
+      "emailPlaceholder": "anata@example.com",
+      "subscribe": "購読する",
+      "thanks": "ありがとうございます — 登録が完了しました。次の記事が公開され次第ご連絡します。",
+      "privacyNote": "メールアドレスはブリーフィングの送信にのみ使用します。詳細はプライバシーページをご確認ください。"
+    },
+    "article": {
+      "readingTime": "{count} 分で読めます",
+      "publishedOn": "{date} 公開",
+      "updated": "{date} 更新",
+      "by": "著者: {author}",
+      "tocTitle": "このページの目次",
+      "relatedTitle": "関連記事",
+      "prevArticle": "前の記事",
+      "nextArticle": "次の記事",
+      "prevNextLabel": "記事ナビゲーション",
+      "backToBlog": "← ブログに戻る",
+      "share": {
+        "title": "この記事をシェア",
+        "share": "シェア",
+        "shareVia": "「{title}」をデバイスからシェア",
+        "copyLink": "リンクをコピー",
+        "linkCopied": "コピーしました ✓",
+        "linkCopiedStatus": "リンクをクリップボードにコピーしました。",
+        "copyError": "コピーできませんでした — アドレスバーから URL をコピーしてください。",
+        "shareOnSocial": "{network} でシェア（{newTab}）"
+      }
+    },
+    "meta": {
+      "title": "BeHumler ブログ — クリエイターエコノミーと YouTube 成長",
+      "description": "クリエイターが実際に YouTube でどう収益を得ているのかについての、正直な記事。RPM、CPM、スポンサー、Shorts の支払い、そしてクリエイターエコノミーを形作るプラットフォームについて。",
+      "breadcrumbHome": "ホーム",
+      "breadcrumbBlog": "ブログ"
+    },
+    "categories": {
+      "all": "すべて",
+      "navLabel": "カテゴリで探す",
+      "eyebrow": "カテゴリ",
+      "empty": "このカテゴリにはまだ記事がありません — またお立ち寄りください。",
+      "monetization": {
+        "label": "YouTube 収益化",
+        "description": "広告、メンバーシップ、Super Chat、Premium — YouTube で実際に収益を得るすべての手段。"
+      },
+      "growth": {
+        "label": "YouTube グロース",
+        "description": "サムネイル、視聴維持、投稿頻度、視聴者の積み上げに関する実践的なアドバイス。"
+      },
+      "creator-economy": {
+        "label": "クリエイターエコノミー",
+        "description": "現代のクリエイターエコシステムにおけるお金の流れ — プラットフォーム、支援者、支払い。"
+      },
+      "analytics": {
+        "label": "アナリティクス",
+        "description": "YouTube Studio の数字を読み解く — そして YouTube が見せない数字も。"
+      },
+      "seo": {
+        "label": "SEO",
+        "description": "検索と関連動画のトラフィックがどう動くか — Google と YouTube の両方について。"
+      },
+      "sponsorships": {
+        "label": "スポンサーシップ",
+        "description": "料金、契約、成果物、独占契約 — クリエイターがもっと早く知りたかったことすべて。"
+      },
+      "shorts": {
+        "label": "Shorts",
+        "description": "縦型動画のエコノミー：クリエイタープールの数学、フック、通常動画との連携。"
+      },
+      "guides": {
+        "label": "ガイド",
+        "description": "本気で取り組み始めたクリエイターのために全体像をまとめる長編ガイド。"
+      }
+    },
+    "tags": {
+      "eyebrow": "タグ",
+      "pageTitle": "#{tag} タグの記事",
+      "pageDescription": "#{tag} タグが付いた BeHumler の記事一覧。"
+    }
   }
 }

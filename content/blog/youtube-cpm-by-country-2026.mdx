@@ -1,0 +1,146 @@
+---
+title: "YouTube CPM by Country (2026)"
+description: "A working table of long-form and Shorts CPMs by market tier, why the number matters more than niche for some channels, and how to read your own audience geography."
+publishedDate: "2026-07-13"
+updatedDate: "2026-07-13"
+category: "analytics"
+tags:
+  - "CPM"
+  - "geography"
+  - "country"
+  - "2026"
+featuredImage: "/blog/hero-analytics.svg"
+featuredImageAlt: "Abstract analytics illustration"
+---
+
+Advertisers do not pay the same amount for a viewer in San Francisco as for a viewer in Manila. They pay something like **20× more.**
+
+For a creator, this fact is the single biggest variable in monthly earnings after niche. Two channels making the same content with the same view count can see a 5× difference in RPM entirely because one is watched in Tier-1 markets and the other isn't.
+
+This article gives you a working CPM table for 2026, explains what actually drives the tiering, and shows how to read your own audience geography in YouTube Studio.
+
+<Callout type="note" title="TL;DR">
+Ad market tiering has stayed stable for years: US, Australia, and the Nordics are the top-paying markets. Central Europe and East Asia are next. Latin America and Eastern Europe are middle. South and Southeast Asia sit at the bottom. Same niche, 20× spread on CPM between top and bottom.
+</Callout>
+
+## The 2026 CPM table
+
+CPMs below are for typical long-form content in a middle-of-the-road niche (general lifestyle / vlogging), before applying niche multipliers. Numbers reflect Q1-Q2 2026 observed ranges and internal benchmarks; expect Q4 to run 40–70% higher across the board.
+
+| Tier | Countries (examples) | Long-form CPM | Shorts implied per-1000 |
+|---|---|---|---|
+| 1 (top) | US, AU, NZ, CA, DK, NO, SE, CH, DE, UK | $10 – $18 | $0.08 – $0.15 |
+| 2 (upper mid) | FR, NL, JP, KR, IE, IL, SG, AT | $6 – $11 | $0.05 – $0.10 |
+| 3 (mid) | ES, IT, BE, FI, TW, CZ, PT | $4 – $7 | $0.04 – $0.08 |
+| 4 (lower mid) | BR, MX, PL, RU, SA, AE, ZA, TR | $2 – $4 | $0.03 – $0.06 |
+| 5 (low) | IN, ID, VN, PH, EG, BD, PK, NG | $0.80 – $2 | $0.02 – $0.04 |
+
+Two things to notice:
+
+1. The **CPM** range within a tier can be 2×. Country generalization is a starting point; specific micro-markets vary (Zurich > Berlin > rural Portugal, all in "Tier 1").
+2. The **long-form to Shorts ratio** is roughly consistent by tier — Shorts pool math weights per-country contribution but flattens the delta.
+
+## What actually drives the tiering
+
+Ad market tiering isn't a YouTube policy. It's a consequence of who advertisers want to reach and how much they're willing to pay to reach them.
+
+### 1. Disposable income per capita
+
+Advertisers pay to reach people who can buy their product. The higher the median disposable income in a country, the more advertisers bid for that country's inventory.
+
+This is the single strongest predictor. It explains why the Nordics regularly out-pay the US on a per-capita basis (Norwegian median disposable income exceeds most US states), and why India's CPM is so low despite the massive audience — the price per attention unit is low because average purchasing power is low.
+
+### 2. Advertiser demand density
+
+Not all industries advertise everywhere. US, UK, and Germany have particularly deep local advertiser bases across finance, SaaS, DTC brands, and automotive. Japan has strong local advertising in consumer electronics and games. Brazil has strong local advertising in banking and retail.
+
+Countries with thin local advertiser bases inherit the CPM from whoever is buying inventory globally, which usually pays less.
+
+### 3. Currency and repatriation
+
+YouTube pays creators in USD (or a small set of major currencies), so ad revenue paid in weak local currencies gets discounted at conversion. Advertisers running local-currency campaigns adjust their bids accordingly. This affects Tier-5 markets most.
+
+### 4. Language premium
+
+English content targeted at English-speaking audiences pulls the highest premium because English-speaking markets have the largest advertiser dollars behind them. Local-language content in strong markets (Japanese, German, French) still earns well. Local-language content in weaker markets earns significantly less than English-in-the-same-market would.
+
+## Why country dominates niche for some channels
+
+A common surprise: a general-niche US channel out-earns a finance-niche Indian channel at the same view count.
+
+Let's do the math:
+
+- **US general**: baseRPM $6.5 × niche multiplier 1.0 = **$6.5 RPM**
+- **India finance**: baseRPM $1.1 × niche multiplier 2.4 = **$2.6 RPM**
+
+Even with a 2.4× niche premium, the US general channel wins by 2.5× on RPM. That's the country effect swamping the niche effect.
+
+The channels where niche DOES dominate country are:
+
+- Finance channels in Tier-3 or Tier-4 (India, Brazil) — the niche multiplier is large enough that they out-earn Tier-1 general channels
+- Tech channels in Tier-2 (Japan, Germany, France) — comfortably in the $6+ RPM range
+- Business channels in Tier-1 — the compound effect gets you to $15–$25+ RPM
+
+If you're picking a niche mostly on RPM, your audience geography is the calculation you need to start with, not niche in isolation.
+
+## How to read your audience geography
+
+In YouTube Studio, go to **Analytics → Audience → Top geographies**. You'll see a percentage breakdown of your watch time by country. This is what actually drives your CPM — not subscriber location, not video language, but *watch-time-weighted* audience geography.
+
+Two things to check:
+
+**1. Is your top country's share above 40%?** If yes, that country dominates your effective CPM. A channel with 65% US audience and 35% mixed Tier-3 audience effectively earns closer to the Tier-1 CPM (US skews the weighted average).
+
+**2. Is your top country actually a strong ad market?** A channel with 65% US audience is well positioned. A channel with 65% Vietnam audience is not, no matter how impressive the total view count is.
+
+## Estimating your effective RPM
+
+To roll country breakdown into an effective RPM, take the weighted average of tier CPMs against your audience-share percentages:
+
+```
+Effective CPM ≈ Σ (country_share × country_CPM)
+Effective RPM ≈ Effective CPM × 0.55 × 0.90
+```
+
+Where 0.55 = long-form revenue share (creator side) and 0.90 = typical monetized-play rate.
+
+For a channel that's 60% US, 20% UK, 20% India, in a general niche:
+
+`(0.60 × $12) + (0.20 × $10) + (0.20 × $1.5) = $9.50 CPM`
+`$9.50 × 0.55 × 0.90 = $4.70 effective RPM`
+
+Which lines up with the "$3–$8 RPM for a typical Tier-1-heavy general channel" heuristic from our other articles.
+
+<CalculatorCta
+  to="money"
+  heading="Get country-adjusted earnings for a real channel"
+  body="Search any channel and set the country dropdown to match its actual audience geography (from YouTube Studio if it's your channel, or best-guessing from language and content if it's someone else's). The country tier gets baked into the estimate."
+/>
+
+## Which countries are moving
+
+CPMs are not static year-to-year. A few macro trends worth watching for 2026:
+
+- **India, Indonesia, Brazil**: gradual CPM growth as local advertising markets mature and DTC brands scale. Still Tier 3/4/5, but the ceiling is rising 5–10% year over year.
+- **Nordics + Switzerland**: consistently trending up. Zurich-based ad spend has become a real category-mover.
+- **US**: relatively flat since 2023. Post-pandemic ad spend normalized; the growth story now is inflation-adjusted.
+- **UK and EU**: slight softening in 2024–25 driven by cost-of-living contractions in ad budgets; recovering into 2026.
+- **China**: irrelevant to YouTube directly, since YouTube is not available in mainland China. But: Chinese diaspora audiences (US, Canada, Australia) command Tier-1 CPMs.
+
+## Reading a country column on someone else's channel
+
+If you're trying to price a sponsorship deal or estimate a competitor's revenue, look for these signals:
+
+- **Video language** — a strong hint but not definitive.
+- **Prominent tags and descriptions** — country-specific tags and hashtag usage give away audience skew.
+- **Comment section language mix** — a rough but reliable proxy.
+- **Product mentions and prices** — if a creator quotes prices in EUR or references Amazon.de, the audience is probably majority European.
+- **Sponsors they've worked with** — sponsors typically pick creators whose audience aligns with their market. A US-only DTC brand sponsoring the channel implies US audience.
+
+None of these is definitive. But three or four together let you make a defensible bet.
+
+## The one takeaway
+
+If you're picking a niche or repositioning a channel, do the country math BEFORE the niche math. A finance channel is 2× more valuable per view than a gaming channel. A US audience is 15× more valuable per view than an Indian audience. The bigger lever isn't the one everyone talks about — it's the one nobody wants to discuss.
+
+For your specific channel or a specific competitor, the country dropdown in the [YouTube Money Calculator](/#find-channel) uses the exact tier bands from this article — so switching between US, Brazil, and India shows the country effect quantitatively rather than just directionally.

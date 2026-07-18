@@ -39,14 +39,12 @@ export function Header() {
         >
           <CalculatorsMenu />
 
-          <span
-            aria-disabled="true"
-            className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
-            title={t("nav.blogSoonTitle")}
+          <Link
+            href="/blog"
+            className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
           >
             {t("nav.blog")}
-            <span className="chip">{t("common.labels.soon")}</span>
-          </span>
+          </Link>
 
           <Link
             href="/methodology"

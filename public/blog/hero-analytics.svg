@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset=".55" stop-color="#4338ca"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <radialGradient id="b" cx="70%" cy="30%" r="55%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#a)"/>
+  <rect width="1200" height="675" fill="url(#b)"/>
+  <g fill="#ffffff" fill-opacity=".85">
+    <rect x="820" y="440" width="42" height="120" rx="4"/>
+    <rect x="880" y="380" width="42" height="180" rx="4"/>
+    <rect x="940" y="320" width="42" height="240" rx="4"/>
+    <rect x="1000" y="240" width="42" height="320" rx="4"/>
+    <rect x="1060" y="180" width="42" height="380" rx="4"/>
+  </g>
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-weight="700">
+    <text x="80" y="360" font-size="88" fill-opacity=".95">Analytics</text>
+    <text x="80" y="430" font-size="26" fill-opacity=".7" font-weight="500">BeHumler · Creator Analytics</text>
+  </g>
+</svg>

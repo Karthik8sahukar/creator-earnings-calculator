@@ -50,7 +50,10 @@ export type AnalyticsEvent =
   | { name: "calculator.assumption_changed"; field: string }
   | {
       name: "share.link_copied";
-      target: "calculator" | "share_section";
+      // Where in the app the copy button was fired from. Extend this
+      // union when you add a new share surface — the compile error
+      // that follows is the point.
+      target: "calculator" | "share_section" | "blog_article";
     }
   | { name: "share.native_shared" }
   | {

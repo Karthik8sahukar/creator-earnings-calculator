@@ -539,5 +539,105 @@
       "estimatedRevenue": "Rendimento estimado",
       "rpm": "RPM"
     }
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "O blog do BeHumler",
+      "title": "Economia Criador e Crescimento no YouTube",
+      "subtitle": "Escrita honesta e bem fundamentada sobre como os criadores realmente ganham dinheiro no YouTube — sem enchimento cheio de palavras-chave."
+    },
+    "search": {
+      "srLabel": "Pesquisar artigos",
+      "placeholder": "Pesquisa por título, etiqueta ou categoria",
+      "clearAria": "Limpar pesquisa",
+      "empty": "Nenhum artigo corresponde a \"{query}\". Tenta outra palavra-chave."
+    },
+    "sections": {
+      "featuredEyebrow": "Escolha editorial",
+      "featured": "Artigo em destaque",
+      "latestEyebrow": "Recentes",
+      "latest": "Artigos mais recentes",
+      "popularEyebrow": "Populares",
+      "popular": "Artigos populares"
+    },
+    "newsletter": {
+      "title": "Recebe o resumo da economia criador",
+      "description": "Um e-mail curto e honesto quando publicamos algo digno de leitura. Sem spam, sem upsells, cancelas com um clique.",
+      "emailPlaceholder": "voce@exemplo.com",
+      "subscribe": "Subscrever",
+      "thanks": "Obrigado — estás na lista. Escrevemos quando o próximo artigo sair.",
+      "privacyNote": "Usamos o teu e-mail apenas para enviar o resumo. Vê a página de privacidade para mais detalhes."
+    },
+    "article": {
+      "readingTime": "{count, plural, one {# min de leitura} other {# min de leitura}}",
+      "publishedOn": "Publicado em {date}",
+      "updated": "Atualizado em {date}",
+      "by": "Por {author}",
+      "tocTitle": "Nesta página",
+      "relatedTitle": "Artigos relacionados",
+      "prevArticle": "Anterior",
+      "nextArticle": "Seguinte",
+      "prevNextLabel": "Navegação de artigos",
+      "backToBlog": "← Voltar ao blog",
+      "share": {
+        "title": "Partilhar este artigo",
+        "share": "Partilhar",
+        "shareVia": "Partilhar \"{title}\" a partir do teu dispositivo",
+        "copyLink": "Copiar link",
+        "linkCopied": "Copiado ✓",
+        "linkCopiedStatus": "Link copiado para a área de transferência.",
+        "copyError": "Não foi possível copiar — podes copiar o URL da barra de endereços.",
+        "shareOnSocial": "Partilhar no {network} ({newTab})"
+      }
+    },
+    "meta": {
+      "title": "O blog do BeHumler — Economia criador e crescimento no YouTube",
+      "description": "Escrita honesta sobre como os criadores realmente ganham dinheiro no YouTube: RPM, CPM, patrocínios, pagamentos de Shorts e as plataformas que moldam a economia criador.",
+      "breadcrumbHome": "Início",
+      "breadcrumbBlog": "Blog"
+    },
+    "categories": {
+      "all": "Todos",
+      "navLabel": "Explorar por categoria",
+      "eyebrow": "Categoria",
+      "empty": "Ainda não há artigos nesta categoria — volta em breve.",
+      "monetization": {
+        "label": "Monetização do YouTube",
+        "description": "Anúncios, membros, Super Chat, Premium — todas as formas de receber dinheiro no YouTube."
+      },
+      "growth": {
+        "label": "Crescimento no YouTube",
+        "description": "Conselhos práticos sobre miniaturas, retenção, cadência de publicação e crescimento da audiência."
+      },
+      "creator-economy": {
+        "label": "Economia Criador",
+        "description": "Como o dinheiro circula no ecossistema criador moderno — plataformas, apoiadores e pagamentos."
+      },
+      "analytics": {
+        "label": "Análises",
+        "description": "Dar sentido aos números do YouTube Studio — e aos que o YouTube não mostra."
+      },
+      "seo": {
+        "label": "SEO",
+        "description": "Como funciona o tráfego de pesquisa e vídeos sugeridos — no Google e no YouTube."
+      },
+      "sponsorships": {
+        "label": "Patrocínios",
+        "description": "Preços, contratos, entregáveis, exclusividade — tudo o que os criadores gostariam de ter sabido antes."
+      },
+      "shorts": {
+        "label": "Shorts",
+        "description": "A economia do vídeo vertical: matemática do fundo de criadores, ganchos e cruzamento com o formato longo."
+      },
+      "guides": {
+        "label": "Guias",
+        "description": "Guias longos e detalhados que juntam tudo para criadores que estão a começar a levar isto a sério."
+      }
+    },
+    "tags": {
+      "eyebrow": "Etiqueta",
+      "pageTitle": "Artigos com a etiqueta #{tag}",
+      "pageDescription": "Todos os artigos do BeHumler sob a etiqueta #{tag}."
+    }
   }
 }

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b21b6"/>
+      <stop offset=".55" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+    <radialGradient id="b" cx="18%" cy="30%" r="55%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="c" cx="82%" cy="82%" r="45%">
+      <stop offset="0" stop-color="#06b6d4" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#a)"/>
+  <rect width="1200" height="675" fill="url(#b)"/>
+  <rect width="1200" height="675" fill="url(#c)"/>
+  <g fill="none" stroke="#ffffff" stroke-opacity=".22" stroke-width="2">
+    <circle cx="200" cy="500" r="150"/>
+    <circle cx="1000" cy="180" r="220"/>
+    <circle cx="700" cy="600" r="90"/>
+  </g>
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-weight="700">
+    <text x="80" y="360" font-size="88" fill-opacity=".95">Monetization</text>
+    <text x="80" y="430" font-size="26" fill-opacity=".7" font-weight="500">BeHumler · Creator Analytics</text>
+  </g>
+</svg>
