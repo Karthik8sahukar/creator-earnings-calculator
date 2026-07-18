@@ -4,7 +4,6 @@
     "tagline": "Creator Analytics Platform",
     "logoAlt": "BeHumler"
   },
-
   "common": {
     "actions": {
       "tryAgain": "Try again",
@@ -14,29 +13,33 @@
       "clear": "Clear",
       "openMenu": "Open menu",
       "closeMenu": "Close menu",
-      "openInNewTab": "opens in a new tab"
+      "openInNewTab": "opens in a new tab",
+      "open": "Open"
     },
     "labels": {
       "loading": "Loading",
       "loadingCalculator": "Loading calculator…",
       "loadingChannel": "Loading channel…",
-      "auto": "Auto"
+      "auto": "Auto",
+      "soon": "Soon"
     },
     "breadcrumbs": {
       "home": "Home"
     },
     "estimatesOnly": "Estimates only. Not financial advice."
   },
-
   "nav": {
     "primary": "Primary",
     "calculators": "Calculators",
     "methodology": "Methodology",
     "about": "About",
     "home": "Home",
-    "homeAria": "BeHumler — home"
+    "homeAria": "BeHumler — home",
+    "blog": "Blog",
+    "blogSoonTitle": "Blog is coming soon",
+    "menu": "Menu",
+    "mobilePrimary": "Primary"
   },
-
   "languageSelector": {
     "trigger": "Language",
     "menuHeading": "Language",
@@ -44,7 +47,6 @@
     "ariaLabel": "Change language",
     "shortLabel": "Language"
   },
-
   "footer": {
     "brandBlurb": "An independent tool that estimates YouTube channel earnings from public statistics. Not affiliated with, endorsed by, or verified by YouTube or Google.",
     "calculators": "Calculators",
@@ -65,9 +67,10 @@
     "dataSourceBody": "Public channel statistics are retrieved using the {link}. Revenue estimates are independently calculated.",
     "dataSourceLink": "YouTube Data API v3",
     "copyright": "© {year} BeHumler. Independent tool.",
-    "notFinancialAdvice": "Estimates only. Not financial advice."
+    "notFinancialAdvice": "Estimates only. Not financial advice.",
+    "blog": "Blog",
+    "estimatesBlurb": "Revenue figures on this site are independently calculated estimates."
   },
-
   "home": {
     "chip": "Powered by the YouTube Data API v3",
     "title": "YouTube Money Calculator",
@@ -79,7 +82,6 @@
       "noLogin": "No Login Required"
     }
   },
-
   "search": {
     "srLabel": "Search channel",
     "placeholder": "Search by channel name, @handle, channel URL or channel ID",
@@ -90,19 +92,16 @@
     "subsSuffix": "subs",
     "subsHidden": "Hidden"
   },
-
   "recent": {
     "title": "Recent searches",
     "hint": "Stored only in your browser. Never sent to any server.",
     "clearHistory": "Clear history"
   },
-
   "transparency": {
     "aria": "Data transparency notice",
     "prefix": "Transparency:",
     "body": "Public channel statistics are retrieved using the YouTube Data API. Revenue estimates are independently calculated and are not provided or verified by YouTube or Google."
   },
-
   "profile": {
     "subscribers": "Subscribers",
     "totalViews": "Total views",
@@ -117,7 +116,6 @@
     "viewOnYouTube": "View on YouTube",
     "viewOnYouTubeAria": "View {title} on YouTube (opens in a new tab)"
   },
-
   "performance": {
     "title": "Performance analysis",
     "sampleNote": "Based on the {count} most recent uploads.",
@@ -137,7 +135,6 @@
     "longForm": "Long-form",
     "shorts": "Shorts"
   },
-
   "videos": {
     "sectionTitle": "Recent videos",
     "empty": "No public videos are available for this channel right now.",
@@ -148,7 +145,6 @@
     "comments": "comments",
     "watchAria": "Watch: {title} ({newTab})"
   },
-
   "share": {
     "sectionTitle": "Share this channel",
     "description": "Public statistics only — estimates are independent and are not provided or verified by the channel owner, YouTube, or Google.",
@@ -164,14 +160,12 @@
     "shareOnWhatsApp": "Share on WhatsApp",
     "shareOnSocialAria": "Share {title} on {network} ({newTab})"
   },
-
   "copyShare": {
     "label": "Copy share link",
     "copied": "Link copied ✓",
     "copiedStatus": "Link copied to your clipboard.",
     "error": "Couldn't copy — you can copy the URL from the address bar."
   },
-
   "channelPage": {
     "backToSearch": "← Back to search",
     "breadcrumbAria": "Breadcrumb",
@@ -182,18 +176,15 @@
     "errorBody": "Something went wrong while loading this channel. This can happen when the YouTube API is temporarily unavailable or rate-limited.",
     "loadingSr": "Loading channel…"
   },
-
   "rootError": {
     "title": "Something went wrong",
     "body": "An unexpected error occurred. Please try again."
   },
-
   "notFound": {
     "code": "404",
     "title": "Page not found",
     "body": "The page you're looking for doesn't exist."
   },
-
   "earnings": {
     "sectionTitle": "Earnings estimator",
     "tabsLabel": "Estimate scenario",
@@ -246,7 +237,6 @@
     },
     "disclaimer": "Estimates only. Actual earnings depend on many factors we can't observe — fill rate, seasonality, ad category mix, YouTube share, refunds, and taxes."
   },
-
   "calculators": {
     "shared": {
       "revenue": "Revenue",
@@ -391,14 +381,12 @@
       }
     }
   },
-
   "translationPending": {
     "title": "Available in English",
     "body": "This page is currently available only in English. Localized versions are coming soon — we translate long-form legal, methodology, and about pages carefully with native reviewers before publishing.",
     "readInEnglish": "Read in English",
     "backToHome": "Back to home"
   },
-
   "static": {
     "about": {
       "title": "About",
@@ -433,20 +421,123 @@
     "backToHome": "← Back to home",
     "lastUpdated": "Last updated:"
   },
-
   "staticPage": {
     "backToHome": "← Back to home"
   },
-
   "homeMeta": {
     "title": "YouTube Money Calculator | Estimate Channel Earnings, RPM & CPM",
     "description": "Estimate YouTube channel earnings using public statistics. Calculate potential monthly income, RPM, CPM, Shorts revenue, sponsorship value, and more with our free YouTube Money Calculator."
   },
-
   "layoutMeta": {
     "titleDefault": "YouTube Money Calculator | Estimate Channel Earnings, RPM & CPM",
     "titleTemplate": "%s · YouTube Money Calculator",
     "description": "Estimate YouTube channel earnings using public statistics. Calculate potential monthly income, RPM, CPM, Shorts revenue, sponsorship value, and more with our free YouTube Money Calculator.",
     "skipToContent": "Skip to content"
+  },
+  "calculatorsMenu": {
+    "money": {
+      "label": "YouTube Money Calculator",
+      "description": "Estimate a channel's monthly revenue."
+    },
+    "rpm": {
+      "label": "RPM Calculator",
+      "description": "Revenue per 1,000 monetized views."
+    },
+    "cpm": {
+      "label": "CPM Calculator",
+      "description": "Advertiser cost per 1,000 impressions."
+    },
+    "shorts": {
+      "label": "Shorts Calculator",
+      "description": "Estimate Shorts Creator Pool payouts."
+    },
+    "sponsorship": {
+      "label": "Sponsorship Calculator",
+      "description": "Estimate brand deal rates."
+    }
+  },
+  "popularCalculators": {
+    "eyebrow": "Tools",
+    "title": "Popular calculators",
+    "cards": {
+      "money": {
+        "title": "YouTube Money Calculator",
+        "description": "Estimate a channel's total monthly revenue from long-form and Shorts views combined."
+      },
+      "rpm": {
+        "title": "RPM Calculator",
+        "description": "Revenue per 1,000 monetized views — a creator-side earnings metric."
+      },
+      "cpm": {
+        "title": "CPM Calculator",
+        "description": "What advertisers pay per 1,000 ad impressions. Useful for pricing benchmarks."
+      },
+      "shorts": {
+        "title": "Shorts Calculator",
+        "description": "Estimate Creator Pool payouts based on Shorts views and monetization mix."
+      },
+      "sponsorship": {
+        "title": "Sponsorship Calculator",
+        "description": "Ballpark brand-deal rates from subscriber count and engagement."
+      }
+    }
+  },
+  "whyBeHumler": {
+    "eyebrow": "Why BeHumler",
+    "title": "Serious analytics without the gatekeeping",
+    "subtitle": "Every creator deserves honest, transparent numbers. BeHumler gives you a defensible estimate you can actually reason about.",
+    "features": {
+      "accurate": {
+        "title": "Accurate estimates",
+        "description": "Every figure is derived from public YouTube statistics using transparent, published formulas."
+      },
+      "fast": {
+        "title": "Fast results",
+        "description": "Type a channel name or handle and get a full earnings breakdown in seconds."
+      },
+      "poweredBy": {
+        "title": "Powered by YouTube Data API",
+        "description": "We fetch channel stats live from Google's official YouTube Data API v3 — no scraping."
+      },
+      "privacy": {
+        "title": "Privacy friendly",
+        "description": "No login. No tracking of the channels you search. Recent searches are stored locally on your device."
+      }
+    }
+  },
+  "homeFaq": {
+    "eyebrow": "FAQ",
+    "title": "Frequently asked questions",
+    "items": {
+      "accuracy": {
+        "q": "How accurate are the earnings estimates?",
+        "a": "The figures are estimates, not statements of actual revenue. They combine a channel's public view counts with industry-typical RPM/CPM ranges. Real earnings depend on the specific ad mix, viewer geography, watch time, YouTube Premium share, and other factors we cannot see from public data alone."
+      },
+      "rpm": {
+        "q": "How is RPM calculated?",
+        "a": "RPM (revenue per mille) is total revenue divided by monetized views, multiplied by one thousand. It is a creator-side metric — different from CPM, which is what advertisers pay per one thousand ad impressions. RPM is typically lower than CPM because it accounts for unmonetized views and YouTube's revenue share."
+      },
+      "subscribers": {
+        "q": "Does YouTube pay per subscriber?",
+        "a": "No. YouTube pays for monetized ad views and other qualifying revenue events, not for subscriber counts. Subscribers matter because they tend to drive more views over time, but the subscriber number itself is not a direct payout."
+      },
+      "shorts": {
+        "q": "Can I estimate Shorts revenue?",
+        "a": "Yes. Shorts monetize through the Creator Pool rather than pre-roll ads, so their RPM is generally much lower than long-form. Our Shorts calculator applies a separate Shorts RPM band so the estimate reflects that difference."
+      }
+    }
+  },
+  "dashboardPreview": {
+    "channelSnapshot": "Channel snapshot",
+    "sampleCreator": "Sample creator",
+    "illustrativePreview": "Illustrative preview",
+    "viewsLast6Months": "Views · last 6 months",
+    "exampleCaption": "Example estimate — actual figures are calculated from a real channel once you search above.",
+    "stats": {
+      "subscribers": "Subscribers",
+      "monthlyViews": "Monthly Views",
+      "estimatedRevenue": "Estimated Revenue",
+      "rpm": "RPM"
+    }
   }
 }

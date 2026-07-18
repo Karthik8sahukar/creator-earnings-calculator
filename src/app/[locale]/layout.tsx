@@ -7,6 +7,7 @@ import Script from "next/script";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { ThemeScript } from "@/components/ThemeScript";
 import { HREFLANG_MAP, routing, type AppLocale } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
 
@@ -148,11 +149,21 @@ export default async function LocaleLayout({
   ];
 
   return (
-    <html lang={HREFLANG_MAP[locale as AppLocale] ?? locale}>
-      <body className="min-h-dvh font-sans antialiased">
+    // `suppressHydrationWarning` lets the ThemeScript flip `html.dark`
+    // before hydration without React complaining about a class mismatch.
+    // `scroll-smooth` matches the redesign's document scroll behaviour.
+    <html
+      lang={HREFLANG_MAP[locale as AppLocale] ?? locale}
+      className="scroll-smooth"
+      suppressHydrationWarning
+    >
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="min-h-dvh font-sans antialiased bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-slate-900 focus:px-3 focus:py-1 focus:rounded"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-slate-900 focus:px-3 focus:py-1 focus:rounded dark:focus:bg-slate-900 dark:focus:text-slate-50"
         >
           {t("skipToContent")}
         </a>

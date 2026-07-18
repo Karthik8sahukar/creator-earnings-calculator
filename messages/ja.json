@@ -4,7 +4,6 @@
     "tagline": "クリエイター向け分析プラットフォーム",
     "logoAlt": "BeHumler"
   },
-
   "common": {
     "actions": {
       "tryAgain": "もう一度試す",
@@ -14,29 +13,33 @@
       "clear": "クリア",
       "openMenu": "メニューを開く",
       "closeMenu": "メニューを閉じる",
-      "openInNewTab": "新しいタブで開きます"
+      "openInNewTab": "新しいタブで開きます",
+      "open": "開く"
     },
     "labels": {
       "loading": "読み込み中",
       "loadingCalculator": "電卓を読み込み中…",
       "loadingChannel": "チャンネルを読み込み中…",
-      "auto": "自動"
+      "auto": "自動",
+      "soon": "近日公開"
     },
     "breadcrumbs": {
       "home": "ホーム"
     },
     "estimatesOnly": "見積もりのみ。金融アドバイスではありません。"
   },
-
   "nav": {
     "primary": "メインナビゲーション",
     "calculators": "電卓",
     "methodology": "計算方法",
     "about": "概要",
     "home": "ホーム",
-    "homeAria": "BeHumler — ホーム"
+    "homeAria": "BeHumler — ホーム",
+    "blog": "ブログ",
+    "blogSoonTitle": "ブログは近日公開",
+    "menu": "メニュー",
+    "mobilePrimary": "メイン"
   },
-
   "languageSelector": {
     "trigger": "言語",
     "menuHeading": "言語",
@@ -44,7 +47,6 @@
     "ariaLabel": "言語を変更",
     "shortLabel": "言語"
   },
-
   "footer": {
     "brandBlurb": "公開統計から YouTube チャンネルの収益を推定する独立系ツールです。YouTube や Google と提携・承認・検証関係はありません。",
     "calculators": "電卓",
@@ -65,9 +67,10 @@
     "dataSourceBody": "公開チャンネル統計は {link} を通じて取得されます。収益見積もりは独立して計算されます。",
     "dataSourceLink": "YouTube Data API v3",
     "copyright": "© {year} BeHumler。独立系ツール。",
-    "notFinancialAdvice": "見積もりのみ。金融アドバイスではありません。"
+    "notFinancialAdvice": "見積もりのみ。金融アドバイスではありません。",
+    "blog": "ブログ",
+    "estimatesBlurb": "本サイトで表示している収益額は、独立して算出した見積もりです。"
   },
-
   "home": {
     "chip": "YouTube Data API v3 を使用",
     "title": "YouTube Money Calculator",
@@ -79,7 +82,6 @@
       "noLogin": "ログイン不要"
     }
   },
-
   "search": {
     "srLabel": "チャンネルを検索",
     "placeholder": "チャンネル名、@handle、URL、チャンネル ID で検索",
@@ -90,19 +92,16 @@
     "subsSuffix": "登録者",
     "subsHidden": "非公開"
   },
-
   "recent": {
     "title": "最近の検索",
     "hint": "お使いのブラウザにのみ保存されます。サーバーには送信されません。",
     "clearHistory": "履歴を消去"
   },
-
   "transparency": {
     "aria": "透明性に関するお知らせ",
     "prefix": "透明性：",
     "body": "公開チャンネル統計は YouTube Data API を通じて取得されます。収益見積もりは独立して計算されており、YouTube や Google が提供または検証したものではありません。"
   },
-
   "profile": {
     "subscribers": "登録者",
     "totalViews": "総視聴回数",
@@ -117,7 +116,6 @@
     "viewOnYouTube": "YouTube で見る",
     "viewOnYouTubeAria": "{title} を YouTube で見る（新しいタブで開きます）"
   },
-
   "performance": {
     "title": "パフォーマンス分析",
     "sampleNote": "直近 {count} 本の動画に基づきます。",
@@ -137,7 +135,6 @@
     "longForm": "通常動画",
     "shorts": "Shorts"
   },
-
   "videos": {
     "sectionTitle": "最近の動画",
     "empty": "現在このチャンネルには公開されている動画がありません。",
@@ -148,7 +145,6 @@
     "comments": "コメント",
     "watchAria": "視聴：{title}（{newTab}）"
   },
-
   "share": {
     "sectionTitle": "このチャンネルをシェア",
     "description": "公開統計のみ — 見積もりは独立して計算されており、チャンネルの運営者、YouTube、Google が提供または検証したものではありません。",
@@ -164,14 +160,12 @@
     "shareOnWhatsApp": "WhatsApp でシェア",
     "shareOnSocialAria": "{title} を {network} でシェア（{newTab}）"
   },
-
   "copyShare": {
     "label": "共有リンクをコピー",
     "copied": "コピーしました ✓",
     "copiedStatus": "リンクをクリップボードにコピーしました。",
     "error": "コピーできませんでした — アドレスバーから URL をコピーしてください。"
   },
-
   "channelPage": {
     "backToSearch": "← 検索に戻る",
     "breadcrumbAria": "パンくずリスト",
@@ -182,18 +176,15 @@
     "errorBody": "このチャンネルの読み込み中に問題が発生しました。YouTube API が一時的に利用できないか、レート制限に達している可能性があります。",
     "loadingSr": "チャンネルを読み込み中…"
   },
-
   "rootError": {
     "title": "問題が発生しました",
     "body": "予期しないエラーが発生しました。もう一度お試しください。"
   },
-
   "notFound": {
     "code": "404",
     "title": "ページが見つかりません",
     "body": "お探しのページは存在しません。"
   },
-
   "earnings": {
     "sectionTitle": "収益見積もりツール",
     "tabsLabel": "見積もりシナリオ",
@@ -246,7 +237,6 @@
     },
     "disclaimer": "見積もりのみ。実際の収益は、フィルレート、季節性、広告カテゴリ、YouTube の分配、返金、税金など、こちらでは把握できない多くの要因に依存します。"
   },
-
   "calculators": {
     "shared": {
       "revenue": "収益",
@@ -391,14 +381,12 @@
       }
     }
   },
-
   "translationPending": {
     "title": "英語のみで提供中",
     "body": "このページは現在、英語のみで提供されています。翻訳版は近日公開予定です — 法的ページ、計算方法、概要ページはネイティブレビュアーによる確認を経てから公開しています。",
     "readInEnglish": "英語で読む",
     "backToHome": "ホームに戻る"
   },
-
   "static": {
     "about": {
       "title": "概要",
@@ -433,20 +421,123 @@
     "backToHome": "← ホームに戻る",
     "lastUpdated": "最終更新："
   },
-
   "staticPage": {
     "backToHome": "← ホームに戻る"
   },
-
   "homeMeta": {
     "title": "YouTube Money Calculator | チャンネルの収益、RPM・CPM を見積もる",
     "description": "公開統計を使って YouTube チャンネルの収益を見積もります。無料の YouTube Money Calculator で、月間収益、RPM、CPM、Shorts 収益、スポンサー価値などを計算できます。"
   },
-
   "layoutMeta": {
     "titleDefault": "YouTube Money Calculator | チャンネルの収益、RPM・CPM を見積もる",
     "titleTemplate": "%s · YouTube Money Calculator",
     "description": "公開統計を使って YouTube チャンネルの収益を見積もります。無料の YouTube Money Calculator で、月間収益、RPM、CPM、Shorts 収益、スポンサー価値などを計算できます。",
     "skipToContent": "コンテンツにスキップ"
+  },
+  "calculatorsMenu": {
+    "money": {
+      "label": "収益電卓",
+      "description": "チャンネルの月間収益を見積もります。"
+    },
+    "rpm": {
+      "label": "RPM 電卓",
+      "description": "収益化された 1,000 回の視聴あたりの収益。"
+    },
+    "cpm": {
+      "label": "CPM 電卓",
+      "description": "1,000 回の広告インプレッションあたりに広告主が支払う額。"
+    },
+    "shorts": {
+      "label": "Shorts 電卓",
+      "description": "Shorts クリエイタープールからの支払いを見積もります。"
+    },
+    "sponsorship": {
+      "label": "スポンサー電卓",
+      "description": "ブランド案件の料金を見積もります。"
+    }
+  },
+  "popularCalculators": {
+    "eyebrow": "ツール",
+    "title": "よく使われる電卓",
+    "cards": {
+      "money": {
+        "title": "YouTube 収益電卓",
+        "description": "通常動画と Shorts の視聴を合わせたチャンネルの月間総収益を見積もります。"
+      },
+      "rpm": {
+        "title": "RPM 電卓",
+        "description": "収益化された 1,000 回の視聴あたりの収益 — クリエイター側の指標です。"
+      },
+      "cpm": {
+        "title": "CPM 電卓",
+        "description": "1,000 回の広告インプレッションあたりに広告主が支払う額。価格の目安に便利です。"
+      },
+      "shorts": {
+        "title": "Shorts 電卓",
+        "description": "Shorts の視聴数と収益化構成から、クリエイタープール支払いを見積もります。"
+      },
+      "sponsorship": {
+        "title": "スポンサー電卓",
+        "description": "登録者数とエンゲージメントから、ブランド案件の料金を概算します。"
+      }
+    }
+  },
+  "whyBeHumler": {
+    "eyebrow": "BeHumler の理由",
+    "title": "垣根のない、本気の分析",
+    "subtitle": "すべてのクリエイターに、正直で透明性のある数字を。BeHumler は根拠を持って議論できる見積もりを提供します。",
+    "features": {
+      "accurate": {
+        "title": "妥当な見積もり",
+        "description": "すべての数値は、公開されている透明な計算式と YouTube の公開統計から導き出されます。"
+      },
+      "fast": {
+        "title": "素早い結果",
+        "description": "チャンネル名や @ハンドルを入力するだけで、数秒で収益の内訳が表示されます。"
+      },
+      "poweredBy": {
+        "title": "YouTube Data API を使用",
+        "description": "Google 公式の YouTube Data API v3 からチャンネル統計をライブで取得します — スクレイピングはしません。"
+      },
+      "privacy": {
+        "title": "プライバシーに配慮",
+        "description": "ログイン不要。検索したチャンネルのトラッキングもありません。最近の検索はご利用のデバイスにのみ保存されます。"
+      }
+    }
+  },
+  "homeFaq": {
+    "eyebrow": "よくある質問",
+    "title": "よくある質問",
+    "items": {
+      "accuracy": {
+        "q": "収益の見積もりはどのくらい正確ですか？",
+        "a": "数値は見積もりであり、実際の収益ではありません。チャンネルの公開視聴数と、業界的に典型的な RPM/CPM の幅を組み合わせています。実際の収益は広告構成、視聴者の地域、視聴時間、YouTube Premium の比率など、公開データだけでは把握できない多くの要因に依存します。"
+      },
+      "rpm": {
+        "q": "RPM はどのように計算されますか？",
+        "a": "RPM（Revenue Per Mille）は、総収益を収益化された視聴数で割り、1,000 を掛けた値です。クリエイター側の指標で、1,000 インプレッションあたりに広告主が支払う CPM とは異なります。RPM は収益化されていない視聴も含み、YouTube の取り分を差し引くため、通常は CPM より低くなります。"
+      },
+      "subscribers": {
+        "q": "YouTube は登録者ごとに支払いますか？",
+        "a": "いいえ。YouTube は収益化された広告視聴などの条件を満たす収益イベントに対して支払います。登録者数そのものが支払い対象ではありません。登録者数は時間の経過とともに視聴数を押し上げる要因として意味がありますが、直接の対価ではありません。"
+      },
+      "shorts": {
+        "q": "Shorts の収益を見積もることはできますか？",
+        "a": "はい。Shorts はプレロール広告ではなく、クリエイタープールを通じて収益化されるため、RPM は通常動画と比べて大幅に低くなります。当社の Shorts 電卓は、この差を反映した専用の RPM 帯を適用します。"
+      }
+    }
+  },
+  "dashboardPreview": {
+    "channelSnapshot": "チャンネル概況",
+    "sampleCreator": "サンプルクリエイター",
+    "illustrativePreview": "参考用プレビュー",
+    "viewsLast6Months": "視聴回数 · 直近 6 か月",
+    "exampleCaption": "参考用の見積もりです — 上で実際のチャンネルを検索すると、そのチャンネルに基づいた数値が計算されます。",
+    "stats": {
+      "subscribers": "登録者",
+      "monthlyViews": "月間視聴回数",
+      "estimatedRevenue": "推定収益",
+      "rpm": "RPM"
+    }
   }
 }

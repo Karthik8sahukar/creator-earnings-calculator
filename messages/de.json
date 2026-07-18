@@ -4,7 +4,6 @@
     "tagline": "Analyse-Plattform für Creator",
     "logoAlt": "BeHumler"
   },
-
   "common": {
     "actions": {
       "tryAgain": "Erneut versuchen",
@@ -14,29 +13,33 @@
       "clear": "Leeren",
       "openMenu": "Menü öffnen",
       "closeMenu": "Menü schließen",
-      "openInNewTab": "wird in einem neuen Tab geöffnet"
+      "openInNewTab": "wird in einem neuen Tab geöffnet",
+      "open": "Öffnen"
     },
     "labels": {
       "loading": "Wird geladen",
       "loadingCalculator": "Rechner wird geladen…",
       "loadingChannel": "Kanal wird geladen…",
-      "auto": "Auto"
+      "auto": "Auto",
+      "soon": "Bald verfügbar"
     },
     "breadcrumbs": {
       "home": "Startseite"
     },
     "estimatesOnly": "Nur Schätzungen. Keine Finanzberatung."
   },
-
   "nav": {
     "primary": "Hauptnavigation",
     "calculators": "Rechner",
     "methodology": "Methodik",
     "about": "Über uns",
     "home": "Startseite",
-    "homeAria": "BeHumler — Startseite"
+    "homeAria": "BeHumler — Startseite",
+    "blog": "Blog",
+    "blogSoonTitle": "Der Blog kommt bald",
+    "menu": "Menü",
+    "mobilePrimary": "Hauptnavigation"
   },
-
   "languageSelector": {
     "trigger": "Sprache",
     "menuHeading": "Sprache",
@@ -44,7 +47,6 @@
     "ariaLabel": "Sprache wechseln",
     "shortLabel": "Sprache"
   },
-
   "footer": {
     "brandBlurb": "Ein unabhängiges Tool, das die Einnahmen eines YouTube-Kanals aus öffentlichen Statistiken schätzt. Nicht mit YouTube oder Google verbunden, unterstützt oder verifiziert.",
     "calculators": "Rechner",
@@ -65,9 +67,10 @@
     "dataSourceBody": "Öffentliche Kanalstatistiken werden über die {link} abgerufen. Umsatzprognosen werden unabhängig berechnet.",
     "dataSourceLink": "YouTube Data API v3",
     "copyright": "© {year} BeHumler. Unabhängiges Tool.",
-    "notFinancialAdvice": "Nur Schätzungen. Keine Finanzberatung."
+    "notFinancialAdvice": "Nur Schätzungen. Keine Finanzberatung.",
+    "blog": "Blog",
+    "estimatesBlurb": "Die Umsatzzahlen auf dieser Seite sind unabhängig berechnete Schätzungen."
   },
-
   "home": {
     "chip": "Basierend auf der YouTube Data API v3",
     "title": "YouTube Money Calculator",
@@ -79,7 +82,6 @@
       "noLogin": "Ohne Anmeldung"
     }
   },
-
   "search": {
     "srLabel": "Kanal suchen",
     "placeholder": "Suche nach Kanalname, @Handle, URL oder Kanal-ID",
@@ -90,19 +92,16 @@
     "subsSuffix": "Abos",
     "subsHidden": "Ausgeblendet"
   },
-
   "recent": {
     "title": "Kürzlich gesucht",
     "hint": "Nur in deinem Browser gespeichert. Wird nie an einen Server gesendet.",
     "clearHistory": "Verlauf löschen"
   },
-
   "transparency": {
     "aria": "Transparenzhinweis",
     "prefix": "Transparenz:",
     "body": "Öffentliche Kanalstatistiken werden über die YouTube Data API abgerufen. Umsatzprognosen werden unabhängig berechnet und stammen weder von YouTube noch von Google und werden auch nicht von diesen verifiziert."
   },
-
   "profile": {
     "subscribers": "Abonnenten",
     "totalViews": "Gesamtaufrufe",
@@ -117,7 +116,6 @@
     "viewOnYouTube": "Auf YouTube ansehen",
     "viewOnYouTubeAria": "{title} auf YouTube ansehen (wird in einem neuen Tab geöffnet)"
   },
-
   "performance": {
     "title": "Performance-Analyse",
     "sampleNote": "Basierend auf den letzten {count} Uploads.",
@@ -137,7 +135,6 @@
     "longForm": "Langform",
     "shorts": "Shorts"
   },
-
   "videos": {
     "sectionTitle": "Aktuelle Videos",
     "empty": "Für diesen Kanal sind derzeit keine öffentlichen Videos verfügbar.",
@@ -148,7 +145,6 @@
     "comments": "Kommentare",
     "watchAria": "Ansehen: {title} ({newTab})"
   },
-
   "share": {
     "sectionTitle": "Diesen Kanal teilen",
     "description": "Nur öffentliche Statistiken — die Schätzungen sind unabhängig und stammen weder vom Kanalinhaber, YouTube oder Google, noch werden sie von diesen verifiziert.",
@@ -164,14 +160,12 @@
     "shareOnWhatsApp": "Auf WhatsApp teilen",
     "shareOnSocialAria": "{title} auf {network} teilen ({newTab})"
   },
-
   "copyShare": {
     "label": "Teilen-Link kopieren",
     "copied": "Link kopiert ✓",
     "copiedStatus": "Link in die Zwischenablage kopiert.",
     "error": "Konnte nicht kopiert werden — du kannst die URL aus der Adresszeile kopieren."
   },
-
   "channelPage": {
     "backToSearch": "← Zurück zur Suche",
     "breadcrumbAria": "Brotkrumen-Navigation",
@@ -182,18 +176,15 @@
     "errorBody": "Beim Laden dieses Kanals ist etwas schiefgelaufen. Das kann passieren, wenn die YouTube-API vorübergehend nicht verfügbar ist oder das Anfragelimit erreicht wurde.",
     "loadingSr": "Kanal wird geladen…"
   },
-
   "rootError": {
     "title": "Etwas ist schiefgelaufen",
     "body": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
   },
-
   "notFound": {
     "code": "404",
     "title": "Seite nicht gefunden",
     "body": "Die gesuchte Seite existiert nicht."
   },
-
   "earnings": {
     "sectionTitle": "Einnahmen-Schätzer",
     "tabsLabel": "Schätzungsszenario",
@@ -246,7 +237,6 @@
     },
     "disclaimer": "Nur Schätzungen. Tatsächliche Einnahmen hängen von vielen Faktoren ab, die wir nicht beobachten können — Fill Rate, Saisonalität, Anzeigenkategorie-Mix, YouTube-Anteil, Rückerstattungen und Steuern."
   },
-
   "calculators": {
     "shared": {
       "revenue": "Einnahmen",
@@ -391,14 +381,12 @@
       }
     }
   },
-
   "translationPending": {
     "title": "Auf Englisch verfügbar",
     "body": "Diese Seite ist derzeit nur auf Englisch verfügbar. Übersetzte Versionen kommen bald — wir lassen rechtliche Seiten, Methodik und die Über-uns-Seite von Muttersprachlern prüfen, bevor wir sie veröffentlichen.",
     "readInEnglish": "Auf Englisch lesen",
     "backToHome": "Zurück zur Startseite"
   },
-
   "static": {
     "about": {
       "title": "Über uns",
@@ -433,20 +421,123 @@
     "backToHome": "← Zurück zur Startseite",
     "lastUpdated": "Zuletzt aktualisiert:"
   },
-
   "staticPage": {
     "backToHome": "← Zurück zur Startseite"
   },
-
   "homeMeta": {
     "title": "YouTube Money Calculator | Einnahmen, RPM & CPM eines Kanals schätzen",
     "description": "Schätze die Einnahmen eines YouTube-Kanals aus öffentlichen Statistiken. Berechne monatliches Einkommenspotenzial, RPM, CPM, Shorts-Einnahmen, Sponsoring-Wert und mehr mit unserem kostenlosen YouTube Money Calculator."
   },
-
   "layoutMeta": {
     "titleDefault": "YouTube Money Calculator | Einnahmen, RPM & CPM eines Kanals schätzen",
     "titleTemplate": "%s · YouTube Money Calculator",
     "description": "Schätze die Einnahmen eines YouTube-Kanals aus öffentlichen Statistiken. Berechne monatliches Einkommenspotenzial, RPM, CPM, Shorts-Einnahmen, Sponsoring-Wert und mehr mit unserem kostenlosen YouTube Money Calculator.",
     "skipToContent": "Zum Inhalt springen"
+  },
+  "calculatorsMenu": {
+    "money": {
+      "label": "Einnahmenrechner",
+      "description": "Schätze die monatlichen Einnahmen eines Kanals."
+    },
+    "rpm": {
+      "label": "RPM-Rechner",
+      "description": "Einnahmen pro 1.000 monetarisierte Aufrufe."
+    },
+    "cpm": {
+      "label": "CPM-Rechner",
+      "description": "Was Werbetreibende pro 1.000 Impressionen zahlen."
+    },
+    "shorts": {
+      "label": "Shorts-Rechner",
+      "description": "Schätze Auszahlungen aus dem Shorts-Creator-Pool."
+    },
+    "sponsorship": {
+      "label": "Sponsoring-Rechner",
+      "description": "Schätze Sponsoring-Preise für Brand Deals."
+    }
+  },
+  "popularCalculators": {
+    "eyebrow": "Tools",
+    "title": "Beliebte Rechner",
+    "cards": {
+      "money": {
+        "title": "Einnahmenrechner",
+        "description": "Schätze den monatlichen Gesamtumsatz eines Kanals aus Langform- und Shorts-Aufrufen."
+      },
+      "rpm": {
+        "title": "RPM-Rechner",
+        "description": "Einnahmen pro 1.000 monetarisierte Aufrufe — eine Kennzahl aus Creator-Sicht."
+      },
+      "cpm": {
+        "title": "CPM-Rechner",
+        "description": "Was Werbetreibende pro 1.000 Impressionen zahlen. Nützlich als Preisrichtwert."
+      },
+      "shorts": {
+        "title": "Shorts-Rechner",
+        "description": "Schätze Auszahlungen aus dem Creator-Pool anhand von Shorts-Aufrufen und Monetarisierung."
+      },
+      "sponsorship": {
+        "title": "Sponsoring-Rechner",
+        "description": "Groben Preis für Brand Deals aus Abonnenten und Engagement schätzen."
+      }
+    }
+  },
+  "whyBeHumler": {
+    "eyebrow": "Warum BeHumler",
+    "title": "Ernstzunehmende Analytik ohne Zugangshürden",
+    "subtitle": "Jeder Creator verdient ehrliche, transparente Zahlen. BeHumler liefert dir eine belastbare Schätzung, mit der du wirklich arbeiten kannst.",
+    "features": {
+      "accurate": {
+        "title": "Präzise Schätzungen",
+        "description": "Jede Zahl leitet sich aus öffentlichen YouTube-Statistiken und transparent veröffentlichten Formeln ab."
+      },
+      "fast": {
+        "title": "Schnelle Ergebnisse",
+        "description": "Kanalname oder @Handle eintippen und in Sekunden eine vollständige Einnahmen-Aufschlüsselung erhalten."
+      },
+      "poweredBy": {
+        "title": "Basierend auf der YouTube Data API",
+        "description": "Wir holen die Kanaldaten live über die offizielle YouTube Data API v3 von Google — kein Scraping."
+      },
+      "privacy": {
+        "title": "Datenschutzfreundlich",
+        "description": "Keine Anmeldung. Kein Tracking der gesuchten Kanäle. Kürzliche Suchen bleiben nur auf deinem Gerät gespeichert."
+      }
+    }
+  },
+  "homeFaq": {
+    "eyebrow": "FAQ",
+    "title": "Häufig gestellte Fragen",
+    "items": {
+      "accuracy": {
+        "q": "Wie genau sind die Einnahmenschätzungen?",
+        "a": "Die Zahlen sind Schätzungen, keine tatsächlichen Einnahmen. Sie kombinieren die öffentlichen Aufrufzahlen eines Kanals mit branchenüblichen RPM/CPM-Bandbreiten. Reale Einnahmen hängen vom Anzeigen-Mix, der Länderverteilung der Zuschauer, der Wiedergabezeit, dem YouTube-Premium-Anteil und weiteren Faktoren ab, die aus öffentlichen Daten nicht sichtbar sind."
+      },
+      "rpm": {
+        "q": "Wie wird der RPM berechnet?",
+        "a": "RPM (Revenue Per Mille) ist der Gesamtumsatz geteilt durch die monetarisierten Aufrufe, multipliziert mit tausend. Es ist eine Kennzahl aus Creator-Sicht — im Gegensatz zum CPM, den Werbetreibende pro tausend Impressionen zahlen. Der RPM ist meist niedriger als der CPM, weil er nicht monetarisierte Aufrufe berücksichtigt und den YouTube-Anteil abzieht."
+      },
+      "subscribers": {
+        "q": "Zahlt YouTube pro Abonnenten?",
+        "a": "Nein. YouTube zahlt für monetarisierte Anzeigenaufrufe und weitere qualifizierende Umsatzereignisse, nicht für die Zahl der Abonnenten. Abonnenten sind relevant, weil sie im Zeitverlauf mehr Aufrufe erzeugen, aber die Zahl selbst ist keine direkte Auszahlung."
+      },
+      "shorts": {
+        "q": "Kann ich Shorts-Einnahmen schätzen?",
+        "a": "Ja. Shorts monetarisieren über den Creator-Pool statt über Pre-Roll-Anzeigen, daher liegt ihr RPM meist deutlich unter dem der Langform. Unser Shorts-Rechner verwendet eine eigene RPM-Bandbreite, die diesen Unterschied abbildet."
+      }
+    }
+  },
+  "dashboardPreview": {
+    "channelSnapshot": "Kanal-Momentaufnahme",
+    "sampleCreator": "Beispiel-Creator",
+    "illustrativePreview": "Illustrative Vorschau",
+    "viewsLast6Months": "Aufrufe · letzte 6 Monate",
+    "exampleCaption": "Beispielhafte Schätzung — die realen Werte werden aus einem echten Kanal berechnet, sobald du oben suchst.",
+    "stats": {
+      "subscribers": "Abonnenten",
+      "monthlyViews": "Aufrufe pro Monat",
+      "estimatedRevenue": "Geschätzter Umsatz",
+      "rpm": "RPM"
+    }
   }
 }
