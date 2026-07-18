@@ -10,7 +10,13 @@ import {
 } from "../icons";
 
 interface Card {
-  href: "/#find-channel" | "/youtube-rpm-calculator" | "/youtube-cpm-calculator" | "/youtube-shorts-calculator" | "/youtube-sponsorship-calculator";
+  href:
+    | "/#find-channel"
+    | "/youtube-rpm-calculator"
+    | "/youtube-cpm-calculator"
+    | "/youtube-shorts-calculator"
+    | "/youtube-sponsorship-calculator"
+    | "/instagram-money-calculator";
   titleKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -22,6 +28,12 @@ const CARDS: readonly Card[] = [
     titleKey: "popularCalculators.cards.money.title",
     descriptionKey: "popularCalculators.cards.money.description",
     Icon: DollarIcon,
+  },
+  {
+    href: "/instagram-money-calculator",
+    titleKey: "popularCalculators.cards.instagram.title",
+    descriptionKey: "popularCalculators.cards.instagram.description",
+    Icon: ShareIcon,
   },
   {
     href: "/youtube-rpm-calculator",

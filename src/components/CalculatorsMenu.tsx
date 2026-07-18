@@ -166,7 +166,13 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
  * imported and reused by `MobileNav` without duplication.
  */
 export interface CalculatorLink {
-  href: "/#find-channel" | "/youtube-rpm-calculator" | "/youtube-cpm-calculator" | "/youtube-shorts-calculator" | "/youtube-sponsorship-calculator";
+  href:
+    | "/#find-channel"
+    | "/youtube-rpm-calculator"
+    | "/youtube-cpm-calculator"
+    | "/youtube-shorts-calculator"
+    | "/youtube-sponsorship-calculator"
+    | "/instagram-money-calculator";
   labelKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -178,6 +184,12 @@ export const CALCULATOR_LINKS: CalculatorLink[] = [
     labelKey: "calculatorsMenu.money.label",
     descriptionKey: "calculatorsMenu.money.description",
     Icon: DollarIcon,
+  },
+  {
+    href: "/instagram-money-calculator",
+    labelKey: "calculatorsMenu.instagram.label",
+    descriptionKey: "calculatorsMenu.instagram.description",
+    Icon: ShareIcon,
   },
   {
     href: "/youtube-rpm-calculator",

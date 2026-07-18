@@ -78,6 +78,14 @@ export function Footer() {
                 {t("sponsorshipCalculator")}
               </Link>
             </li>
+            <li>
+              <Link
+                href="/instagram-money-calculator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("instagramCalculator")}
+              </Link>
+            </li>
           </ul>
         </div>
 

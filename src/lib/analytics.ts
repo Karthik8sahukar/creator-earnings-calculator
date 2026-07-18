@@ -26,6 +26,12 @@
  *   - `share.native_shared`
  *   - `share.social_opened`          ({ target: "x"|"linkedin"|"whatsapp" })
  *   - `additional_calculator.opened` (kind of calc)
+ *   - `instagram_calculator.opened`
+ *   - `instagram_calculator.completed`     (no raw earnings values)
+ *   - `instagram_calculator.share_link_created`
+ *   - `instagram_calculator.currency_changed`
+ *   - `instagram_calculator.results_copied`
+ *   - `instagram_calculator.advanced_opened`
  *
  * WHAT WE NEVER SEND:
  *   - The YouTube API key.
@@ -63,7 +69,31 @@ export type AnalyticsEvent =
   | {
       name: "additional_calculator.opened";
       kind: "rpm" | "cpm" | "shorts" | "sponsorship";
-    };
+    }
+  // ─── Instagram Money Calculator ────────────────────────────────
+  //
+  // The Instagram calculator DELIBERATELY does not report raw
+  // earnings. Its analytics carry only structural fields — never
+  // dollar amounts — so we can measure engagement with the tool
+  // without leaking a user's private income estimate.
+  | { name: "instagram_calculator.opened" }
+  | {
+      name: "instagram_calculator.completed";
+      /** Which monetization streams were enabled. Booleans only. */
+      streams: {
+        posts: boolean;
+        reels: boolean;
+        stories: boolean;
+        affiliate: boolean;
+        subscriptions: boolean;
+      };
+      /** Bucketed follower size — a coarse label, never the raw count. */
+      followerBucket: "nano" | "micro" | "mid" | "macro" | "mega";
+    }
+  | { name: "instagram_calculator.share_link_created" }
+  | { name: "instagram_calculator.currency_changed"; currency: string }
+  | { name: "instagram_calculator.results_copied" }
+  | { name: "instagram_calculator.advanced_opened" };
 
 export type AnalyticsEventName = AnalyticsEvent["name"];
 
