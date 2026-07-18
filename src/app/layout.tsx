@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 
 import { Footer } from "@/components/Footer";
@@ -75,6 +76,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Google Analytics 4 — only mounted when the Measurement ID is
+  // provided in the environment. In local dev and preview deployments
+  // this env var is normally unset, so no tracker is loaded.
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+
   // JSON-LD: WebSite + WebApplication. FAQ pages own their own FAQPage schema.
   // We deliberately do NOT publish aggregate rating markup — this tool has no
   // fake reviews.
@@ -123,6 +129,7 @@ export default function RootLayout({
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {gaId && <GoogleAnalytics gaId={gaId} />}
       </body>
     </html>
   );
