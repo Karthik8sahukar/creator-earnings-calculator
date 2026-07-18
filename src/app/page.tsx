@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
+import { Faq } from "@/components/home/Faq";
+import { Hero } from "@/components/home/Hero";
+import { PopularCalculators } from "@/components/home/PopularCalculators";
+import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 
 /**
  * Homepage SEO — explicit metadata overrides the layout defaults with
@@ -35,30 +39,16 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="space-y-10">
-      <section
-        aria-labelledby="hero-title"
-        className="text-center space-y-4 pt-6 sm:pt-10"
-      >
-        <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
-          Powered by the YouTube Data API v3
-        </p>
-        <h1
-          id="hero-title"
-          className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900"
-        >
-          YouTube Money Calculator
-        </h1>
-        <p className="max-w-2xl mx-auto text-lg text-slate-600">
-          Estimate a YouTube channel&apos;s potential monthly earnings using
-          public YouTube data, estimated RPM, CPM, and view analytics.
-        </p>
-      </section>
+    <div className="space-y-20 sm:space-y-28">
+      <Hero>
+        <Suspense fallback={<WorkspaceFallback />}>
+          <ChannelWorkspace />
+        </Suspense>
+      </Hero>
 
-      <Suspense fallback={<WorkspaceFallback />}>
-        <ChannelWorkspace />
-      </Suspense>
+      <PopularCalculators />
+      <WhyBeHumler />
+      <Faq />
     </div>
   );
 }

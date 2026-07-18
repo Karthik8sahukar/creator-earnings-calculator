@@ -4,6 +4,7 @@ import Script from "next/script";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { ThemeScript } from "@/components/ThemeScript";
 import { publicConfig } from "@/lib/config";
 
 import "./globals.css";
@@ -110,11 +111,14 @@ export default function RootLayout({
   ];
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className="min-h-dvh font-sans antialiased">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-slate-900 focus:px-3 focus:py-1 focus:rounded"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-slate-900 focus:px-3 focus:py-1 focus:rounded dark:focus:bg-slate-900 dark:focus:text-slate-50"
         >
           Skip to content
         </a>

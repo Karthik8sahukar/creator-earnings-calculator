@@ -256,3 +256,125 @@ export function LogoMark(props: IconProps) {
     </svg>
   );
 }
+
+
+/* ------------------------------------------------------------------
+ * Additional icons for the redesigned homepage / header / footer.
+ * Same stroke-based, 24×24 style as the icons above so they visually
+ * match the existing set. All icons inherit currentColor.
+ * ------------------------------------------------------------------ */
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+    </svg>
+  );
+}
+
+export function SunIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </svg>
+  );
+}
+
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+export function MenuIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  );
+}
+
+export function RocketIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M5 15c-1.5 2-2 6-2 6s4-.5 6-2c1.14-.86 1.94-2.02 2-3.5" />
+      <path d="M9 12c1-3 3-6 6.5-8C19 3 21 3 21 3s0 2-1 5.5C18 12 15 14 12 15Z" />
+      <path d="M14 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z" />
+      <path d="M9 12l3 3" />
+    </svg>
+  );
+}
+
+export function ShieldIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3 4 6v6c0 4.5 3.5 8.5 8 9 4.5-.5 8-4.5 8-9V6l-8-3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
+
+export function ZapIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />
+    </svg>
+  );
+}
+
+export function TrendingUpIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="m3 17 6-6 4 4 8-8" />
+      <path d="M14 7h7v7" />
+    </svg>
+  );
+}
+
+export function HelpCircleIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.9.4-1.5 1-1.5 2.2" />
+      <path d="M12 17h.01" />
+    </svg>
+  );
+}
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="m5 12 5 5L20 7" />
+    </svg>
+  );
+}
+
+export function TargetIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1.5" />
+    </svg>
+  );
+}
+
+export function LockIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <rect x="4" y="11" width="16" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 1 1 8 0v4" />
+    </svg>
+  );
+}
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M8 5v14l11-7L8 5Z" />
+    </svg>
+  );
+}
