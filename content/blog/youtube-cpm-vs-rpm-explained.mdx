@@ -1,0 +1,160 @@
+---
+title: "YouTube CPM vs. RPM: What's the Difference (and Why It Matters)"
+description: "CPM and RPM sound like the same thing. They aren't. Here's exactly what each measures, how they relate, and which one to pay attention to when tracking your channel's earnings."
+publishedDate: "2026-07-17"
+updatedDate: "2026-07-17"
+category: "analytics"
+tags:
+  - "CPM"
+  - "RPM"
+  - "cornerstone"
+  - "analytics"
+featuredImage: "/blog/hero-analytics.svg"
+featuredImageAlt: "Abstract analytics chart illustration"
+---
+
+CPM and RPM are two of the most quoted — and most mixed-up — metrics in creator earnings.
+
+Every YouTube analytics thread eventually blurs them together, and every creator asking "why is my RPM so low if my CPM is $8?" has already been given ten different answers, half of which are wrong.
+
+Here's the version that actually holds up.
+
+<Callout type="note" title="TL;DR">
+**CPM** is what advertisers pay YouTube per 1,000 ad impressions. **RPM** is what the creator receives per 1,000 total video views after YouTube's cut and after unmonetized views are averaged in. RPM is always lower than CPM. Both numbers matter, but for creators, RPM is the one that predicts your paycheck.
+</Callout>
+
+## The precise definitions
+
+Let's start with the numerators and denominators. Once these are locked in, everything else follows.
+
+### CPM
+
+**Cost Per Mille** — Latin for "cost per thousand." The metric is defined from the advertiser's side of the auction:
+
+`CPM = total advertiser spend / ad impressions × 1,000`
+
+An impression is a single viewer seeing at least one ad. If YouTube shows a pre-roll on your video and one mid-roll to the same viewer, that's 2 impressions.
+
+CPM is measured **before** YouTube takes its revenue share. It does not include your Premium revenue or your unmonetized views. If a video has 100k views but 20k of those views got no ad at all (Premium subscriber, ad blocker, no matching bidder), the CPM is calculated on the 80k views that did see an ad, not on all 100k.
+
+### RPM
+
+**Revenue Per Mille** — same denominator meaning, different intent:
+
+`RPM = total revenue you receive / total views × 1,000`
+
+RPM is measured **after** YouTube's share and includes all your revenue sources: ads, YouTube Premium, Super Chat, channel memberships, Super Thanks, Shopping. It's calculated on **every** view your channel logged, monetized or not.
+
+RPM is the number that, when you multiply it by your view count and divide by 1,000, gets you within a few dollars of the "Total revenue" figure YouTube Studio shows for the month. CPM will not do that.
+
+## Why RPM is always lower than CPM
+
+Three drops happen between the CPM in your dashboard and the RPM that ends up in your bank account.
+
+### Drop 1: YouTube's revenue share
+
+For long-form content in the YouTube Partner Program, YouTube keeps roughly **45%** of ad revenue and passes ~55% to the creator. For Shorts, YouTube keeps about **55%** (because the ad revenue is pooled across many videos), passing ~45% to creators.
+
+So a $10 CPM immediately becomes $5.50 in creator-facing revenue on long-form, before we account for anything else.
+
+### Drop 2: Non-monetized views
+
+CPM is calculated on the subset of views that saw an ad. RPM is calculated on **all** views. In a typical English-language channel, roughly 10–15% of views are non-monetizable:
+
+- Premium subscribers who don't see ads
+- Ad-blocker users
+- Very short watches that ended before the pre-roll finished loading
+- Videos flagged for limited monetization
+
+That $5.50 spreads across a bigger denominator, dropping to something like $5.00 per 1,000 total views.
+
+### Drop 3: The Premium revenue path
+
+Views from YouTube Premium subscribers don't generate ad revenue at all. Instead, YouTube pools Premium subscription revenue and pays creators from that pool proportional to how much watch time they captured from Premium viewers. Those payouts typically work out lower than ad payouts on a per-view basis.
+
+The Premium path bumps RPM back up a bit (say, from $5.00 to $5.15), but not all the way back to CPM levels.
+
+Net result: for a "typical" channel with $10 CPM, the RPM you'd see is roughly $5.00–$5.50. **CPM ÷ 2 is a good sanity-check estimate for RPM.**
+
+## When to look at which
+
+CPM and RPM answer different questions.
+
+**Look at CPM when you're evaluating a niche or a video topic.** CPM tells you what advertisers are willing to pay for people watching *this kind of content*. If your CPM crashes when you switch from cooking to gaming, it's a signal about audience demand, not about how well you're monetizing.
+
+**Look at RPM when you're forecasting revenue.** RPM includes everything — ad revenue share, Premium, everything YouTube pays you — divided by all your views. When you multiply RPM by expected view count, you get expected revenue. CPM will overstate every forecast by ~50%.
+
+**Look at both when you're diagnosing a drop.** If your CPM stayed steady but your RPM fell, the problem is on the monetization-mix side (more Premium viewers, more Shorts, more flagged videos). If your CPM fell, the problem is upstream — advertiser demand for your topic slipped.
+
+## The Shorts twist
+
+The math above is for long-form. For Shorts, it looks different.
+
+Shorts monetization runs through the **Creator Pool**: a monthly pool of Shorts ad revenue that gets divided across all Shorts creators proportional to their view share. Because the pool is finite and view volume is enormous, per-view earnings are much lower than long-form.
+
+For Shorts:
+
+- Your "CPM" in YouTube Studio is a **notional** number — it's what the pool math implies your per-1000 payout works out to.
+- YouTube keeps ~55% of the pool for licensing costs (music, primarily) and payouts to the pool.
+- Typical Shorts RPM lands at **$0.03–$0.20** for a channel that would earn $3–$8 RPM on long-form.
+
+The Shorts pool is designed to be roughly platform-share-neutral — meaning if you get 1% of all Shorts views one month, you get roughly 1% of the Creator Pool. That's why the number is so stable across niches. Advertiser demand for finance vs. gaming matters less for Shorts than it does for long-form; the pool spreads it out.
+
+<CalculatorCta
+  to="cpm"
+  heading="Convert between CPM and RPM"
+  body="Plug in your gross ad revenue and monetized impressions to get CPM directly. Handles the divide-by-zero cases and shows you the formula it used."
+/>
+
+## Worked examples
+
+Let's put this all together with three concrete channels.
+
+### Example 1: US tech channel
+
+- Monthly views: 500,000 (all long-form)
+- Monetized playbacks: 435,000 (87%)
+- Gross ad revenue reported by advertisers: $4,350
+
+**CPM** = $4,350 / 435,000 × 1000 = **$10.00**
+**RPM** = ($4,350 × 55% share + a small Premium contribution) / 500,000 × 1000 ≈ **$5.00**
+
+The creator sees $10 CPM and might expect $10 × 500 = $5,000. Actual take-home is about $2,500. That's the CPM vs. RPM gap in dollars.
+
+### Example 2: US gaming channel
+
+- Monthly views: 1,000,000 (all long-form)
+- Monetized playbacks: 900,000
+- Gross ad revenue: $6,300
+
+**CPM** = $6,300 / 900,000 × 1000 = **$7.00**
+**RPM** = ($6,300 × 55%) / 1,000,000 × 1000 ≈ **$3.50**
+
+Same platform, different niche — the CPM is lower because gaming advertisers bid less, but the CPM-to-RPM ratio is the same ~2:1.
+
+### Example 3: US general channel, half Shorts
+
+- Long-form views: 500,000, ad revenue $2,500 (CPM $5, RPM $2.75)
+- Shorts views: 500,000, Creator Pool payout $50 (implied RPM $0.10)
+- Blended: 1,000,000 views, $2,550 revenue
+- **Blended RPM: $2.55**
+
+Notice the Shorts side barely contributes. That's why doubling your view count with Shorts doesn't double your revenue.
+
+## Common confusions worth clearing up
+
+**"My CPM is high, so I must be doing well."** Not necessarily. High CPM with low monetized-playback rate can still mean low take-home. Watch RPM.
+
+**"My RPM dropped in Q1 — YouTube must be paying less."** Q1 is seasonal. Advertiser demand collapses after the December holiday spend, and CPMs regularly drop 30–40% in January. It rebounds by Q2. Look at year-over-year, not quarter-over-quarter.
+
+**"YouTube takes 45% of my RPM."** No — YouTube takes 45% of the ad revenue, and RPM is what you see AFTER that split. Don't subtract 45% again.
+
+**"CPM is what I'll make per 1,000 views."** Only if you're an advertiser buying inventory. As a creator, you'll make RPM per 1,000 views.
+
+## What to actually do with these numbers
+
+Track both in a spreadsheet, monthly. Watch them independently. When you're comparing your channel to someone else's — or comparing this month to last — make sure you're comparing like-for-like.
+
+And if a YouTuber tells you their "CPM is $30, so my thousand views are worth thirty bucks" — quietly translate: they probably mean CPM, they'll probably see something closer to $12–$15 RPM, and that's still an excellent number in a good niche.
+
+For your own channel, plug real numbers into the [RPM Calculator](/youtube-rpm-calculator) and the [CPM Calculator](/youtube-cpm-calculator) — the formulas and division-by-zero handling are the same as YouTube Studio uses, so the outputs will line up.

@@ -167,13 +167,13 @@ export function MobileNav({ className = "" }: { className?: string }) {
                 </p>
                 <ul className="space-y-0.5">
                   <li>
-                    <span
-                      aria-disabled="true"
-                      className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
+                    <Link
+                      href="/blog"
+                      onClick={close}
+                      className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
                     >
                       {t("nav.blog")}
-                      <span className="chip">{t("common.labels.soon")}</span>
-                    </span>
+                    </Link>
                   </li>
                   {PRIMARY_LINKS.map((l) => (
                     <li key={l.href}>

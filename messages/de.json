@@ -539,5 +539,105 @@
       "estimatedRevenue": "Geschätzter Umsatz",
       "rpm": "RPM"
     }
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "Der BeHumler-Blog",
+      "title": "Creator-Ökonomie & YouTube-Wachstum",
+      "subtitle": "Ehrliches, gut recherchiertes Schreiben darüber, wie Creator auf YouTube wirklich Geld verdienen — ohne Keyword-Füller."
+    },
+    "search": {
+      "srLabel": "Artikel suchen",
+      "placeholder": "Suche nach Titel, Tag oder Kategorie",
+      "clearAria": "Suche leeren",
+      "empty": "Kein Artikel passt zu „{query}“. Versuche ein anderes Stichwort."
+    },
+    "sections": {
+      "featuredEyebrow": "Redaktionsempfehlung",
+      "featured": "Empfohlener Artikel",
+      "latestEyebrow": "Aktuell",
+      "latest": "Neueste Artikel",
+      "popularEyebrow": "Beliebt",
+      "popular": "Beliebte Artikel"
+    },
+    "newsletter": {
+      "title": "Hol dir das Creator-Ökonomie-Briefing",
+      "description": "Eine kurze, ehrliche E-Mail, wenn wir etwas Lesenswertes veröffentlichen. Kein Spam, kein Upsell, Abmeldung mit einem Klick.",
+      "emailPlaceholder": "du@beispiel.com",
+      "subscribe": "Abonnieren",
+      "thanks": "Danke — du bist auf der Liste. Wir melden uns, wenn der nächste Artikel erscheint.",
+      "privacyNote": "Wir verwenden deine E-Mail nur, um das Briefing zu versenden. Details siehe Datenschutzseite."
+    },
+    "article": {
+      "readingTime": "{count, plural, one {# Min. Lesezeit} other {# Min. Lesezeit}}",
+      "publishedOn": "Veröffentlicht am {date}",
+      "updated": "Aktualisiert am {date}",
+      "by": "Von {author}",
+      "tocTitle": "Auf dieser Seite",
+      "relatedTitle": "Verwandte Artikel",
+      "prevArticle": "Zurück",
+      "nextArticle": "Weiter",
+      "prevNextLabel": "Artikelnavigation",
+      "backToBlog": "← Zurück zum Blog",
+      "share": {
+        "title": "Diesen Artikel teilen",
+        "share": "Teilen",
+        "shareVia": "„{title}“ vom Gerät aus teilen",
+        "copyLink": "Link kopieren",
+        "linkCopied": "Kopiert ✓",
+        "linkCopiedStatus": "Link in die Zwischenablage kopiert.",
+        "copyError": "Konnte nicht kopiert werden — du kannst die URL aus der Adresszeile kopieren.",
+        "shareOnSocial": "Auf {network} teilen ({newTab})"
+      }
+    },
+    "meta": {
+      "title": "Der BeHumler-Blog — Creator-Ökonomie & YouTube-Wachstum",
+      "description": "Ehrliches Schreiben darüber, wie Creator auf YouTube wirklich Geld verdienen: RPM, CPM, Sponsoring, Shorts-Auszahlungen und die Plattformen, die die Creator-Ökonomie prägen.",
+      "breadcrumbHome": "Startseite",
+      "breadcrumbBlog": "Blog"
+    },
+    "categories": {
+      "all": "Alle",
+      "navLabel": "Nach Kategorie stöbern",
+      "eyebrow": "Kategorie",
+      "empty": "In dieser Kategorie gibt es noch keine Artikel — schau bald wieder rein.",
+      "monetization": {
+        "label": "YouTube-Monetarisierung",
+        "description": "Anzeigen, Mitgliedschaften, Super Chat, Premium — jeder Weg, auf YouTube tatsächlich Geld zu verdienen."
+      },
+      "growth": {
+        "label": "YouTube-Wachstum",
+        "description": "Praktische Ratschläge zu Thumbnails, Retention, Veröffentlichungsrhythmus und wachsender Reichweite."
+      },
+      "creator-economy": {
+        "label": "Creator-Ökonomie",
+        "description": "Wie Geld im modernen Creator-Ökosystem fließt — Plattformen, Förderer und Auszahlungen."
+      },
+      "analytics": {
+        "label": "Analytik",
+        "description": "Die Zahlen in YouTube Studio einordnen — und die, die YouTube nicht zeigt."
+      },
+      "seo": {
+        "label": "SEO",
+        "description": "Wie Such- und Empfehlungstraffic funktioniert — für Google und für YouTube."
+      },
+      "sponsorships": {
+        "label": "Sponsoring",
+        "description": "Preise, Verträge, Deliverables, Exklusivität — alles, was Creator früher gewusst haben wollten."
+      },
+      "shorts": {
+        "label": "Shorts",
+        "description": "Die Ökonomie des Hochformats: Creator-Pool-Mathematik, Hooks und Übergang ins Langformat."
+      },
+      "guides": {
+        "label": "Guides",
+        "description": "Ausführliche Guides, die das Gesamtbild für Creator zusammenführen, die es ernst zu meinen beginnen."
+      }
+    },
+    "tags": {
+      "eyebrow": "Tag",
+      "pageTitle": "Mit #{tag} getaggte Artikel",
+      "pageDescription": "Alle BeHumler-Artikel unter dem Tag #{tag}."
+    }
   }
 }

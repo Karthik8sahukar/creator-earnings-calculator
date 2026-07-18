@@ -1,24 +1,37 @@
 import type { MetadataRoute } from "next";
 
 import { HREFLANG_MAP, routing } from "@/i18n/routing";
+import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
 import { publicConfig } from "@/lib/config";
 
 /**
  * Sitemap.
  *
- * Emits one entry per (locale × path) pair, plus per-entry
- * `alternates.languages` so search engines can discover every
- * translation of every page — including an `x-default` pointer to the
- * canonical English URL.
+ * Structure by URL type:
  *
- * `/channel/[channelId]` is not included: it's a per-channel dynamic
- * page indexed by direct link, not by sitemap enumeration.
- * `/api/*`, `/robots.txt`, and `/sitemap.xml` are never localized.
+ * 1. Marketing / product pages (home, calculators, methodology, ...):
+ *    one entry per (locale × path) pair, with full `alternates.languages`
+ *    covering every supported locale and `x-default` → English.
+ *
+ * 2. Blog listing (/blog) and category pages (/blog/category/[slug]):
+ *    one entry per (locale × path) pair — the listing UI is translated
+ *    for every locale, so all seven variants are indexable.
+ *
+ * 3. Blog article pages (/blog/[slug]):
+ *    ONLY the English canonical URL is included. Non-English article
+ *    pages render a `<TranslationPending />` notice and are marked
+ *    `robots: noindex, follow` in metadata — including them in the
+ *    sitemap would contradict that signal. Search engines still
+ *    discover the article's `alternates.languages` block on the page
+ *    itself if they arrive via another route.
+ *
+ * `/channel/[channelId]` and `/api/*` are never emitted.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = publicConfig.siteUrl;
   const now = new Date();
-  const routes = [
+
+  const staticRoutes = [
     "",
     "/methodology",
     "/disclaimer",
@@ -29,26 +42,71 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/youtube-cpm-calculator",
     "/youtube-shorts-calculator",
     "/youtube-sponsorship-calculator",
+    "/blog",
   ];
 
-  const entries: MetadataRoute.Sitemap = [];
-  for (const locale of routing.locales) {
-    for (const path of routes) {
+  const blogCategoryRoutes = BLOG_CATEGORIES.map((c) => `/blog/category/${c.slug}`);
+
+  const perLocaleWithAlternates = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]) => {
+    const out: MetadataRoute.Sitemap = [];
+    for (const locale of routing.locales) {
       const url = `${base}/${locale}${path}`;
       const languages: Record<string, string> = {};
       for (const loc of routing.locales) {
         languages[HREFLANG_MAP[loc]] = `${base}/${loc}${path}`;
       }
       languages["x-default"] = `${base}/${routing.defaultLocale}${path}`;
-
-      entries.push({
+      out.push({
         url,
         lastModified: now,
-        changeFrequency: path === "" ? "weekly" : "monthly",
-        priority: path === "" ? 1 : 0.6,
+        changeFrequency,
+        priority,
         alternates: { languages },
       });
     }
+    return out;
+  };
+
+  const entries: MetadataRoute.Sitemap = [];
+
+  // 1 + 2: marketing pages, blog listing, category listings.
+  for (const path of staticRoutes) {
+    const isHome = path === "";
+    entries.push(
+      ...perLocaleWithAlternates(
+        path,
+        isHome ? 1 : path === "/blog" ? 0.8 : 0.6,
+        isHome || path === "/blog" ? "weekly" : "monthly",
+      ),
+    );
   }
+  for (const path of blogCategoryRoutes) {
+    entries.push(...perLocaleWithAlternates(path, 0.5, "weekly"));
+  }
+
+  // 3: blog article pages — English canonical only.
+  try {
+    const posts = await loadPosts();
+    for (const post of posts) {
+      const url = `${base}/${routing.defaultLocale}/blog/${post.slug}`;
+      entries.push({
+        url,
+        lastModified: post.updatedDate
+          ? new Date(post.updatedDate)
+          : new Date(post.publishedDate),
+        changeFrequency: "monthly",
+        priority: 0.7,
+        // Deliberately no `alternates.languages` — non-English article
+        // pages are noindex, so declaring them here would contradict
+        // the page-level robots signal.
+      });
+    }
+  } catch {
+    // If the content directory is missing (fresh clone before any
+    // posts, or a broken filesystem read), we return marketing +
+    // category entries and swallow the error. Missing posts should
+    // never crash sitemap generation.
+  }
+
   return entries;
 }

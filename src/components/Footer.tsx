@@ -3,6 +3,8 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { publicConfig } from "@/lib/config";
 import { Logo } from "./Logo";
+// Blog is now a real destination (previously rendered as a disabled
+// "Soon" chip). The link below points to the MDX-backed blog index.
 
 /**
  * Site footer.
@@ -21,7 +23,6 @@ import { Logo } from "./Logo";
  */
 export function Footer() {
   const t = useTranslations("footer");
-  const tCommon = useTranslations("common.labels");
   const year = new Date().getFullYear();
 
   return (
@@ -102,14 +103,12 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              {/* Non-linked placeholder — same treatment as the header. */}
-              <span
-                aria-disabled="true"
-                className="inline-flex items-center gap-2 text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
+              <Link
+                href="/blog"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
               >
                 {t("blog")}
-                <span className="chip">{tCommon("soon")}</span>
-              </span>
+              </Link>
             </li>
           </ul>
         </div>

@@ -539,5 +539,105 @@
       "estimatedRevenue": "Estimated Revenue",
       "rpm": "RPM"
     }
+  },
+  "blog": {
+    "hero": {
+      "eyebrow": "The BeHumler blog",
+      "title": "Creator Economy & YouTube Growth",
+      "subtitle": "Honest, well-sourced writing on how creators actually make money on YouTube — with no keyword-stuffed filler."
+    },
+    "search": {
+      "srLabel": "Search articles",
+      "placeholder": "Search articles by title, tag, or category",
+      "clearAria": "Clear search",
+      "empty": "No articles match \"{query}\". Try a different keyword."
+    },
+    "categories": {
+      "all": "All",
+      "navLabel": "Browse by category",
+      "eyebrow": "Category",
+      "empty": "No articles in this category yet — check back soon.",
+      "monetization": {
+        "label": "YouTube Monetization",
+        "description": "Ads, memberships, Super Chat, Premium — every path to actually getting paid on YouTube."
+      },
+      "growth": {
+        "label": "YouTube Growth",
+        "description": "Practical advice on packaging, retention, publishing cadence, and audience compounding."
+      },
+      "creator-economy": {
+        "label": "Creator Economy",
+        "description": "How money moves through the modern creator ecosystem — platforms, patrons, and payouts."
+      },
+      "analytics": {
+        "label": "Analytics",
+        "description": "Making sense of the numbers in YouTube Studio — and the ones YouTube doesn't show you."
+      },
+      "seo": {
+        "label": "SEO",
+        "description": "How search and suggested-video traffic works — for both Google and YouTube."
+      },
+      "sponsorships": {
+        "label": "Sponsorships",
+        "description": "Pricing, contracts, deliverables, exclusivity — everything creators wish they knew earlier."
+      },
+      "shorts": {
+        "label": "Shorts",
+        "description": "The vertical-video economy: Creator Pool math, hooks, and long-form crossover."
+      },
+      "guides": {
+        "label": "Guides",
+        "description": "Long-form deep dives that pull the whole picture together for creators just getting serious."
+      }
+    },
+    "sections": {
+      "featuredEyebrow": "Editor's pick",
+      "featured": "Featured article",
+      "latestEyebrow": "Latest",
+      "latest": "Latest articles",
+      "popularEyebrow": "Popular",
+      "popular": "Popular articles"
+    },
+    "newsletter": {
+      "title": "Get the creator-economy briefing",
+      "description": "One short, honest email when we publish something worth reading. No spam, no upsells, unsubscribe with one click.",
+      "emailPlaceholder": "you@example.com",
+      "subscribe": "Subscribe",
+      "thanks": "Thanks — you're on the list. We'll be in touch when the next article ships.",
+      "privacyNote": "We only use your email to send the briefing. See our privacy page for details."
+    },
+    "article": {
+      "readingTime": "{count, plural, one {# min read} other {# min read}}",
+      "publishedOn": "Published on {date}",
+      "updated": "Updated {date}",
+      "by": "By {author}",
+      "tocTitle": "On this page",
+      "relatedTitle": "Related articles",
+      "prevArticle": "Previous",
+      "nextArticle": "Next",
+      "prevNextLabel": "Article navigation",
+      "backToBlog": "← Back to the blog",
+      "share": {
+        "title": "Share this article",
+        "share": "Share",
+        "shareVia": "Share \"{title}\" from your device",
+        "copyLink": "Copy link",
+        "linkCopied": "Copied ✓",
+        "linkCopiedStatus": "Link copied to your clipboard.",
+        "copyError": "Couldn't copy — you can copy the URL from the address bar.",
+        "shareOnSocial": "Share on {network} ({newTab})"
+      }
+    },
+    "meta": {
+      "title": "The BeHumler Blog — Creator Economy & YouTube Growth",
+      "description": "Genuinely useful writing on how creators actually make money on YouTube: RPM, CPM, sponsorships, Shorts payouts, and the platforms shaping the creator economy.",
+      "breadcrumbHome": "Home",
+      "breadcrumbBlog": "Blog"
+    },
+    "tags": {
+      "eyebrow": "Tag",
+      "pageTitle": "Articles tagged #{tag}",
+      "pageDescription": "Every BeHumler article filed under the #{tag} tag."
+    }
   }
 }

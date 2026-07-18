@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="a" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#0891b2"/>
+      <stop offset=".55" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#c026d3"/>
+    </linearGradient>
+    <radialGradient id="b" cx="80%" cy="20%" r="50%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#a)"/>
+  <rect width="1200" height="675" fill="url(#b)"/>
+  <g fill="none" stroke="#ffffff" stroke-opacity=".26" stroke-width="3">
+    <path d="M120 540 Q 320 380 500 420 T 900 260 T 1120 180"/>
+    <path d="M120 590 Q 320 470 500 500 T 900 340 T 1120 270"/>
+  </g>
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-weight="700">
+    <text x="80" y="360" font-size="88" fill-opacity=".95">Growth</text>
+    <text x="80" y="430" font-size="26" fill-opacity=".7" font-weight="500">BeHumler · Creator Analytics</text>
+  </g>
+</svg>
