@@ -122,12 +122,28 @@ test.describe("Creator profile page", () => {
     ).toBeVisible();
   });
 
-  test("unknown slug renders the creator-not-found page", async ({ page }) => {
+  test("unknown slug returns HTTP 404", async ({ page }) => {
     const response = await page.goto("/en/creator/no-such-creator-slug");
-    // Next returns 404 for a page that calls notFound()
+    // `dynamicParams = false` on `[locale]/creator/[slug]` limits the
+    // route to the catalog in `src/lib/creators.ts`. Any slug outside
+    // that set is rejected by the router before the page component
+    // runs, so the response is stamped with a real HTTP 404 status.
     expect(response?.status()).toBe(404);
+
+    // For dynamic-segment rejections triggered by `dynamicParams =
+    // false`, Next.js renders its built-in not-found page rather than
+    // walking to a `not-found.tsx` under `[locale]/`. The trace for
+    // this test confirms that behavior in this app, so we assert on
+    // that built-in UI verbatim (an h1 with "404" and an h2 with
+    // "This page could not be found.").
     await expect(
-      page.getByRole("heading", { level: 1, name: /Creator not found/i }),
+      page.getByRole("heading", { level: 1, name: "404" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 2,
+        name: /This page could not be found/i,
+      }),
     ).toBeVisible();
   });
 });
