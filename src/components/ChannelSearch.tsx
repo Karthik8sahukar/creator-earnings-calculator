@@ -26,6 +26,63 @@ interface State {
 }
 
 /**
+ * Response envelope returned by /api/search.
+ *
+ * Success:  { success: true, results: ChannelSearchResult[] }
+ * Failure:  { success: false, error: { code, message } }
+ *
+ * The frontend validates BOTH `response.ok` AND `data.success` before
+ * trusting the payload — a 200 with `success: false`, or a non-2xx
+ * with a JSON body, both surface as errors with a user-friendly message.
+ */
+type SearchApiResponse =
+  | { success: true; results: ChannelSearchResult[] }
+  | { success: false; error?: { code?: string; message?: string } }
+  // Legacy / defensive: some older paths may not include `success`.
+  | { results?: ChannelSearchResult[]; error?: unknown; message?: string };
+
+/**
+ * Map stable server error codes to friendly, user-safe messages.
+ *
+ * The server already returns actionable copy in `error.message`, but
+ * this table is a defense-in-depth override so the user never sees a
+ * confusing string even if the server changes.
+ */
+function friendlyMessageForCode(code: string | undefined): string | null {
+  switch (code) {
+    case "INVALID_QUERY":
+      return "Please enter a search term.";
+    case "NOT_FOUND":
+      return "No matching YouTube channel was found.";
+    case "QUOTA_EXCEEDED":
+      return "The YouTube API quota has been exceeded. Please try again later.";
+    case "RATE_LIMITED":
+      return "Too many searches. Please wait a moment and try again.";
+    case "MISSING_API_KEY":
+      return "The server is missing its YouTube API configuration.";
+    case "INVALID_API_KEY":
+      return "The YouTube API key on the server is invalid. Please contact the site operator.";
+    case "KEY_RESTRICTED":
+      return "The YouTube API key is restricted and rejected this request. Please contact the site operator.";
+    case "API_DISABLED":
+      return "The YouTube Data API is not enabled on the server. Please contact the site operator.";
+    case "UPSTREAM_TIMEOUT":
+    case "UPSTREAM_UNAVAILABLE":
+    case "NETWORK_ERROR":
+    case "MALFORMED_UPSTREAM":
+    case "YOUTUBE_API_ERROR":
+    case "FORBIDDEN":
+      return "YouTube search is temporarily unavailable. Please try again shortly.";
+    case "BAD_REQUEST":
+      return "The YouTube API rejected this request. Try a different search term.";
+    case "INTERNAL_ERROR":
+      return "Something went wrong. Please try again shortly.";
+    default:
+      return null;
+  }
+}
+
+/**
  * Channel search combobox.
  *
  * ARIA structure is preserved verbatim from the pre-i18n version so
@@ -62,22 +119,51 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
       try {
         const res = await fetch(
           `/api/search?q=${encodeURIComponent(trimmed)}`,
-          { signal: controller.signal },
+          { signal: controller.signal, cache: "no-store" },
         );
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.message ?? `Search failed (${res.status})`);
+
+        // Defensive JSON parsing. If the server returns HTML (e.g. an
+        // edge error page) or the body isn't valid JSON, we still
+        // surface a user-friendly message instead of a raw crash.
+        let body: SearchApiResponse | null = null;
+        try {
+          body = (await res.json()) as SearchApiResponse;
+        } catch {
+          body = null;
         }
-        const body = (await res.json()) as { results: ChannelSearchResult[] };
-        if (body.results.length === 0) {
+
+        // Validate BOTH `response.ok` and `body.success` before trusting.
+        const parsedSuccess =
+          body !== null &&
+          "success" in body &&
+          (body as { success?: unknown }).success === true;
+        if (!res.ok || !parsedSuccess) {
+          const errorObj =
+            body && typeof (body as { error?: unknown }).error === "object"
+              ? ((body as { error?: { code?: string; message?: string } })
+                  .error ?? {})
+              : {};
+          const code = errorObj.code;
+          const serverMessage =
+            errorObj.message ??
+            (body as { message?: string } | null)?.message;
+          const message =
+            friendlyMessageForCode(code) ??
+            serverMessage ??
+            "YouTube search is temporarily unavailable.";
+          throw new Error(message);
+        }
+
+        const results = (body as { results?: ChannelSearchResult[] }).results ?? [];
+        if (results.length === 0) {
           setState({ status: "empty", results: [] });
         } else {
-          setState({ status: "success", results: body.results });
+          setState({ status: "success", results });
         }
         track({
           name: "search.submitted",
           queryLength: trimmed.length,
-          resultCount: body.results.length,
+          resultCount: results.length,
         });
         setOpen(true);
         setActiveIndex(-1);

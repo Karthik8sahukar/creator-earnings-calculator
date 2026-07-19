@@ -60,8 +60,9 @@ describe("safeErrorResponse -> ErrorReporter wiring", () => {
       expect(res.status).toBe(500);
       const body = await res.json();
       // The public message is generic — never leaks internals.
-      expect(body.message).toBe("Unexpected server error.");
-      expect(body.error).toBe("INTERNAL_ERROR");
+      expect(body.success).toBe(false);
+      expect(body.error.code).toBe("INTERNAL_ERROR");
+      expect(body.error.message).toBe("Unexpected server error.");
     });
     expect(captured).toHaveLength(1);
     // The reported error is redacted to a stack-free normalized shape.

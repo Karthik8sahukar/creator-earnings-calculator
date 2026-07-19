@@ -5,6 +5,10 @@ import { YouTubeApiError } from "@/lib/errors";
 /**
  * Integration tests: we hit the route handlers directly with mocked
  * youtube service calls. Rate limiter state is cleared between tests.
+ *
+ * Every route uses the canonical envelope:
+ *   Success: { success: true, <data> }
+ *   Error  : { success: false, error: { code, message } }
  */
 
 const searchChannels = vi.fn();
@@ -42,20 +46,23 @@ afterEach(() => {
 
 // ---------- /api/search ----------
 describe("GET /api/search", () => {
-  it("returns 400 when q is missing or blank", async () => {
+  it("returns 400 with INVALID_QUERY when q is missing or blank", async () => {
     const res = await searchGET(new Request("http://x/api/search"));
     expect(res.status).toBe(400);
     const body = await res.json();
-    expect(body.error).toBe("INVALID_QUERY");
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("INVALID_QUERY");
   });
 
   it("returns 400 when q is too long", async () => {
     const q = "a".repeat(200);
     const res = await searchGET(new Request(`http://x/api/search?q=${q}`));
     expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error.code).toBe("INVALID_QUERY");
   });
 
-  it("returns results on success", async () => {
+  it("returns wrapped results on success", async () => {
     searchChannels.mockResolvedValueOnce([
       {
         channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx",
@@ -70,8 +77,39 @@ describe("GET /api/search", () => {
     const res = await searchGET(new Request("http://x/api/search?q=test"));
     expect(res.status).toBe(200);
     const body = await res.json();
+    expect(body.success).toBe(true);
     expect(body.results).toHaveLength(1);
     expect(body.results[0].title).toBe("T");
+  });
+
+  it("returns an empty results array (success=true) when nothing matches", async () => {
+    searchChannels.mockResolvedValueOnce([]);
+    const res = await searchGET(
+      new Request("http://x/api/search?q=nothingxyz"),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.results).toEqual([]);
+  });
+
+  it("relays a channel result with hiddenSubscriberCount=true (no subscriberCount) intact", async () => {
+    searchChannels.mockResolvedValueOnce([
+      {
+        channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx",
+        title: "Hidden Channel",
+        handle: null,
+        description: "",
+        thumbnail: "",
+        subscriberCount: null,
+        hiddenSubscriberCount: true,
+      },
+    ]);
+    const res = await searchGET(new Request("http://x/api/search?q=hidden"));
+    const body = await res.json();
+    expect(body.success).toBe(true);
+    expect(body.results[0].hiddenSubscriberCount).toBe(true);
+    expect(body.results[0].subscriberCount).toBeNull();
   });
 
   it("maps QUOTA_EXCEEDED to 429", async () => {
@@ -81,7 +119,52 @@ describe("GET /api/search", () => {
     const res = await searchGET(new Request("http://x/api/search?q=test"));
     expect(res.status).toBe(429);
     const body = await res.json();
-    expect(body.error).toBe("QUOTA_EXCEEDED");
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("QUOTA_EXCEEDED");
+  });
+
+  it("maps INVALID_API_KEY (403) to a 500 with a clear operator message", async () => {
+    searchChannels.mockRejectedValueOnce(
+      new YouTubeApiError(
+        500,
+        "INVALID_API_KEY",
+        "The server's YouTube API key is invalid.",
+      ),
+    );
+    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error.code).toBe("INVALID_API_KEY");
+    expect(body.error.message.toLowerCase()).toContain("invalid");
+  });
+
+  it("maps API_DISABLED to a 500 with a clear operator message", async () => {
+    searchChannels.mockRejectedValueOnce(
+      new YouTubeApiError(
+        500,
+        "API_DISABLED",
+        "The YouTube Data API v3 is not enabled for the server's Google Cloud project.",
+      ),
+    );
+    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error.code).toBe("API_DISABLED");
+  });
+
+  it("maps MISSING_API_KEY to a 500 with a specific operator message", async () => {
+    searchChannels.mockRejectedValueOnce(
+      new YouTubeApiError(
+        500,
+        "MISSING_API_KEY",
+        "The server is missing its YouTube API configuration. Set the YOUTUBE_API_KEY environment variable on the server and redeploy.",
+      ),
+    );
+    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error.code).toBe("MISSING_API_KEY");
+    expect(body.error.message).toContain("YOUTUBE_API_KEY");
   });
 
   it("maps UPSTREAM_UNAVAILABLE to 502", async () => {
@@ -90,6 +173,43 @@ describe("GET /api/search", () => {
     );
     const res = await searchGET(new Request("http://x/api/search?q=test"));
     expect(res.status).toBe(502);
+    const body = await res.json();
+    expect(body.error.code).toBe("UPSTREAM_UNAVAILABLE");
+  });
+
+  it("maps a MALFORMED_UPSTREAM error to a 502 with a friendly message", async () => {
+    searchChannels.mockRejectedValueOnce(
+      new YouTubeApiError(
+        502,
+        "MALFORMED_UPSTREAM",
+        "The YouTube API returned an unreadable response. Please try again shortly.",
+      ),
+    );
+    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    expect(res.status).toBe(502);
+    const body = await res.json();
+    expect(body.error.code).toBe("MALFORMED_UPSTREAM");
+    // The message must NEVER be the old confusing 'unexpected response' text
+    expect(body.error.message.toLowerCase()).not.toContain(
+      "unexpected response",
+    );
+  });
+
+  it("does NOT surface the confusing generic 'unexpected response' message for a plain Error", async () => {
+    searchChannels.mockRejectedValueOnce(
+      new Error("random internal problem"),
+    );
+    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    const body = await res.json();
+    expect(body.error.message.toLowerCase()).not.toContain(
+      "unexpected response",
+    );
+  });
+
+  it("sets Cache-Control: no-store on the success response", async () => {
+    searchChannels.mockResolvedValueOnce([]);
+    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
   });
 
   it("does not leak generic error internals in the message", async () => {
@@ -99,9 +219,9 @@ describe("GET /api/search", () => {
     const res = await searchGET(new Request("http://x/api/search?q=test"));
     expect(res.status).toBe(500);
     const body = await res.json();
-    expect(body.error).toBe("INTERNAL_ERROR");
-    expect(body.message).not.toContain("/etc/passwd");
-    expect(body.message).not.toContain("leaked");
+    expect(body.error.code).toBe("INTERNAL_ERROR");
+    expect(body.error.message).not.toContain("/etc/passwd");
+    expect(body.error.message).not.toContain("leaked");
   });
 
   it("does not leak the API key on network errors", async () => {
@@ -126,7 +246,8 @@ describe("GET /api/search", () => {
       if (res.status === 429) {
         sawRateLimit = true;
         const body = await res.json();
-        expect(body.error).toBe("RATE_LIMITED");
+        expect(body.success).toBe(false);
+        expect(body.error.code).toBe("RATE_LIMITED");
         expect(res.headers.get("Retry-After")).not.toBeNull();
         break;
       }
@@ -142,17 +263,22 @@ describe("GET /api/channel", () => {
       new Request("http://x/api/channel?channelId=bad"),
     );
     expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error.code).toBe("INVALID_QUERY");
   });
 
-  it("returns 404 when channel is not found", async () => {
+  it("returns 404 with a NOT_FOUND envelope when the channel does not exist", async () => {
     getChannelById.mockResolvedValueOnce(null);
     const res = await channelGET(
       new Request("http://x/api/channel?channelId=UC_xxxxxxxxxxxxxxxxxxxxxx"),
     );
     expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("NOT_FOUND");
   });
 
-  it("returns the channel on success", async () => {
+  it("returns the wrapped channel on success", async () => {
     getChannelById.mockResolvedValueOnce({
       channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx",
       title: "T",
@@ -162,6 +288,7 @@ describe("GET /api/channel", () => {
     );
     expect(res.status).toBe(200);
     const body = await res.json();
+    expect(body.success).toBe(true);
     expect(body.channel.title).toBe("T");
   });
 });
@@ -173,9 +300,11 @@ describe("GET /api/videos", () => {
       new Request("http://x/api/videos?playlistId=nope"),
     );
     expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error.code).toBe("INVALID_QUERY");
   });
 
-  it("returns the video list on success", async () => {
+  it("returns the wrapped video list on success", async () => {
     getRecentVideos.mockResolvedValueOnce([{ videoId: "v1" }]);
     const res = await videosGET(
       new Request(
@@ -184,6 +313,7 @@ describe("GET /api/videos", () => {
     );
     expect(res.status).toBe(200);
     const body = await res.json();
+    expect(body.success).toBe(true);
     expect(body.videos).toEqual([{ videoId: "v1" }]);
   });
 

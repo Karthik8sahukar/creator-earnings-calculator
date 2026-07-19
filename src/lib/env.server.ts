@@ -112,6 +112,18 @@ if (!parsed.success) {
   throw new Error("Invalid server environment configuration.");
 }
 
+// Warn (never fatal) if the operator misconfigured the API key with a
+// `NEXT_PUBLIC_` prefix. That prefix inlines the value into every
+// client bundle Next.js builds — leaking a server secret to the
+// browser. Detecting this at boot means the mistake surfaces on the
+// very first deployment log, not later in a security review.
+if (typeof process.env.NEXT_PUBLIC_YOUTUBE_API_KEY === "string") {
+  console.warn(
+    "NEXT_PUBLIC_YOUTUBE_API_KEY is set. The YouTube API key MUST be a server-only variable named `YOUTUBE_API_KEY`. " +
+      "The `NEXT_PUBLIC_` prefix inlines its value into every client bundle. Remove that variable in your hosting provider (e.g. Vercel → Project → Settings → Environment Variables) and set `YOUTUBE_API_KEY` instead.",
+  );
+}
+
 const data = parsed.data;
 
 export const serverEnv = Object.freeze({

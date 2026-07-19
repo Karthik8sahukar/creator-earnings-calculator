@@ -28,6 +28,11 @@ import { apiLimiter, identifyClient } from "./rateLimit";
  * short, user-safe messages are exposed.
  */
 
+/**
+ * Stable public error codes. Anything not in this set is rewritten to
+ * a safe generic before being returned to the client, so we can never
+ * accidentally leak an internal-looking code.
+ */
 const SAFE_CODES = new Set([
   "INVALID_QUERY",
   "NOT_FOUND",
@@ -41,24 +46,42 @@ const SAFE_CODES = new Set([
   "FORBIDDEN",
   "INVALID_API_KEY",
   "MISSING_API_KEY",
+  "KEY_RESTRICTED",
+  "API_DISABLED",
+  "BAD_REQUEST",
+  "YOUTUBE_API_ERROR",
   "INTERNAL_ERROR",
 ]);
 
+/**
+ * Build the canonical error response envelope used by every API route.
+ *
+ * Shape:
+ *   { "success": false, "error": { "code": "…", "message": "…" } }
+ *
+ * A separate `error` string field is intentionally NOT included at the
+ * top level — the nested object is the single source of truth, so the
+ * frontend can rely on `body.error.code` and `body.error.message`.
+ */
+function errorEnvelope(code: string, message: string) {
+  return { success: false as const, error: { code, message } };
+}
+
 export function safeErrorResponse(err: unknown): NextResponse {
   if (err instanceof YouTubeApiError) {
-    const code = SAFE_CODES.has(err.code) ? err.code : "UPSTREAM_ERROR";
-    return NextResponse.json(
-      { error: code, message: err.message },
-      { status: err.status },
-    );
+    const code = SAFE_CODES.has(err.code) ? err.code : "YOUTUBE_API_ERROR";
+    return NextResponse.json(errorEnvelope(code, err.message), {
+      status: err.status,
+      headers: { "Cache-Control": "no-store" },
+    });
   }
   if (err instanceof z.ZodError) {
     return NextResponse.json(
-      {
-        error: "INVALID_QUERY",
-        message: err.issues[0]?.message ?? "Invalid request",
-      },
-      { status: 400 },
+      errorEnvelope(
+        "INVALID_QUERY",
+        err.issues[0]?.message ?? "Invalid request",
+      ),
+      { status: 400, headers: { "Cache-Control": "no-store" } },
     );
   }
   // Anything reaching this branch is unexpected — report it (redacted)
@@ -71,8 +94,8 @@ export function safeErrorResponse(err: unknown): NextResponse {
     upstreamCategory: ctx?.upstreamCategory,
   });
   return NextResponse.json(
-    { error: "INTERNAL_ERROR", message: "Unexpected server error." },
-    { status: 500 },
+    errorEnvelope("INTERNAL_ERROR", "Unexpected server error."),
+    { status: 500, headers: { "Cache-Control": "no-store" } },
   );
 }
 
@@ -96,12 +119,12 @@ export function applyRateLimit(request: Request): NextResponse | null {
   if (!result.allowed) {
     markRateLimit("blocked");
     headers.set("Retry-After", String(result.retryAfterSeconds));
+    headers.set("Cache-Control", "no-store");
     return NextResponse.json(
-      {
-        error: "RATE_LIMITED",
-        message:
-          "Too many requests. Please slow down and try again shortly.",
-      },
+      errorEnvelope(
+        "RATE_LIMITED",
+        "Too many requests. Please slow down and try again shortly.",
+      ),
       { status: 429, headers },
     );
   }
@@ -138,13 +161,20 @@ export function withRouteObservability(
     }
 
     try {
-      // The response body always includes `error` for non-success paths.
+      // The response body always includes an error descriptor for
+      // non-success paths. Read the new nested `error.code`, but also
+      // accept the legacy flat `error: "CODE"` shape so old fixtures
+      // and hand-written mocks keep working.
       if (response.status >= 400) {
         const cloned = response.clone();
         const parsed = (await cloned.json().catch(() => null)) as
-          | { error?: string }
+          | { error?: string | { code?: string } }
           | null;
-        errorCode = parsed?.error;
+        if (parsed && typeof parsed.error === "string") {
+          errorCode = parsed.error;
+        } else if (parsed && parsed.error && typeof parsed.error === "object") {
+          errorCode = parsed.error.code;
+        }
       }
     } catch {
       // ignore — we still log the status

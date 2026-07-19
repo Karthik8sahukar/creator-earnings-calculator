@@ -42,6 +42,16 @@ function mockFetch(body: unknown, ok = true, status = 200) {
   return fetchMock;
 }
 
+/** Wrap results in the current success envelope. */
+function successEnvelope(results: unknown[]) {
+  return { success: true, results };
+}
+
+/** Wrap an error into the current envelope. */
+function errorEnvelope(code: string, message: string) {
+  return { success: false, error: { code, message } };
+}
+
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
 });
@@ -65,7 +75,7 @@ describe("ChannelSearch", () => {
 
   it("does not fire a fetch until the user stops typing (debounce)", async () => {
     const onSelect = vi.fn();
-    const fetchMock = mockFetch({ results: RESULTS });
+    const fetchMock = mockFetch(successEnvelope(RESULTS));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     await user.type(screen.getByRole("combobox"), "test");
@@ -84,7 +94,13 @@ describe("ChannelSearch", () => {
       "fetch",
       vi.fn(async () => {
         await pending;
-        return { ok: true, status: 200, async json() { return { results: RESULTS }; } };
+        return {
+          ok: true,
+          status: 200,
+          async json() {
+            return successEnvelope(RESULTS);
+          },
+        };
       }),
     );
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
@@ -100,7 +116,7 @@ describe("ChannelSearch", () => {
 
   it("renders each search result", async () => {
     const onSelect = vi.fn();
-    mockFetch({ results: RESULTS });
+    mockFetch(successEnvelope(RESULTS));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     await user.type(screen.getByRole("combobox"), "test");
@@ -113,7 +129,7 @@ describe("ChannelSearch", () => {
 
   it("shows an empty message when the API returns no results", async () => {
     const onSelect = vi.fn();
-    mockFetch({ results: [] });
+    mockFetch(successEnvelope([]));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     await user.type(screen.getByRole("combobox"), "nothingxyz");
@@ -123,21 +139,122 @@ describe("ChannelSearch", () => {
     );
   });
 
-  it("shows an error message on API failure", async () => {
+  it("shows the mapped 'quota' message when the server returns QUOTA_EXCEEDED", async () => {
     const onSelect = vi.fn();
-    mockFetch({ message: "Quota exceeded" }, false, 429);
+    mockFetch(
+      errorEnvelope(
+        "QUOTA_EXCEEDED",
+        "The YouTube API quota has been exceeded. Please try again later.",
+      ),
+      false,
+      429,
+    );
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     await user.type(screen.getByRole("combobox"), "test");
     vi.advanceTimersByTime(500);
     await waitFor(() =>
-      expect(screen.getByText(/quota exceeded/i)).toBeInTheDocument(),
+      expect(screen.getByText(/quota has been exceeded/i)).toBeInTheDocument(),
+    );
+  });
+
+  it("shows the mapped 'missing YouTube API configuration' message for MISSING_API_KEY", async () => {
+    const onSelect = vi.fn();
+    mockFetch(
+      errorEnvelope(
+        "MISSING_API_KEY",
+        "The server is missing its YouTube API configuration.",
+      ),
+      false,
+      500,
+    );
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<ChannelSearch onSelect={onSelect} />);
+    await user.type(screen.getByRole("combobox"), "test");
+    vi.advanceTimersByTime(500);
+    await waitFor(() =>
+      expect(
+        screen.getByText(/missing its YouTube API configuration/i),
+      ).toBeInTheDocument(),
+    );
+  });
+
+  it("shows the mapped 'temporarily unavailable' message for UPSTREAM_UNAVAILABLE", async () => {
+    const onSelect = vi.fn();
+    mockFetch(
+      errorEnvelope("UPSTREAM_UNAVAILABLE", "Down"),
+      false,
+      502,
+    );
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<ChannelSearch onSelect={onSelect} />);
+    await user.type(screen.getByRole("combobox"), "test");
+    vi.advanceTimersByTime(500);
+    await waitFor(() =>
+      expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument(),
+    );
+  });
+
+  it("shows the mapped 'temporarily unavailable' message for YOUTUBE_API_ERROR (never the old 'unexpected response' copy)", async () => {
+    const onSelect = vi.fn();
+    mockFetch(
+      errorEnvelope("YOUTUBE_API_ERROR", "server-side detail"),
+      false,
+      502,
+    );
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<ChannelSearch onSelect={onSelect} />);
+    await user.type(screen.getByRole("combobox"), "test");
+    vi.advanceTimersByTime(500);
+    await waitFor(() =>
+      expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument(),
+    );
+    expect(
+      screen.queryByText(/returned an unexpected response/i),
+    ).toBeNull();
+  });
+
+  it("treats a 200 response with success=false as an error", async () => {
+    const onSelect = vi.fn();
+    // Some upstream / edge middleware quirks can return HTTP 200 with a
+    // body of { success: false, error: { … } }. The client must still
+    // treat this as an error path.
+    mockFetch(errorEnvelope("YOUTUBE_API_ERROR", "test"), true, 200);
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<ChannelSearch onSelect={onSelect} />);
+    await user.type(screen.getByRole("combobox"), "test");
+    vi.advanceTimersByTime(500);
+    await waitFor(() =>
+      expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument(),
+    );
+  });
+
+  it("falls back gracefully when the server responds with non-JSON", async () => {
+    const onSelect = vi.fn();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: false,
+        status: 502,
+        async json() {
+          throw new SyntaxError("Unexpected token < in JSON");
+        },
+      })),
+    );
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    render(<ChannelSearch onSelect={onSelect} />);
+    await user.type(screen.getByRole("combobox"), "test");
+    vi.advanceTimersByTime(500);
+    // We should surface some user-facing error message; the specific
+    // wording is a fallback but must never be a raw JSON parse error.
+    await waitFor(() =>
+      expect(screen.getByText(/temporarily unavailable/i)).toBeInTheDocument(),
     );
   });
 
   it("does NOT auto-select the first result", async () => {
     const onSelect = vi.fn();
-    mockFetch({ results: RESULTS });
+    mockFetch(successEnvelope(RESULTS));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     await user.type(screen.getByRole("combobox"), "test");
@@ -152,7 +269,7 @@ describe("ChannelSearch", () => {
 
   it("Arrow keys navigate and Enter selects", async () => {
     const onSelect = vi.fn();
-    mockFetch({ results: RESULTS });
+    mockFetch(successEnvelope(RESULTS));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     const input = screen.getByRole("combobox");
@@ -169,7 +286,7 @@ describe("ChannelSearch", () => {
 
   it("Escape closes the dropdown", async () => {
     const onSelect = vi.fn();
-    mockFetch({ results: RESULTS });
+    mockFetch(successEnvelope(RESULTS));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     const input = screen.getByRole("combobox");
@@ -182,7 +299,7 @@ describe("ChannelSearch", () => {
 
   it("clicking a result calls onSelect", async () => {
     const onSelect = vi.fn();
-    mockFetch({ results: RESULTS });
+    mockFetch(successEnvelope(RESULTS));
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(<ChannelSearch onSelect={onSelect} />);
     await user.type(screen.getByRole("combobox"), "test");

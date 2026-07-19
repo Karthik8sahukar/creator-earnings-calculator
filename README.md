@@ -108,11 +108,33 @@ The app is designed to deploy on Vercel with zero custom config
 (`vercel.json` is intentionally absent — the Next.js defaults are correct
 for this app).
 
+### Required environment variable
+
+You **must** set `YOUTUBE_API_KEY` before the search will work:
+
+1. In the Vercel dashboard: **Project → Settings → Environment Variables**.
+2. Add a new variable:
+   - **Name**: `YOUTUBE_API_KEY`
+   - **Value**: your YouTube Data API v3 key (see
+     [Google Cloud & API-key setup](#google-cloud--api-key-setup)).
+   - **Environments**: enable **Production**, **Preview**, and
+     **Development** as appropriate for your workflow.
+3. Save.
+4. **Redeploy** so the new value is baked in. Vercel does NOT hot-reload
+   environment variables into already-running functions — a redeploy is
+   mandatory after any env-var change.
+
+> ⚠️ Never prefix this variable with `NEXT_PUBLIC_`. That prefix inlines
+> the value into every client bundle Next.js builds. The app detects
+> this misconfiguration at boot and logs a warning: any variable named
+> `NEXT_PUBLIC_YOUTUBE_API_KEY` should be **deleted** from the Vercel
+> dashboard and re-added as `YOUTUBE_API_KEY`.
+
+### Deployment steps
+
 1. **Import the GitHub repository into Vercel.**
 2. **Select the Next.js framework preset** (Vercel auto-detects it).
-3. In **Settings → Environment Variables**, add:
-   - `YOUTUBE_API_KEY` — your YouTube Data API v3 key (Production +
-     Preview + Development).
+3. Add the required environment variables above (`YOUTUBE_API_KEY`).
 4. Add the production `NEXT_PUBLIC_SITE_URL` — for example
    `https://your-domain.example`. This must be an absolute URL in
    production (Zod-validated at boot; the app will fail to start with
@@ -714,16 +736,62 @@ synchronously so a11y isn't gated on the lazy load.
 
 ## Troubleshooting
 
-- **`MISSING_API_KEY`** — no `YOUTUBE_API_KEY`. Copy `.env.example` to
-  `.env.local`, add the key, restart `npm run dev`.
-- **`QUOTA_EXCEEDED`** (`HTTP 429`) — you burned through the daily quota.
-  Wait for reset, or request more quota in Google Cloud.
-- **`INVALID_API_KEY`** — the key is wrong, disabled, or your project
-  doesn't have the YouTube Data API v3 enabled.
+All API errors follow the envelope
+`{ success: false, error: { code, message } }`. The `code` values map
+1:1 to a specific fix — the `message` is the user-facing copy that the
+frontend renders. Common codes you might see in production:
+
+- **`MISSING_API_KEY`** — no `YOUTUBE_API_KEY` on the server. In local
+  dev: copy `.env.example` to `.env.local`, add the key, restart
+  `npm run dev`. On Vercel: add `YOUTUBE_API_KEY` in the project
+  settings, then **redeploy**.
+- **`INVALID_API_KEY`** — the key exists but Google rejected it. The
+  key is wrong, revoked, or expired. Generate a new one in Google Cloud
+  → Credentials.
+- **`KEY_RESTRICTED`** — the key has an HTTP-referrer or IP restriction
+  that doesn't match. Requests to YouTube are **server-to-server** and
+  carry no `Referer` header — an HTTP-referrer restriction always
+  rejects them. Remove that restriction, or replace it with an
+  API-restriction limited to *YouTube Data API v3* only.
+- **`API_DISABLED`** — the YouTube Data API v3 is not enabled in the
+  server's Google Cloud project. Go to
+  **APIs & Services → Library**, find *YouTube Data API v3* and click
+  **Enable**. Then redeploy.
+- **`QUOTA_EXCEEDED`** (`HTTP 429`) — you exhausted the daily quota
+  (10 000 units/day on the free tier). Wait for reset (Pacific-time
+  midnight) or request more quota in Google Cloud.
 - **`UPSTREAM_TIMEOUT`** — the YouTube API took longer than
   `YOUTUBE_TIMEOUT_MS` (default 8 s). Retry or bump the limit.
+- **`NETWORK_ERROR`** — the server couldn't even reach the YouTube API
+  (DNS failure, egress issue, or Vercel's outbound network is
+  temporarily degraded). Retry.
+- **`UPSTREAM_UNAVAILABLE`** (`HTTP 502`) — YouTube returned a 5xx.
+  This is a Google-side outage; retry shortly.
+- **`MALFORMED_UPSTREAM`** — a proxy / gateway returned HTML instead
+  of JSON. Almost always transient.
+- **`YOUTUBE_API_ERROR`** — YouTube returned a non-2xx status our
+  taxonomy doesn't have an explicit branch for. Retry shortly.
+- **`BAD_REQUEST`** — YouTube rejected the query. Try a different
+  search term.
 - **`RATE_LIMITED`** — you're hammering the local API too fast. Raise
   the limit via `RATE_LIMIT_MAX` or slow down.
+
+### Verifying a Vercel deployment
+
+After adding `YOUTUBE_API_KEY` and redeploying, verify the deployment:
+
+1. Hit `https://your-domain.example/api/health` — the JSON body should
+   include `"youtubeApiConfigured": true`. If it's `false`, the env var
+   isn't reaching the runtime (Vercel didn't redeploy, or the variable
+   name is wrong).
+2. Search for a well-known channel by name (e.g. "MrBeast") on the
+   homepage. You should see a dropdown of matching channels.
+3. If you see an error message in the dropdown, its wording maps
+   directly to a `code` above — apply the corresponding fix.
+4. Check the Vercel function logs. Every failing search writes a
+   `youtube.upstream_error` line with the upstream HTTP status,
+   Google's classified reason, and a boolean `apiKeyPresent` — never
+   the key itself.
 
 ---
 

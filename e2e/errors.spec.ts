@@ -98,15 +98,18 @@ test.describe("error workflows", () => {
         status: 500,
         contentType: "application/json",
         body: JSON.stringify({
-          error: "MISSING_API_KEY",
-          message: "The YouTube API is not configured on the server.",
+          success: false,
+          error: {
+            code: "MISSING_API_KEY",
+            message: "The server is missing its YouTube API configuration.",
+          },
         }),
       }),
     );
     await page.goto("/");
     await page.getByRole("combobox").fill("something");
     await expect(
-      page.getByText(/not configured on the server/i),
+      page.getByText(/missing its YouTube API configuration/i),
     ).toBeVisible();
   });
 });

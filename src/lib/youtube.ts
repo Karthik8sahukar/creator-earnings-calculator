@@ -12,6 +12,7 @@ import {
 import { serverEnv } from "./env.server";
 import { YouTubeApiError } from "./errors";
 import { parseIsoDuration, formatDuration } from "./format";
+import { logger } from "./logger";
 import {
   markCache,
   markUpstream,
@@ -45,10 +46,14 @@ function assertKey(): string {
   const key = serverEnv.youtubeApiKey;
   if (!key) {
     markUpstream("missing_key");
+    // Safe temporary log for operators. We only log the boolean
+    // "present-or-not" — never the key itself. This is the highest
+    // signal you can get without leaking a secret.
+    logger.error("youtube.missing_api_key", { apiKeyPresent: false });
     throw new YouTubeApiError(
       500,
       "MISSING_API_KEY",
-      "The YouTube API is not configured on the server.",
+      "The server is missing its YouTube API configuration. Set the YOUTUBE_API_KEY environment variable on the server and redeploy.",
     );
   }
   return key;
@@ -66,11 +71,13 @@ function categoryFor(code: string): UpstreamCategory {
     case "NOT_FOUND":
       return "not_found";
     case "INVALID_API_KEY":
+    case "KEY_RESTRICTED":
       return "invalid_key";
     case "MISSING_API_KEY":
       return "missing_key";
     case "MALFORMED_UPSTREAM":
       return "malformed_response";
+    case "API_DISABLED":
     case "FORBIDDEN":
       return "forbidden";
     default:
@@ -79,61 +86,147 @@ function categoryFor(code: string): UpstreamCategory {
 }
 
 /**
- * Map a raw upstream reason string to a stable public error code +
- * safe user-facing message. We never surface the raw Google error
- * verbatim to the client — it can contain internal-looking details.
+ * Map an upstream status + reason string to a stable public error
+ * code, an HTTP status suitable for the response, and a short,
+ * user-safe message. We NEVER surface the raw Google error verbatim
+ * — it can contain internal-looking details.
+ *
+ * The mapping is exhaustive: every documented YouTube Data API error
+ * reason is classified. Anything unknown resolves to a "temporarily
+ * unavailable" message with a `YOUTUBE_API_ERROR` code, NEVER the
+ * old catch-all "returned an unexpected response" which gave the
+ * user no actionable information.
+ *
+ * Documented reasons handled here:
+ *   quota / rate limits  : quotaExceeded, dailyLimitExceeded,
+ *                          userRateLimitExceeded, rateLimitExceeded
+ *   invalid key          : keyInvalid, keyExpired, badRequest
+ *                          (400 shape often means "key looks wrong"),
+ *                          invalid, unauthorized
+ *   key restricted       : ipRefererBlocked, ipBlocked, refererBlocked,
+ *                          appBlocked
+ *   api disabled         : accessNotConfigured, apiNotActivatedError,
+ *                          SERVICE_DISABLED
+ *   invalid request      : invalidArgument, parseError, invalidQuery
+ *   not found            : notFound, channelNotFound, playlistNotFound
+ *   forbidden (other)    : forbidden, insufficientPermissions
+ *   upstream unavailable : any 5xx
  */
-function mapUpstreamError(
+export function mapUpstreamError(
   status: number,
   reason: string | undefined,
 ): { code: string; status: number; message: string } {
   const normalized = (reason ?? "").toLowerCase();
+
+  // ---- Quota / rate-limit reasons (403 in practice, sometimes 429) ----
   if (
-    status === 400 &&
-    (normalized.includes("badrequest") || normalized.includes("keyinvalid"))
+    normalized.includes("quota") ||
+    normalized.includes("dailylimit") ||
+    normalized.includes("ratelimit")
+  ) {
+    return {
+      code: "QUOTA_EXCEEDED",
+      status: 429,
+      message:
+        "The YouTube API quota has been exceeded. Please try again later.",
+    };
+  }
+
+  // ---- Invalid / expired API key (400 or 403 depending on Google) ----
+  if (
+    normalized.includes("keyinvalid") ||
+    normalized.includes("keyexpired") ||
+    normalized === "unauthorized"
   ) {
     return {
       code: "INVALID_API_KEY",
       status: 500,
       message:
-        "The YouTube API key is invalid. If you are the operator, check the server configuration.",
+        "The server's YouTube API key is invalid or expired. If you are the operator, generate a new key in Google Cloud and redeploy.",
     };
   }
-  if (status === 401 || status === 403) {
-    if (normalized.includes("quota")) {
-      return {
-        code: "QUOTA_EXCEEDED",
-        status: 429,
-        message:
-          "The daily YouTube API quota has been exceeded. Please try again later.",
-      };
-    }
-    if (
-      normalized.includes("forbidden") ||
-      normalized.includes("keyinvalid") ||
-      normalized.includes("apinotactivated")
-    ) {
-      return {
-        code: "INVALID_API_KEY",
-        status: 500,
-        message:
-          "The YouTube API rejected the request. If you are the operator, check that the key is valid and the API is enabled.",
-      };
-    }
+
+  // ---- Key restricted (referrer / IP / app) ----
+  // These fire when the key has HTTP-referrer or IP restrictions that
+  // don't match the server making the call (a common Vercel mistake).
+  if (
+    normalized.includes("iprefererblocked") ||
+    normalized.includes("ipblocked") ||
+    normalized.includes("refererblocked") ||
+    normalized.includes("referrerblocked") ||
+    normalized.includes("appblocked")
+  ) {
     return {
-      code: "FORBIDDEN",
-      status: 502,
-      message: "The YouTube API refused the request.",
+      code: "KEY_RESTRICTED",
+      status: 500,
+      message:
+        "The server's YouTube API key is restricted and rejected this request. If you are the operator, remove the HTTP referrer / IP restriction — the app calls YouTube server-to-server.",
     };
   }
-  if (status === 404) {
+
+  // ---- YouTube Data API not enabled for this project ----
+  if (
+    normalized.includes("accessnotconfigured") ||
+    normalized.includes("apinotactivated") ||
+    normalized.includes("service_disabled") ||
+    normalized.includes("servicedisabled")
+  ) {
+    return {
+      code: "API_DISABLED",
+      status: 500,
+      message:
+        "The YouTube Data API v3 is not enabled for the server's Google Cloud project. If you are the operator, enable it in the API Library and redeploy.",
+    };
+  }
+
+  // ---- 404 / not-found reasons ----
+  if (
+    status === 404 ||
+    normalized === "notfound" ||
+    normalized.includes("notfound")
+  ) {
     return {
       code: "NOT_FOUND",
       status: 404,
-      message: "The requested resource was not found.",
+      message: "The requested YouTube resource was not found.",
     };
   }
-  if (status >= 500) {
+
+  // ---- 400 / invalid-request reasons (query problems, not key) ----
+  if (
+    status === 400 ||
+    normalized.includes("invalidargument") ||
+    normalized.includes("badrequest") ||
+    normalized.includes("parseerror") ||
+    normalized.includes("invalidquery") ||
+    normalized.includes("invalidvalue") ||
+    normalized.includes("invalidparameter")
+  ) {
+    return {
+      code: "BAD_REQUEST",
+      status: 400,
+      message:
+        "The YouTube API rejected this request. Try a different search term.",
+    };
+  }
+
+  // ---- 401 / 403 catch-all (forbidden, insufficient permissions, ...) ----
+  if (
+    status === 401 ||
+    status === 403 ||
+    normalized.includes("forbidden") ||
+    normalized.includes("insufficient")
+  ) {
+    return {
+      code: "FORBIDDEN",
+      status: 502,
+      message:
+        "The YouTube API refused this request. If you are the operator, check the API key's restrictions and permissions.",
+    };
+  }
+
+  // ---- 5xx upstream unavailable ----
+  if (status >= 500 && status < 600) {
     return {
       code: "UPSTREAM_UNAVAILABLE",
       status: 502,
@@ -141,10 +234,17 @@ function mapUpstreamError(
         "The YouTube API is currently unavailable. Please try again shortly.",
     };
   }
+
+  // ---- Fallback: a status we don't have an explicit branch for ----
+  // Deliberately NOT the old "returned an unexpected response" copy —
+  // that gave the user zero actionable information. Instead treat it
+  // as a temporary upstream problem, which is what it almost always
+  // is (edge proxy hiccups, brief 3xx redirects, non-JSON error body).
   return {
-    code: "UPSTREAM_ERROR",
+    code: "YOUTUBE_API_ERROR",
     status: 502,
-    message: "The YouTube API returned an unexpected response.",
+    message:
+      "YouTube search is temporarily unavailable. Please try again shortly.",
   };
 }
 
@@ -168,22 +268,32 @@ async function ytFetch<T>(
   try {
     res = await fetch(url.toString(), {
       signal: controller.signal,
-      // Small revalidate hint for platforms that respect it. Our own cache
-      // layer is the primary guard.
-      next: { revalidate: 300 },
+      // Live channel searches must not be cached at the framework layer.
+      // Our in-process TTL cache is the sole authoritative caching layer
+      // for successful responses; opt out of any implicit Next.js cache.
+      cache: "no-store",
     });
   } catch (err) {
     // The fetch failed at the network level. This includes timeouts.
     // Do NOT include the request URL — it contains the API key.
     if ((err as { name?: string }).name === "AbortError") {
       markUpstream("timeout");
+      logger.warn("youtube.upstream_timeout", {
+        endpoint: path,
+        apiKeyPresent: true,
+        timeoutMs: UPSTREAM_TIMEOUT_MS,
+      });
       throw new YouTubeApiError(
         504,
         "UPSTREAM_TIMEOUT",
-        "The YouTube API took too long to respond.",
+        "The YouTube API took too long to respond. Please try again.",
       );
     }
     markUpstream("network_error");
+    logger.error("youtube.network_error", {
+      endpoint: path,
+      apiKeyPresent: true,
+    });
     throw new YouTubeApiError(
       502,
       "NETWORK_ERROR",
@@ -194,32 +304,91 @@ async function ytFetch<T>(
   }
 
   if (!res.ok) {
+    // Try to extract Google's classified reason. The upstream error
+    // body is JSON in the happy case, but may be HTML or plain text
+    // (edge proxy, WAF, gateway). Handle both without throwing.
     let reason: string | undefined;
+    let upstreamMessage: string | undefined;
+    let bodyText = "";
     try {
-      const body = (await res.json()) as {
-        error?: { errors?: { reason?: string }[] };
-      };
-      reason = body.error?.errors?.[0]?.reason;
+      bodyText = await res.text();
     } catch {
-      // ignore — we already have a status code
+      // ignore — we still have status
     }
+    if (bodyText) {
+      try {
+        const parsedBody = JSON.parse(bodyText) as {
+          error?: {
+            message?: string;
+            status?: string;
+            errors?: { reason?: string }[];
+          };
+        };
+        reason =
+          parsedBody.error?.errors?.[0]?.reason ??
+          parsedBody.error?.status;
+        upstreamMessage = parsedBody.error?.message;
+      } catch {
+        // Non-JSON response body (HTML error page, plain text). We use
+        // status alone and let mapUpstreamError classify it.
+      }
+    }
+
     const mapped = mapUpstreamError(res.status, reason);
     markUpstream(categoryFor(mapped.code));
+
+    // Safe temporary log: upstream status, classified reason, our
+    // outgoing code, and a boolean about the API key. Never the key
+    // itself, and never the URL (which carries the key).
+    logger.warn("youtube.upstream_error", {
+      endpoint: path,
+      upstreamStatus: res.status,
+      upstreamReason: reason,
+      // Redact but include first 200 chars of Google's own message.
+      // Our logger.redact() strips API keys before writing.
+      upstreamMessage: upstreamMessage?.slice(0, 200),
+      // Whether the body wasn't JSON at all — signals a WAF / edge
+      // problem rather than a plain YouTube-level error.
+      bodyIsJson: Boolean(reason || upstreamMessage),
+      apiKeyPresent: true,
+      resolvedCode: mapped.code,
+      resolvedStatus: mapped.status,
+    });
+
     throw new YouTubeApiError(mapped.status, mapped.code, mapped.message);
   }
 
+  // Success path. Safely parse the JSON — the body should always be
+  // JSON on 2xx, but a broken proxy could still return HTML on 200.
+  let parsed: T;
   try {
-    const parsed = (await res.json()) as T;
-    markUpstream("success");
-    return parsed;
+    parsed = (await res.json()) as T;
   } catch {
     markUpstream("malformed_response");
+    logger.warn("youtube.malformed_response", {
+      endpoint: path,
+      upstreamStatus: res.status,
+      apiKeyPresent: true,
+    });
     throw new YouTubeApiError(
       502,
       "MALFORMED_UPSTREAM",
-      "The YouTube API returned a malformed response.",
+      "The YouTube API returned an unreadable response. Please try again shortly.",
     );
   }
+
+  markUpstream("success");
+  // Safe temporary success log: item count for debugging silent
+  // failures in production without leaking any user data.
+  const maybeItems = (parsed as unknown as { items?: unknown[] }).items;
+  const itemsLen = Array.isArray(maybeItems) ? maybeItems.length : undefined;
+  logger.debug("youtube.upstream_success", {
+    endpoint: path,
+    upstreamStatus: res.status,
+    itemCount: itemsLen,
+    apiKeyPresent: true,
+  });
+  return parsed;
 }
 
 // ---------- Raw response shapes ----------

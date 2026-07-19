@@ -31,11 +31,15 @@ function mockFetchSequence(responses: MockResponse[]) {
   const fetchMock = vi.fn(async () => {
     const r = responses[Math.min(i, responses.length - 1)];
     i++;
+    const serialized = JSON.stringify(r.body);
     return {
       ok: r.ok ?? true,
       status: r.status ?? 200,
       async json() {
         return r.body;
+      },
+      async text() {
+        return serialized;
       },
     } as unknown as Response;
   });
@@ -150,7 +154,7 @@ describe("youtube service", () => {
       }
     });
 
-    it("throws INVALID_API_KEY on 400 badRequest/keyInvalid", async () => {
+    it("throws INVALID_API_KEY on 400 keyInvalid", async () => {
       mockFetchSequence([
         {
           ok: false,
@@ -164,12 +168,142 @@ describe("youtube service", () => {
       ).rejects.toMatchObject({ code: "INVALID_API_KEY" });
     });
 
+    it("throws INVALID_API_KEY on 403 keyInvalid", async () => {
+      mockFetchSequence([
+        {
+          ok: false,
+          status: 403,
+          body: { error: { errors: [{ reason: "keyInvalid" }] } },
+        },
+      ]);
+      const { getChannelById } = await loadYoutube();
+      await expect(
+        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      ).rejects.toMatchObject({ code: "INVALID_API_KEY" });
+    });
+
+    it("throws KEY_RESTRICTED when the key has an ipRefererBlocked restriction", async () => {
+      mockFetchSequence([
+        {
+          ok: false,
+          status: 403,
+          body: { error: { errors: [{ reason: "ipRefererBlocked" }] } },
+        },
+      ]);
+      const { getChannelById } = await loadYoutube();
+      await expect(
+        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      ).rejects.toMatchObject({ code: "KEY_RESTRICTED", status: 500 });
+    });
+
+    it("throws API_DISABLED when YouTube Data API v3 is not enabled", async () => {
+      mockFetchSequence([
+        {
+          ok: false,
+          status: 403,
+          body: {
+            error: {
+              status: "PERMISSION_DENIED",
+              errors: [{ reason: "accessNotConfigured" }],
+            },
+          },
+        },
+      ]);
+      const { getChannelById } = await loadYoutube();
+      await expect(
+        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      ).rejects.toMatchObject({ code: "API_DISABLED", status: 500 });
+    });
+
+    it("throws API_DISABLED when Google returns SERVICE_DISABLED as status", async () => {
+      // Some Google responses only expose the enum in `error.status`
+      // without an `errors[0].reason`. Verify we still classify correctly.
+      mockFetchSequence([
+        {
+          ok: false,
+          status: 403,
+          body: {
+            error: {
+              status: "SERVICE_DISABLED",
+              message: "YouTube Data API v3 has not been used…",
+            },
+          },
+        },
+      ]);
+      const { getChannelById } = await loadYoutube();
+      await expect(
+        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      ).rejects.toMatchObject({ code: "API_DISABLED" });
+    });
+
+    it("throws BAD_REQUEST on 400 invalidArgument (no longer the confusing 'unexpected response')", async () => {
+      mockFetchSequence([
+        {
+          ok: false,
+          status: 400,
+          body: { error: { errors: [{ reason: "invalidArgument" }] } },
+        },
+      ]);
+      const { getChannelById } = await loadYoutube();
+      const rejected = getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      await expect(rejected).rejects.toMatchObject({ code: "BAD_REQUEST" });
+      await expect(rejected).rejects.toThrow(
+        /rejected this request|try a different search term/i,
+      );
+    });
+
+    it("returns YOUTUBE_API_ERROR (not the old 'unexpected response') for unknown status shapes", async () => {
+      // Simulate a broken edge proxy that returns HTML on a non-2xx.
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () => ({
+          ok: false,
+          status: 418, // teapot — not one of our explicit branches
+          async text() {
+            return "<html>not json</html>";
+          },
+          async json() {
+            throw new Error("not json");
+          },
+        }) as unknown as Response),
+      );
+      const { getChannelById } = await loadYoutube();
+      const rejected = getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      await expect(rejected).rejects.toMatchObject({
+        code: "YOUTUBE_API_ERROR",
+      });
+      await expect(rejected).rejects.toThrow(
+        /temporarily unavailable/i,
+      );
+    });
+
     it("throws UPSTREAM_UNAVAILABLE on 5xx", async () => {
       mockFetchSequence([{ ok: false, status: 500, body: {} }]);
       const { getChannelById } = await loadYoutube();
       await expect(
         getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
       ).rejects.toMatchObject({ code: "UPSTREAM_UNAVAILABLE", status: 502 });
+    });
+
+    it("throws MALFORMED_UPSTREAM on a 200 with a body that isn't valid JSON", async () => {
+      // Simulate an edge / gateway returning HTML with a 200 status.
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () => ({
+          ok: true,
+          status: 200,
+          async json() {
+            throw new SyntaxError("Unexpected token < in JSON");
+          },
+          async text() {
+            return "<html>not json</html>";
+          },
+        }) as unknown as Response),
+      );
+      const { getChannelById } = await loadYoutube();
+      await expect(
+        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      ).rejects.toMatchObject({ code: "MALFORMED_UPSTREAM", status: 502 });
     });
 
     it("throws MISSING_API_KEY if the env var is empty", async () => {
@@ -179,6 +313,17 @@ describe("youtube service", () => {
       await expect(
         getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
       ).rejects.toMatchObject({ code: "MISSING_API_KEY" });
+    });
+
+    it("MISSING_API_KEY message tells the operator how to fix it", async () => {
+      delete process.env.YOUTUBE_API_KEY;
+      mockFetchSequence([{ ok: true, body: {} }]);
+      const { getChannelById } = await loadYoutube();
+      try {
+        await getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      } catch (err) {
+        expect((err as Error).message).toMatch(/YOUTUBE_API_KEY/);
+      }
     });
 
     it("throws NETWORK_ERROR if fetch itself rejects", async () => {

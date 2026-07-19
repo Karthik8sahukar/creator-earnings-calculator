@@ -11,6 +11,14 @@ import { getChannelById } from "@/lib/youtube";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/**
+ * GET /api/channel?channelId=<UC...>
+ *
+ * Response envelope:
+ *   Success (found)     : { success: true,  channel: ChannelDetails }
+ *   Success (not found) : { success: false, error: { code: "NOT_FOUND", ... } } with HTTP 404
+ *   Error               : { success: false, error: { code, message } }
+ */
 export async function GET(request: Request) {
   return withRouteObservability("api.channel", async () => {
     const limited = applyRateLimit(request);
@@ -22,8 +30,15 @@ export async function GET(request: Request) {
     });
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "INVALID_QUERY", message: parsed.error.issues[0]?.message },
-        { status: 400 },
+        {
+          success: false,
+          error: {
+            code: "INVALID_QUERY",
+            message:
+              parsed.error.issues[0]?.message ?? "Invalid channel id.",
+          },
+        },
+        { status: 400, headers: { "Cache-Control": "no-store" } },
       );
     }
 
@@ -31,11 +46,20 @@ export async function GET(request: Request) {
       const channel = await getChannelById(parsed.data.channelId);
       if (!channel) {
         return NextResponse.json(
-          { error: "NOT_FOUND", message: "Channel not found" },
-          { status: 404 },
+          {
+            success: false,
+            error: {
+              code: "NOT_FOUND",
+              message: "No matching YouTube channel was found.",
+            },
+          },
+          { status: 404, headers: { "Cache-Control": "no-store" } },
         );
       }
-      return NextResponse.json({ channel });
+      return NextResponse.json(
+        { success: true, channel },
+        { headers: { "Cache-Control": "no-store" } },
+      );
     } catch (err) {
       return safeErrorResponse(err);
     }

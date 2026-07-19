@@ -11,6 +11,17 @@ import { searchChannels } from "@/lib/youtube";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/**
+ * GET /api/search?q=<query>
+ *
+ * Response envelope:
+ *   Success: { success: true, results: ChannelSearchResult[] }
+ *   Error  : { success: false, error: { code, message } }
+ *
+ * Live searches are never cached at the framework / CDN layer — the
+ * in-process TTL cache is authoritative. `Cache-Control: no-store`
+ * both on 2xx and on error responses (built by `safeErrorResponse`).
+ */
 export async function GET(request: Request) {
   return withRouteObservability("api.search", async () => {
     const limited = applyRateLimit(request);
@@ -22,20 +33,23 @@ export async function GET(request: Request) {
     });
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "INVALID_QUERY", message: parsed.error.issues[0]?.message },
-        { status: 400 },
+        {
+          success: false,
+          error: {
+            code: "INVALID_QUERY",
+            message:
+              parsed.error.issues[0]?.message ?? "Please enter a search query.",
+          },
+        },
+        { status: 400, headers: { "Cache-Control": "no-store" } },
       );
     }
 
     try {
       const results = await searchChannels(parsed.data.q);
       return NextResponse.json(
-        { results },
-        {
-          headers: {
-            "Cache-Control": "private, max-age=60, stale-while-revalidate=60",
-          },
-        },
+        { success: true, results },
+        { headers: { "Cache-Control": "no-store" } },
       );
     } catch (err) {
       return safeErrorResponse(err);
