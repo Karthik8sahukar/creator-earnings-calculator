@@ -79,17 +79,24 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, slug } = await params;
   const creator = getCreatorBySlug(slug);
+
+  // Reject unknown slugs as early as possible.
+  //
+  // Calling `notFound()` from `generateMetadata` short-circuits the
+  // request BEFORE any response headers are staged for streaming.
+  // Next.js then renders the closest `not-found.tsx` boundary with
+  // a real HTTP 404 status code. Doing this check inside the page
+  // body instead (after `await params` + `setRequestLocale()` + the
+  // start of a streamed render) can leave the response stamped as
+  // HTTP 200 with the not-found UI in the body — the exact failure
+  // mode this fix addresses.
+  //
+  // The `notFound()` call in the page body below remains as a
+  // defensive belt-and-suspenders check.
+  if (!creator) notFound();
+
   const t = await getTranslations({ locale, namespace: "creator.meta" });
   const currentYear = new Date().getFullYear();
-
-  if (!creator) {
-    return {
-      title: t("notFoundTitle"),
-      description: t("notFoundDescription"),
-      alternates: { canonical: `/${locale}/creators` },
-      robots: { index: false, follow: true },
-    };
-  }
 
   const title = t("title", {
     name: creator.displayName,
