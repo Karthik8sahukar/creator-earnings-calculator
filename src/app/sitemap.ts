@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { HREFLANG_MAP, routing } from "@/i18n/routing";
 import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
 import { publicConfig } from "@/lib/config";
+import { listCreators } from "@/lib/creators";
 
 /**
  * Sitemap.
@@ -44,6 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/youtube-sponsorship-calculator",
     "/instagram-money-calculator",
     "/blog",
+    "/creators",
   ];
 
   const blogCategoryRoutes = BLOG_CATEGORIES.map((c) => `/blog/category/${c.slug}`);
@@ -83,6 +85,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   for (const path of blogCategoryRoutes) {
     entries.push(...perLocaleWithAlternates(path, 0.5, "weekly"));
+  }
+
+  // Creator profile pages — one per (locale × slug) with full
+  // alternates so search engines route the right locale to the right
+  // reader. Priority is slightly below the /creators index page.
+  for (const creator of listCreators()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/creator/${creator.slug}`, 0.6, "weekly"),
+    );
   }
 
   // 3: blog article pages — English canonical only.

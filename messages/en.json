@@ -40,7 +40,9 @@
     "blog": "Blog",
     "blogSoonTitle": "Blog is coming soon",
     "menu": "Menu",
-    "mobilePrimary": "Primary"
+    "mobilePrimary": "Primary",
+    "creators": "Creators",
+    "creatorsAria": "Browse YouTube creator profiles"
   },
   "languageSelector": {
     "trigger": "Language",
@@ -72,6 +74,7 @@
     "copyright": "© {year} BeHumler. Independent tool.",
     "notFinancialAdvice": "Estimates only. Not financial advice.",
     "blog": "Blog",
+    "creators": "Creators",
     "estimatesBlurb": "Revenue figures on this site are independently calculated estimates."
   },
   "home": {
@@ -942,6 +945,145 @@
       "eyebrow": "Tag",
       "pageTitle": "Articles tagged #{tag}",
       "pageDescription": "Every BeHumler article filed under the #{tag} tag."
+    }
+  },
+  "popularCreators": {
+    "eyebrow": "Creators",
+    "title": "Popular creators",
+    "viewAll": "View all creators"
+  },
+  "creators": {
+    "eyebrow": "Creators directory",
+    "title": "YouTube Creators",
+    "subtitle": "Browse and search YouTube creators. Every profile includes independent earnings estimates, channel statistics, and links to the calculators.",
+    "searchLabel": "Search creators",
+    "searchPlaceholder": "Search by name, handle, category or country",
+    "clearSearchAria": "Clear search",
+    "filterAll": "All",
+    "filterCountry": "Country",
+    "filterCategory": "Category",
+    "filterAlphabet": "Starts with",
+    "clearFilters": "Clear filters",
+    "resultCount": "{count, plural, =0 {No creators} one {# creator} other {# creators}}",
+    "emptyResults": "No creators match your filters. Try clearing them or searching for a different name.",
+    "card": {
+      "cardAria": "Open {name} profile"
+    },
+    "meta": {
+      "title": "YouTube Creators Directory — Earnings, Revenue & Stats",
+      "description": "Browse YouTube creators with independent estimates for monthly earnings, revenue, sponsorship value, RPM, CPM, and channel statistics.",
+      "breadcrumb": "Creators"
+    }
+  },
+  "creator": {
+    "breadcrumb": {
+      "aria": "Breadcrumb",
+      "creators": "Creators"
+    },
+    "hero": {
+      "bannerAlt": "{name} YouTube banner",
+      "fallbackNote": "Live YouTube statistics could not be loaded right now. The numbers below use fallback values — refresh in a few minutes for live data."
+    },
+    "earnings": {
+      "eyebrow": "Estimated earnings",
+      "title": "How much does {name} make?",
+      "assumption": "Based on ~{views} monthly views and an estimated RPM of {rpm} per 1,000 views.",
+      "noData": "Live view data is unavailable right now — reload for a live estimate.",
+      "monthly": "Estimated monthly earnings",
+      "yearly": "Estimated yearly earnings",
+      "sponsorship": "Sponsorship value (per video)",
+      "rpm": "Estimated RPM",
+      "cpm": "Estimated CPM",
+      "shortsRevenue": "Estimated Shorts revenue",
+      "perThousand": "/ 1,000 views",
+      "perMonth": "/ month",
+      "disclaimer": "Independent estimates only. Actual earnings depend on many factors we cannot observe — ad category mix, fill rate, watch time, YouTube revenue share, sponsorship deals, taxes, and more."
+    },
+    "stats": {
+      "eyebrow": "Channel stats",
+      "title": "Channel statistics",
+      "averageViews": "Average views",
+      "averageViewsHint": "Averaged across the {count} most recent uploads.",
+      "uploadFrequency": "Upload frequency",
+      "uploadFrequencyValue": "{count30} in 30 days · {count90} in 90 days",
+      "engagement": "Estimated engagement",
+      "engagementHint": "Average of (likes + comments) ÷ views on recent uploads.",
+      "contentMix": "Content mix",
+      "contentMixValue": "{long}% long-form · {shorts}% Shorts",
+      "contentCategory": "Content category",
+      "revenueSources": "Revenue sources",
+      "revenueSourcesValue": "Ads, Shorts, Sponsorships, Memberships",
+      "revenueSourcesHint": "Typical streams for a creator of this size. This tool only estimates ad revenue and sponsorship value.",
+      "noVideoSampleHint": "No recent uploads are available to analyze."
+    },
+    "videos": {
+      "recentTitle": "Recent uploads",
+      "recentEmpty": "No recent uploads are available for this creator.",
+      "topTitle": "Top videos",
+      "topEmpty": "No top-performing videos are available for this creator."
+    },
+    "relatedCalculators": {
+      "eyebrow": "Related calculators",
+      "title": "Estimate this creator with our calculators",
+      "openCta": "Open",
+      "money": {
+        "title": "YouTube Money Calculator",
+        "description": "Estimate a channel's total monthly revenue from long-form and Shorts views."
+      },
+      "rpm": {
+        "title": "RPM Calculator",
+        "description": "Revenue per 1,000 monetized views — the creator-side earnings metric."
+      },
+      "cpm": {
+        "title": "CPM Calculator",
+        "description": "What advertisers pay per 1,000 ad impressions."
+      },
+      "shorts": {
+        "title": "Shorts Calculator",
+        "description": "Estimate Creator Pool payouts from Shorts views."
+      },
+      "sponsorship": {
+        "title": "Sponsorship Calculator",
+        "description": "Ballpark brand-deal rates from subscribers and engagement."
+      }
+    },
+    "relatedCreators": {
+      "eyebrow": "Related creators",
+      "title": "Similar creators"
+    },
+    "faq": {
+      "title": "Frequently asked questions"
+    },
+    "fallback": {
+      "aria": "Data availability notice",
+      "prefix": "Heads up:",
+      "reasons": {
+        "not-configured": "The YouTube API is not configured on this server — showing catalog metadata and estimated numbers only.",
+        "quota-exceeded": "The daily YouTube API quota has been reached — showing catalog metadata and estimated numbers. Live figures return once the quota resets.",
+        "upstream-unavailable": "The YouTube API is temporarily unavailable — the profile is rendered with catalog metadata and estimated numbers.",
+        "not-found": "We could not resolve this creator's YouTube channel right now — showing catalog metadata and estimated numbers.",
+        "unknown-error": "Live YouTube data could not be loaded right now — showing catalog metadata and estimated numbers."
+      }
+    },
+    "loading": {
+      "srLabel": "Loading creator profile…"
+    },
+    "notFound": {
+      "code": "404",
+      "title": "Creator not found",
+      "body": "We do not have a profile for that creator yet. Browse the directory to find every creator we have added so far.",
+      "browseAll": "Browse the directory"
+    },
+    "error": {
+      "title": "Couldn't load creator profile",
+      "body": "Something went wrong while rendering this creator profile. This is rarely reached — the profile normally falls back gracefully when the YouTube API is unavailable.",
+      "browseAll": "Browse the directory"
+    },
+    "meta": {
+      "title": "{name} Net Worth, YouTube Earnings & Revenue ({year})",
+      "description": "Discover {name}'s estimated monthly earnings, yearly revenue, sponsorship value, RPM, CPM and YouTube statistics on {site}.",
+      "notFoundTitle": "Creator not found",
+      "notFoundDescription": "We do not have a profile for that creator yet."
     }
   }
 }

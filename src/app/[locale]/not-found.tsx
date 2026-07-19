@@ -8,6 +8,14 @@ import { Link } from "@/i18n/navigation";
  * `not-found.tsx` under a segment cannot receive route params directly,
  * so we resolve translations via `getTranslations()` which reads the
  * active locale from the request context.
+ *
+ * Note: `dynamicParams = false` on `[locale]/creator/[slug]/page.tsx`
+ * causes unknown-slug rejections to be handled by Next.js's built-in
+ * not-found page rather than walking here. That's the intended
+ * behavior for the catalog route (see commit history on PR #12 and
+ * the "unknown slug returns HTTP 404" test in `e2e/creators.spec.ts`).
+ * This file still handles every other locale-scoped 404 — for example
+ * a matched page calling `notFound()` directly.
  */
 export default async function NotFound() {
   const t = await getTranslations("notFound");

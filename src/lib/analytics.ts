@@ -70,6 +70,29 @@ export type AnalyticsEvent =
       name: "additional_calculator.opened";
       kind: "rpm" | "cpm" | "shorts" | "sponsorship";
     }
+  // ─── Creator Profile system ────────────────────────────────────
+  //
+  // Structural events only — the slug is a PUBLIC, low-cardinality
+  // identifier (we curate the catalog), never a channel URL or
+  // free-text query.
+  | { name: "creator.viewed"; slug: string }
+  | {
+      name: "creator.related_clicked";
+      /** Slug of the profile the user was on. */
+      from: string;
+      /** Slug of the related creator that was clicked. */
+      to: string;
+    }
+  | {
+      name: "creators.searched";
+      /** Length of the search query (never the query text itself). */
+      queryLength: number;
+      resultCount: number;
+    }
+  | {
+      name: "creators.filtered";
+      filter: "country" | "category" | "alphabet" | "clear";
+    }
   // ─── Instagram Money Calculator ────────────────────────────────
   //
   // The Instagram calculator DELIBERATELY does not report raw
