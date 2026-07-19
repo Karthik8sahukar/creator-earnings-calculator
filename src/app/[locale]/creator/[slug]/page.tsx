@@ -15,6 +15,7 @@ import { TransparencyBanner } from "@/components/TransparencyBanner";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
+import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import {
   getCreatorBySlug,
   listCreators,
@@ -137,6 +138,11 @@ export default async function CreatorPage({ params }: PageProps) {
 
   const profile = await getCreatorProfile(creator);
   const related = resolveRelatedCreators(creator.relatedCreators);
+  // Fetch avatars for the related-creators strip in parallel with
+  // the rest of the render. Reuses the same YouTube TtlCache — if
+  // `getCreatorProfile()` already warmed the cache for any of these
+  // handles, this call is instant.
+  const relatedAvatars = await getCreatorAvatars(related);
   const faqEntries = buildCreatorFaq(profile);
 
   const t = await getTranslations({ locale, namespace: "creator" });
@@ -260,7 +266,7 @@ export default async function CreatorPage({ params }: PageProps) {
 
       <CreatorRelatedArticles />
 
-      <RelatedCreators creators={related} />
+      <RelatedCreators creators={related} avatars={relatedAvatars} />
 
       <CreatorFaqSection entries={faqEntries} />
     </div>

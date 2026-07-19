@@ -1,11 +1,22 @@
 import { useTranslations } from "next-intl";
 
+import { CreatorAvatar } from "./CreatorAvatar";
 import { Link } from "@/i18n/navigation";
 import { GlobeIcon } from "@/components/icons";
 import type { Creator } from "@/lib/creators";
 
 interface Props {
   creator: Creator;
+  /**
+   * Live YouTube channel avatar URL. Pass `null` (or omit) to render
+   * the initial-based placeholder — that path never crashes and never
+   * shows a broken image icon.
+   *
+   * The parent server component is responsible for fetching this
+   * (see `src/lib/creatorAvatars.ts`). CreatorCard itself is a pure
+   * presentation component — it does NOT make network requests.
+   */
+  avatarUrl?: string | null;
   /** Optional test id — set on the /creators grid to make E2E precise. */
   testId?: string;
 }
@@ -16,12 +27,11 @@ interface Props {
  *   - The "Related creators" strip on `/creator/[slug]`
  *   - The "Popular creators" strip on the homepage
  *
- * We render only the STATIC catalog fields (name, handle, country,
- * category, description) — never subscriber counts or thumbnail
- * URLs. Live YouTube stats live on the profile page itself, which is
- * the one route that server-side fetches them.
+ * The avatar is rendered by `<CreatorAvatar/>`, which handles both
+ * happy-path (YouTube image) and fallback (initial) states — see
+ * that component for the rules.
  */
-export function CreatorCard({ creator, testId }: Props) {
+export function CreatorCard({ creator, avatarUrl, testId }: Props) {
   const t = useTranslations("creators.card");
 
   return (
@@ -33,18 +43,11 @@ export function CreatorCard({ creator, testId }: Props) {
       className="group card block h-full p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-pop focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
     >
       <div className="flex items-start gap-3">
-        {/*
-          Decorative circular avatar placeholder — the same gradient
-          treatment the profile hero uses when we don't have a live
-          thumbnail. Kept static so the /creators grid doesn't hammer
-          the YouTube API on every page load.
-        */}
-        <div
-          aria-hidden
-          className="h-12 w-12 shrink-0 rounded-full bg-gradient-to-br from-brand-100 to-accent-400/30 dark:from-brand-500/30 dark:to-accent-500/20 flex items-center justify-center text-lg font-bold text-brand-700 dark:text-brand-100"
-        >
-          {creator.displayName.charAt(0)}
-        </div>
+        <CreatorAvatar
+          src={avatarUrl}
+          alt={creator.displayName}
+          initial={creator.displayName.charAt(0)}
+        />
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 truncate">
             {creator.displayName}

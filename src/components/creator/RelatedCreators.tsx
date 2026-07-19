@@ -5,9 +5,15 @@ import type { Creator } from "@/lib/creators";
 
 interface Props {
   creators: readonly Creator[];
+  /**
+   * `slug → avatarUrl | null` map resolved server-side by the
+   * parent route. Optional — when omitted, every card renders its
+   * initial fallback.
+   */
+  avatars?: Record<string, string | null>;
 }
 
-export function RelatedCreators({ creators }: Props) {
+export function RelatedCreators({ creators, avatars }: Props) {
   const t = useTranslations("creator.relatedCreators");
   if (creators.length === 0) return null;
 
@@ -26,7 +32,11 @@ export function RelatedCreators({ creators }: Props) {
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {creators.map((c) => (
           <li key={c.slug}>
-            <CreatorCard creator={c} testId={`related-creator-${c.slug}`} />
+            <CreatorCard
+              creator={c}
+              avatarUrl={avatars?.[c.slug] ?? null}
+              testId={`related-creator-${c.slug}`}
+            />
           </li>
         ))}
       </ul>

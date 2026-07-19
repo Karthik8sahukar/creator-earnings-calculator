@@ -173,7 +173,6 @@ describe("getCreatorProfile — graceful fallback", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       makeChannelFixture() as any,
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(youtube.getRecentVideos).mockResolvedValueOnce([
       { videoId: "a", viewCount: 100, publishedAt: "2026-01-01T00:00:00Z" },
       { videoId: "b", viewCount: 900, publishedAt: "2026-02-01T00:00:00Z" },

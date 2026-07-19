@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { CreatorsIndexClient } from "@/components/creator/CreatorsIndexClient";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
+import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import {
   listCreatorCategories,
   listCreatorCountries,
@@ -15,6 +16,17 @@ import {
   buildItemListLd,
   serializeJsonLd,
 } from "@/lib/jsonLd";
+
+// The directory page fetches every creator's avatar from the
+// YouTube Data API on render. Even though `getCreatorAvatars()`
+// reuses the process-local TtlCache, the very first render after a
+// cold cache still needs the API key to be present — so we opt out
+// of build-time prerendering and force the Node runtime. In steady
+// state this is cheap: each avatar lookup is served from the
+// TtlCache (45m for search entries, 6h for channel entries), and
+// the entire batch completes in a few milliseconds once warm.
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * `/[locale]/creators` — the search + filter index of every creator
@@ -70,6 +82,12 @@ export default async function CreatorsIndexPage({
   const countries = listCreatorCountries();
   const categories = listCreatorCategories();
 
+  // Fetch every avatar in parallel, reusing the existing TtlCache
+  // via the youtube service. Failures fall through to `null`, which
+  // the card renders as an initial-based placeholder — the page
+  // never blocks on a single flaky lookup.
+  const avatars = await getCreatorAvatars(creators);
+
   // JSON-LD: BreadcrumbList + ItemList of creator profiles.
   const breadcrumbLd = buildBreadcrumbListLd([
     { name: tCommon("home"), url: `${publicConfig.siteUrl}/${locale}` },
@@ -110,6 +128,7 @@ export default async function CreatorsIndexPage({
         creators={creators}
         countries={countries}
         categories={categories}
+        avatars={avatars}
       />
     </div>
   );

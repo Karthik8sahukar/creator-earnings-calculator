@@ -12,6 +12,13 @@ interface Props {
   creators: readonly Creator[];
   countries: readonly string[];
   categories: readonly string[];
+  /**
+   * Map of `slug → avatarUrl | null`, resolved server-side by
+   * `getCreatorAvatars()`. The map is guaranteed to have an entry
+   * for every creator; a `null` value means "show the initial
+   * fallback".
+   */
+  avatars?: Record<string, string | null>;
 }
 
 type AlphabetFilter = "all" | (typeof ALPHA)[number];
@@ -38,6 +45,7 @@ export function CreatorsIndexClient({
   creators,
   countries,
   categories,
+  avatars,
 }: Props) {
   const t = useTranslations("creators");
   const [query, setQuery] = useState("");
@@ -204,7 +212,7 @@ export function CreatorsIndexClient({
         >
           {filtered.map((c) => (
             <li key={c.slug}>
-              <CreatorCard creator={c} />
+              <CreatorCard creator={c} avatarUrl={avatars?.[c.slug] ?? null} />
             </li>
           ))}
         </ul>

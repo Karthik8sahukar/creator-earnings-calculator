@@ -1,7 +1,8 @@
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { CreatorCard } from "@/components/creator/CreatorCard";
 import { Link } from "@/i18n/navigation";
+import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
 
 /**
@@ -26,13 +27,18 @@ const POPULAR_SLUGS = [
  * correctly and no JavaScript is shipped for a display-only grid.
  * Sits between `<PopularCalculators/>` and `<CreatorPlatforms/>` on
  * the homepage — see `src/app/[locale]/page.tsx`.
+ *
+ * Fetches the 6 avatars in parallel via `getCreatorAvatars()`,
+ * which reuses the existing YouTube TtlCache and never throws.
  */
-export function PopularCreators() {
-  const t = useTranslations("popularCreators");
+export async function PopularCreators() {
+  const t = await getTranslations("popularCreators");
 
   const creators = POPULAR_SLUGS.map((slug) => getCreatorBySlug(slug)).filter(
     (c): c is NonNullable<typeof c> => Boolean(c),
   );
+
+  const avatars = await getCreatorAvatars(creators);
 
   return (
     <section aria-labelledby="popular-creators-title">
@@ -58,7 +64,11 @@ export function PopularCreators() {
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {creators.map((c) => (
           <li key={c.slug}>
-            <CreatorCard creator={c} testId={`popular-creator-${c.slug}`} />
+            <CreatorCard
+              creator={c}
+              avatarUrl={avatars[c.slug] ?? null}
+              testId={`popular-creator-${c.slug}`}
+            />
           </li>
         ))}
       </ul>

@@ -27,6 +27,26 @@ describe("<CreatorCard />", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders the initial fallback when no avatarUrl is provided", () => {
+    render(<CreatorCard creator={sample} />);
+    // The first letter of the display name shows in the placeholder
+    // avatar. Query by the exact single-letter text.
+    expect(screen.getByText("S")).toBeInTheDocument();
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("renders the real YouTube avatar when avatarUrl is provided", () => {
+    render(
+      <CreatorCard
+        creator={sample}
+        avatarUrl="https://yt3.ggpht.com/sample.jpg"
+      />,
+    );
+    const img = screen.getByRole("img", { name: "Sample Creator" });
+    expect(img).toBeInTheDocument();
+    expect(img.getAttribute("src")).toContain("yt3.ggpht.com");
+  });
+
   it("wraps the card in a link to /creator/<slug>", () => {
     render(<CreatorCard creator={sample} />);
     const link = screen.getByRole("link");
