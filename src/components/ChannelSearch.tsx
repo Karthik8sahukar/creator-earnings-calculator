@@ -41,6 +41,86 @@ type SearchApiResponse =
   // Legacy / defensive: some older paths may not include `success`.
   | { results?: ChannelSearchResult[]; error?: unknown; message?: string };
 
+// ---------- Quota-efficiency tuning constants ----------
+//
+// These values are deliberate — see the "Quota efficiency" section of
+// the README. Tightening any of them will cause more upstream YouTube
+// calls; loosening them will make the box feel sluggish.
+
+/** Minimum non-whitespace characters before a search is attempted. */
+const MIN_SEARCH_CHARS = 3;
+/** Idle time after the last keystroke before a search fires. */
+const DEBOUNCE_MS = 700;
+/** Client-side result cache TTL. */
+const CLIENT_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+/** Max number of distinct queries cached client-side. */
+const CLIENT_CACHE_MAX = 20;
+
+/**
+ * Normalize a query the way the server does, so client-side dedup and
+ * caching agree with the server's cache key.
+ *
+ * IMPORTANT: keep this in sync with `normalizeSearchQuery` in
+ * `src/lib/youtube.ts`. Duplicating the logic here (instead of
+ * importing) is intentional — the component must not pull in any
+ * server-only module.
+ */
+function normalizeQuery(raw: string): string {
+  return raw.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/**
+ * True iff the user has typed enough "meaningful" characters (i.e.
+ * non-whitespace) to warrant a search. Ignores accidental space
+ * bounces from mobile keyboards.
+ */
+function hasEnoughChars(raw: string): boolean {
+  return raw.replace(/\s+/g, "").length >= MIN_SEARCH_CHARS;
+}
+
+/**
+ * Tiny LRU-ish client-side result cache. Keyed by normalized query.
+ * We deliberately do NOT cache empty results — a user who mistyped
+ * "MrBiiast" and immediately re-types the correct term should not be
+ * shown a stale empty state.
+ */
+interface CachedResult {
+  results: ChannelSearchResult[];
+  ts: number;
+}
+const clientCache = new Map<string, CachedResult>();
+function readClientCache(key: string): ChannelSearchResult[] | null {
+  const entry = clientCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > CLIENT_CACHE_TTL_MS) {
+    clientCache.delete(key);
+    return null;
+  }
+  // Refresh LRU order.
+  clientCache.delete(key);
+  clientCache.set(key, entry);
+  return entry.results;
+}
+function writeClientCache(key: string, results: ChannelSearchResult[]): void {
+  if (results.length === 0) return; // don't cache empties
+  if (clientCache.has(key)) clientCache.delete(key);
+  clientCache.set(key, { results, ts: Date.now() });
+  while (clientCache.size > CLIENT_CACHE_MAX) {
+    const oldest = clientCache.keys().next().value;
+    if (oldest === undefined) break;
+    clientCache.delete(oldest);
+  }
+}
+/** Exposed for tests — never used in production code paths. */
+export const _clientSearchCacheForTests = {
+  clear(): void {
+    clientCache.clear();
+  },
+  size(): number {
+    return clientCache.size;
+  },
+};
+
 /**
  * Map stable server error codes to friendly, user-safe messages.
  *
@@ -100,19 +180,63 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  /**
+   * Normalized key of the query currently being fetched. Prevents
+   * duplicate in-flight requests: if the user types "mr beast", pauses,
+   * types " " (still "mr beast" after normalization), pauses again,
+   * we don't issue a second /api/search call.
+   */
+  const inflightKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     const trimmed = query.trim();
+
+    // ---- Idle state: query is empty ----
     if (!trimmed) {
       abortRef.current?.abort();
+      inflightKeyRef.current = null;
       setState({ status: "idle", results: [] });
       return;
     }
 
+    // ---- Below the "meaningful chars" threshold ----
+    // Fewer than MIN_SEARCH_CHARS non-whitespace characters is almost
+    // always a user still typing. Don't spend a 100-quota-unit
+    // search.list call on "m" or "mr".
+    if (!hasEnoughChars(trimmed)) {
+      abortRef.current?.abort();
+      inflightKeyRef.current = null;
+      setState({ status: "idle", results: [] });
+      return;
+    }
+
+    const normalized = normalizeQuery(trimmed);
+
+    // ---- Client-side cache hit → no request at all ----
+    const cached = readClientCache(normalized);
+    if (cached) {
+      abortRef.current?.abort();
+      inflightKeyRef.current = null;
+      setState({ status: "success", results: cached });
+      setOpen(true);
+      setActiveIndex(-1);
+      return;
+    }
+
+    // ---- In-flight dedup ----
+    // If we're already fetching for this exact normalized query, do
+    // nothing — the in-flight response will populate state when it
+    // arrives.
+    if (inflightKeyRef.current === normalized) {
+      return;
+    }
+
+    // ---- Debounced fetch ----
     const timer = setTimeout(async () => {
       abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
+      inflightKeyRef.current = normalized;
 
       setState((s) => ({ ...s, status: "loading" }));
       setOpen(true);
@@ -154,7 +278,13 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
           throw new Error(message);
         }
 
+        // Guard against a stale response (user has typed further and
+        // moved on). Compare the normalized key we launched with the
+        // current one in the ref — if they don't match, ignore.
+        if (inflightKeyRef.current !== normalized) return;
+
         const results = (body as { results?: ChannelSearchResult[] }).results ?? [];
+        writeClientCache(normalized, results);
         if (results.length === 0) {
           setState({ status: "empty", results: [] });
         } else {
@@ -169,14 +299,20 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
         setActiveIndex(-1);
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
+        // Same stale-response guard as above.
+        if (inflightKeyRef.current !== normalized) return;
         setState({
           status: "error",
           results: [],
           error: (err as Error).message,
         });
         setOpen(true);
+      } finally {
+        if (inflightKeyRef.current === normalized) {
+          inflightKeyRef.current = null;
+        }
       }
-    }, 400);
+    }, DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
   }, [query]);

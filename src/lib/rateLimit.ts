@@ -151,3 +151,27 @@ export const apiLimiter = new SlidingWindowLimiter({
   limit: serverEnv.rateLimitMax,
   windowMs: serverEnv.rateLimitWindowMs,
 });
+
+/**
+ * Stricter, search-specific limiter.
+ *
+ * Applied ONLY to `/api/search` requests whose normalized query is
+ * NOT already cached in the in-process TTL cache — i.e. only requests
+ * that would otherwise burn 100+ YouTube quota units. Cache hits do
+ * not consume tokens here, so a user who repeatedly searches the
+ * same terms is not throttled.
+ *
+ * Tuning:
+ *   - 10 unique searches per 60 seconds per client is generous for
+ *     exploratory typing (one search every 6 seconds on average),
+ *     but far below the ~60 rps the general limiter would allow —
+ *     enough to survive a runaway loop or accidental Ctrl-R spam
+ *     without exhausting the daily quota.
+ */
+export const SEARCH_RATE_LIMIT_MAX = 10;
+export const SEARCH_RATE_LIMIT_WINDOW_MS = 60_000;
+
+export const searchLimiter = new SlidingWindowLimiter({
+  limit: SEARCH_RATE_LIMIT_MAX,
+  windowMs: SEARCH_RATE_LIMIT_WINDOW_MS,
+});

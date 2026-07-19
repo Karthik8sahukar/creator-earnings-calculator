@@ -15,18 +15,21 @@ import { YouTubeApiError } from "@/lib/errors";
 const REAL_KEY = "AIzaSyC-abcdefghijklmnopqrstuvwxyz1234";
 const searchChannels = vi.fn();
 const getChannelById = vi.fn();
+const isSearchCached = vi.fn().mockReturnValue(false);
 
 vi.mock("@/lib/youtube", () => ({
   YouTubeApiError,
   searchChannels: (...args: unknown[]) => searchChannels(...args),
   getChannelById: (...args: unknown[]) => getChannelById(...args),
   getRecentVideos: vi.fn(),
+  isSearchCached: (...args: unknown[]) => isSearchCached(...args),
+  searchCacheKeyFor: (raw: string) => `test:${raw}`,
 }));
 
 import { ConsoleSpy } from "@/lib/__tests__/_helpers";
 import { GET as searchGET } from "../search/route";
 import { GET as channelGET } from "../channel/route";
-import { apiLimiter } from "@/lib/rateLimit";
+import { apiLimiter, searchLimiter } from "@/lib/rateLimit";
 
 function assertNoLeak(all: string[]) {
   const joined = all.join("\n");
@@ -44,6 +47,8 @@ describe("route observability logging", () => {
   beforeEach(() => {
     process.env.YOUTUBE_API_KEY = REAL_KEY;
     apiLimiter.clear();
+    searchLimiter.clear();
+    isSearchCached.mockReset().mockReturnValue(false);
     spy = new ConsoleSpy();
     searchChannels.mockReset();
     getChannelById.mockReset();

@@ -137,25 +137,46 @@ export class TtlCache<V> {
  * Global cache instances for the YouTube service. Sized generously enough
  * to matter for real traffic but small enough to stay bounded in RAM.
  *
- * TTLs:
- *   - Search results   : 45 minutes  (queries are noisy, small TTL is fine)
- *   - Channel details  : 6 hours     (stats update slowly)
- *   - Recent videos    : 2 hours     (new uploads matter but not hot-path)
+ * TTLs (quota-optimized):
+ *
+ *   - Search results   : 12 hours  Every `search.list` call costs 100
+ *                                  quota units. A 12h TTL means we pay
+ *                                  those units at most twice a day
+ *                                  per unique query — and repeated
+ *                                  identical searches within a session
+ *                                  are free.
+ *
+ *   - Channel details  : 24 hours  `channels.list` is 1 unit, but the
+ *                                  data (subscriber count, title,
+ *                                  handle, thumbnail) changes on the
+ *                                  order of days at most. Caching for
+ *                                  24h keeps the featured-creator
+ *                                  avatars a one-per-day cost.
+ *
+ *   - Recent videos    :  6 hours  New uploads matter but do not need
+ *                                  minute-level freshness. 6h is a
+ *                                  reasonable compromise between cost
+ *                                  and staleness.
+ *
+ * These values are deliberately generous — the data is public and the
+ * user experience is unaffected by a small staleness window, while the
+ * quota savings are dramatic (~90% of upstream calls avoided in
+ * steady-state).
  */
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 
 export const searchCache = new TtlCache<unknown>({
   maxSize: 500,
-  ttlMs: 45 * MINUTE,
+  ttlMs: 12 * HOUR,
 });
 
 export const channelCache = new TtlCache<unknown>({
   maxSize: 500,
-  ttlMs: 6 * HOUR,
+  ttlMs: 24 * HOUR,
 });
 
 export const videosCache = new TtlCache<unknown>({
   maxSize: 500,
-  ttlMs: 2 * HOUR,
+  ttlMs: 6 * HOUR,
 });
