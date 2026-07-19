@@ -111,6 +111,15 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/creators"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+                data-testid="footer-creators-link"
+              >
+                {t("creators")}
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/methodology"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >

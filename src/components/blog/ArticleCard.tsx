@@ -17,7 +17,14 @@ interface Props {
  * The `featured` variant is only rendered on the blog homepage.
  */
 export function ArticleCard({ post, featured = false }: Props) {
+  // Two scopes: the article-body strings live under `blog.article.*`
+  // so we scope `t` there; the category label keys in
+  // `src/lib/blog/categories.ts` are already fully-qualified
+  // (`blog.categories.<id>.label`), so they need a root-scoped
+  // translator — otherwise the lookup double-prefixes to
+  // `blog.blog.categories.<id>.label` and rings a MISSING_MESSAGE.
   const t = useTranslations("blog");
+  const tRoot = useTranslations();
   const category = findCategory(post.categoryId);
 
   return (
@@ -54,7 +61,7 @@ export function ArticleCard({ post, featured = false }: Props) {
               href={`/blog/category/${category.slug}` as any}
               className="inline-flex items-center rounded-full bg-brand-50 text-brand-700 px-2.5 py-1 font-medium hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-200 dark:hover:bg-brand-500/20"
             >
-              {t(category.labelKey)}
+              {tRoot(category.labelKey)}
             </Link>
           )}
           <span aria-hidden>·</span>

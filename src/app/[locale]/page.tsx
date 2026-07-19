@@ -7,6 +7,7 @@ import { CreatorPlatforms } from "@/components/home/CreatorPlatforms";
 import { Faq } from "@/components/home/Faq";
 import { Hero } from "@/components/home/Hero";
 import { PopularCalculators } from "@/components/home/PopularCalculators";
+import { PopularCreators } from "@/components/home/PopularCreators";
 import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
@@ -63,6 +64,7 @@ export default async function HomePage({
       </Hero>
 
       <PopularCalculators />
+      <PopularCreators />
       <CreatorPlatforms />
       <WhyBeHumler />
       <Faq />

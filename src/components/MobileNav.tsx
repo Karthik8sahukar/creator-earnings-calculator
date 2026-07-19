@@ -10,6 +10,7 @@ import { MenuIcon, XIcon } from "./icons";
 import { ThemeToggle } from "./ThemeToggle";
 
 const PRIMARY_LINKS = [
+  { href: "/creators", labelKey: "nav.creators" },
   { href: "/methodology", labelKey: "nav.methodology" },
   { href: "/about", labelKey: "nav.about" },
 ] as const;

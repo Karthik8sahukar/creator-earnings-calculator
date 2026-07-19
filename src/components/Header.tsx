@@ -57,6 +57,15 @@ export function Header() {
           </Link>
 
           <Link
+            href="/creators"
+            aria-label={t("nav.creatorsAria")}
+            className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+            data-testid="header-creators-link"
+          >
+            {t("nav.creators")}
+          </Link>
+
+          <Link
             href="/blog"
             className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
           >
