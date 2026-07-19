@@ -48,6 +48,27 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/**
+ * Constrain the route to the catalog.
+ *
+ * `generateStaticParams()` below returns exactly (locales × known
+ * slugs). Setting `dynamicParams = false` tells Next.js that ANY
+ * request whose slug is not in that list must return a real HTTP
+ * 404 — without invoking `generateMetadata` or the page component.
+ *
+ * This is the correct authority model here: creator existence is
+ * defined by the local catalog (`src/lib/creators.ts`), NOT by the
+ * YouTube API. Known catalog slugs still render normally even when
+ * the API is unavailable (the page uses graceful fallbacks); slugs
+ * outside the catalog return a real 404 with the existing
+ * `not-found.tsx` boundary.
+ *
+ * The `notFound()` calls inside `generateMetadata` and the page
+ * body are kept as belt-and-suspenders for the edge case where a
+ * slug slips through (e.g. dev-mode with a stale route manifest).
+ */
+export const dynamicParams = false;
+
 interface RouteParams {
   locale: string;
   slug: string;
