@@ -42,7 +42,9 @@
     "instagramCalculator": "Instagram Calculator",
     "instagramCalculatorAria": "Instagram Money Calculator",
     "creators": "Créateurs",
-    "creatorsAria": "Parcourir les profils de créateurs YouTube"
+    "creatorsAria": "Parcourir les profils de créateurs YouTube",
+    "channelAnalyzer": "Analyseur de chaîne",
+    "channelAnalyzerAria": "Ouvrir l'analyseur de chaîne YouTube"
   },
   "languageSelector": {
     "trigger": "Langue",
@@ -75,7 +77,8 @@
     "blog": "Blog",
     "estimatesBlurb": "Les revenus affichés sur ce site sont des estimations calculées indépendamment.",
     "instagramCalculator": "Instagram Money Calculator",
-    "creators": "Créateurs"
+    "creators": "Créateurs",
+    "channelAnalyzer": "Analyseur de chaîne"
   },
   "home": {
     "chip": "Basé sur l'API YouTube Data v3",
@@ -464,6 +467,10 @@
     "instagram": {
       "label": "Instagram Money Calculator",
       "description": "Estimate Instagram creator earnings."
+    },
+    "channelAnalyzer": {
+      "label": "Analyseur de chaîne",
+      "description": "Aperçu instantané de n'importe quelle chaîne YouTube."
     }
   },
   "popularCalculators": {
@@ -1085,5 +1092,175 @@
     "eyebrow": "Créateurs",
     "title": "Créateurs populaires",
     "viewAll": "Voir tous les créateurs"
+  },
+  "tools": {
+    "channelAnalyzer": {
+      "breadcrumb": "Analyseur de chaîne",
+      "breadcrumbAria": "Breadcrumb",
+      "hero": {
+        "eyebrow": "Outil gratuit · Sans inscription",
+        "title": "Analysez n'importe quelle chaîne YouTube",
+        "subtitle": "Collez l'URL, le @handle ou l'ID d'une chaîne YouTube et obtenez un aperçu instantané : abonnés, vues, engagement, revenus estimés, RPM, CPM et meilleures vidéos.",
+        "badges": {
+          "free": "100% gratuit",
+          "noLogin": "Sans inscription",
+          "estimatesOnly": "Estimations uniquement"
+        }
+      },
+      "input": {
+        "label": "URL, handle ou ID de la chaîne YouTube",
+        "placeholder": "https://www.youtube.com/@MrBeast — ou @MrBeast, ou un ID de chaîne",
+        "submit": "Analyser la chaîne",
+        "analyzing": "Analyse en cours…",
+        "clearAria": "Effacer la saisie",
+        "formAria": "Analyser une chaîne YouTube",
+        "helpSr": "Supports channel URLs, handles with or without the @ prefix, raw channel IDs, and channel names."
+      },
+      "card": {
+        "subscribers": "Subscribers",
+        "totalViews": "Total views",
+        "videos": "Videos",
+        "joined": "Joined"
+      },
+      "performance": {
+        "title": "Performance & earnings snapshot",
+        "disclaimer": "All figures are independent estimates based on public statistics. Actual YouTube revenue depends on ad category mix, monetization rate, seasonality, taxes, and other factors we cannot observe.",
+        "monthlyEarnings": {
+          "label": "Estimated monthly earnings",
+          "title": "Estimated monthly ad revenue",
+          "caption": "Range: {range}"
+        },
+        "yearlyEarnings": {
+          "label": "Estimated yearly earnings",
+          "title": "Estimated annual ad revenue",
+          "caption": "Range: {range}"
+        },
+        "rpm": {
+          "label": "Estimated RPM",
+          "title": "Revenue per 1,000 total views (creator side)",
+          "caption": "Based on {country} audience mix"
+        },
+        "cpm": {
+          "label": "Estimated CPM",
+          "title": "Advertiser cost per 1,000 monetized impressions",
+          "caption": "Before YouTube's revenue share"
+        },
+        "averageViews": {
+          "label": "Average views",
+          "caption": "{count, plural, =0 {No sample} one {From last upload} other {From last # uploads}}"
+        },
+        "uploadFrequency": {
+          "label": "Upload frequency",
+          "value": "{count, plural, =0 {No recent uploads} one {# / month} other {# / month}}",
+          "caption": "Based on the last 30 days"
+        },
+        "engagementRate": {
+          "label": "Engagement rate",
+          "caption": "Likes plus comments per view"
+        },
+        "growthScore": {
+          "label": "Growth score",
+          "labels": {
+            "quiet": "Quiet — low recent activity",
+            "steady": "Steady — consistent baseline",
+            "growing": "Growing — momentum building",
+            "thriving": "Thriving — strong signals"
+          }
+        }
+      },
+      "topVideos": {
+        "title": "Top videos",
+        "subtitle": "{count, plural, =0 {No videos yet} one {# highest-viewed upload} other {# highest-viewed uploads}}",
+        "watchOnYouTube": "Watch on YouTube"
+      },
+      "aiSummary": {
+        "title": "AI Insights",
+        "badge": "Coming soon",
+        "placeholderTitle": "AI insights coming soon.",
+        "placeholderBody": "We're building an AI layer that will summarize a channel's growth trajectory, monetization opportunities, and content strategy in plain English. It will plug into this section without changing the rest of the report."
+      },
+      "related": {
+        "title": "Related free tools",
+        "subtitle": "Use the numbers above as inputs to any of our other creator calculators.",
+        "links": {
+          "money": {
+            "title": "YouTube Money Calculator",
+            "description": "Estimate a channel's monthly revenue."
+          },
+          "rpm": {
+            "title": "RPM Calculator",
+            "description": "Revenue per 1,000 monetized views."
+          },
+          "cpm": {
+            "title": "CPM Calculator",
+            "description": "Advertiser cost per 1,000 impressions."
+          },
+          "shorts": {
+            "title": "Shorts Calculator",
+            "description": "Estimate Shorts Creator Pool payouts."
+          },
+          "sponsorship": {
+            "title": "Sponsorship Calculator",
+            "description": "Estimate brand deal rates."
+          }
+        }
+      },
+      "loading": {
+        "sr": "Analyzing channel…"
+      },
+      "results": {
+        "emptyTitle": "Paste a YouTube channel to get started",
+        "emptyBody": "The Channel Analyzer accepts any YouTube channel URL, handle, or channel ID. Try one of these formats:",
+        "emptyExamples": {
+          "url": "youtube.com/@MrBeast",
+          "handle": "@MrBeast",
+          "id": "UCX6OQ3DkcsbYNE6H8uQQuVA",
+          "name": "MrBeast"
+        },
+        "noVideosTitle": "No recent uploads found",
+        "noVideosBody": "This channel doesn't have any recent uploads we can sample. Earnings and engagement estimates need a video sample to be reliable.",
+        "errors": {
+          "echoInput": "You entered: {input}",
+          "invalid-input": {
+            "title": "That input doesn't look right",
+            "body": "Please double-check the URL, handle, or channel ID and try again."
+          },
+          "not-found": {
+            "title": "We couldn't find that channel",
+            "body": "No public YouTube channel matched that input. Try pasting the full channel URL or the @handle exactly as it appears on YouTube."
+          },
+          "not-configured": {
+            "title": "Channel Analyzer isn't fully configured",
+            "body": "The server is missing a YouTube API key. If you're the operator, set YOUTUBE_API_KEY in your environment."
+          },
+          "quota-exceeded": {
+            "title": "Daily API quota reached",
+            "body": "We've temporarily hit YouTube's daily API quota. Please try again in a few hours."
+          },
+          "upstream-unavailable": {
+            "title": "YouTube is not responding",
+            "body": "YouTube's API is currently unreachable or timing out. Please try again shortly."
+          },
+          "empty-input": {
+            "title": "Enter a channel to analyze",
+            "body": "Paste a YouTube channel URL, @handle, channel ID, or channel name above."
+          },
+          "unknown-error": {
+            "title": "Something went wrong",
+            "body": "We couldn't complete the analysis for that channel. Please try again in a moment."
+          }
+        }
+      },
+      "routeError": {
+        "title": "Channel Analyzer ran into a problem",
+        "body": "Something unexpected happened while rendering the report. Please try again — your input is preserved in the URL.",
+        "startOver": "Start over"
+      },
+      "meta": {
+        "title": "Analyseur de chaîne YouTube — Revenus, statistiques et meilleures vidéos",
+        "description": "Analysez n'importe quelle chaîne YouTube en quelques secondes. Revenus estimés, RPM, CPM, engagement, meilleures vidéos et croissance. Gratuit, sans inscription.",
+        "ogDescription": "Collez n'importe quelle URL ou handle d'une chaîne YouTube pour obtenir revenus mensuels estimés, RPM, CPM, engagement et meilleures vidéos."
+      }
+    }
   }
 }

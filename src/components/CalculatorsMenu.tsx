@@ -172,7 +172,8 @@ export interface CalculatorLink {
     | "/youtube-cpm-calculator"
     | "/youtube-shorts-calculator"
     | "/youtube-sponsorship-calculator"
-    | "/instagram-money-calculator";
+    | "/instagram-money-calculator"
+    | "/tools/channel-analyzer";
   labelKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -190,6 +191,15 @@ export const CALCULATOR_LINKS: CalculatorLink[] = [
     labelKey: "calculatorsMenu.instagram.label",
     descriptionKey: "calculatorsMenu.instagram.description",
     Icon: ShareIcon,
+  },
+  {
+    // Channel Analyzer — a full-page inspection tool for any YouTube
+    // channel. Placed here so it sits right below the two "money"
+    // calculators, which are its most natural sibling links.
+    href: "/tools/channel-analyzer",
+    labelKey: "calculatorsMenu.channelAnalyzer.label",
+    descriptionKey: "calculatorsMenu.channelAnalyzer.description",
+    Icon: ChartIcon,
   },
   {
     href: "/youtube-rpm-calculator",

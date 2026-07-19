@@ -42,7 +42,9 @@
     "instagramCalculator": "Instagram Calculator",
     "instagramCalculatorAria": "Instagram Money Calculator",
     "creators": "クリエイター",
-    "creatorsAria": "YouTube クリエイターのプロフィールを見る"
+    "creatorsAria": "YouTube クリエイターのプロフィールを見る",
+    "channelAnalyzer": "チャンネル分析",
+    "channelAnalyzerAria": "YouTube チャンネル分析を開く"
   },
   "languageSelector": {
     "trigger": "言語",
@@ -75,7 +77,8 @@
     "blog": "ブログ",
     "estimatesBlurb": "本サイトで表示している収益額は、独立して算出した見積もりです。",
     "instagramCalculator": "Instagram Money Calculator",
-    "creators": "クリエイター"
+    "creators": "クリエイター",
+    "channelAnalyzer": "チャンネル分析"
   },
   "home": {
     "chip": "YouTube Data API v3 を使用",
@@ -464,6 +467,10 @@
     "instagram": {
       "label": "Instagram Money Calculator",
       "description": "Estimate Instagram creator earnings."
+    },
+    "channelAnalyzer": {
+      "label": "チャンネル分析",
+      "description": "任意の YouTube チャンネルの瞬時サマリー。"
     }
   },
   "popularCalculators": {
@@ -1085,5 +1092,175 @@
     "eyebrow": "クリエイター",
     "title": "人気のクリエイター",
     "viewAll": "すべてのクリエイターを見る"
+  },
+  "tools": {
+    "channelAnalyzer": {
+      "breadcrumb": "チャンネル分析",
+      "breadcrumbAria": "Breadcrumb",
+      "hero": {
+        "eyebrow": "無料ツール · ログイン不要",
+        "title": "任意の YouTube チャンネルを分析",
+        "subtitle": "YouTube チャンネルの URL・@ハンドル・ID を貼り付けるだけで、登録者数・視聴回数・エンゲージメント・推定収益・RPM・CPM・トップ動画を即座に表示します。",
+        "badges": {
+          "free": "100% 無料",
+          "noLogin": "ログイン不要",
+          "estimatesOnly": "推定値のみ"
+        }
+      },
+      "input": {
+        "label": "YouTube チャンネル URL、ハンドル、または ID",
+        "placeholder": "https://www.youtube.com/@MrBeast — または @MrBeast、チャンネル ID",
+        "submit": "チャンネルを分析",
+        "analyzing": "分析中…",
+        "clearAria": "入力をクリア",
+        "formAria": "YouTube チャンネルを分析",
+        "helpSr": "Supports channel URLs, handles with or without the @ prefix, raw channel IDs, and channel names."
+      },
+      "card": {
+        "subscribers": "Subscribers",
+        "totalViews": "Total views",
+        "videos": "Videos",
+        "joined": "Joined"
+      },
+      "performance": {
+        "title": "Performance & earnings snapshot",
+        "disclaimer": "All figures are independent estimates based on public statistics. Actual YouTube revenue depends on ad category mix, monetization rate, seasonality, taxes, and other factors we cannot observe.",
+        "monthlyEarnings": {
+          "label": "Estimated monthly earnings",
+          "title": "Estimated monthly ad revenue",
+          "caption": "Range: {range}"
+        },
+        "yearlyEarnings": {
+          "label": "Estimated yearly earnings",
+          "title": "Estimated annual ad revenue",
+          "caption": "Range: {range}"
+        },
+        "rpm": {
+          "label": "Estimated RPM",
+          "title": "Revenue per 1,000 total views (creator side)",
+          "caption": "Based on {country} audience mix"
+        },
+        "cpm": {
+          "label": "Estimated CPM",
+          "title": "Advertiser cost per 1,000 monetized impressions",
+          "caption": "Before YouTube's revenue share"
+        },
+        "averageViews": {
+          "label": "Average views",
+          "caption": "{count, plural, =0 {No sample} one {From last upload} other {From last # uploads}}"
+        },
+        "uploadFrequency": {
+          "label": "Upload frequency",
+          "value": "{count, plural, =0 {No recent uploads} one {# / month} other {# / month}}",
+          "caption": "Based on the last 30 days"
+        },
+        "engagementRate": {
+          "label": "Engagement rate",
+          "caption": "Likes plus comments per view"
+        },
+        "growthScore": {
+          "label": "Growth score",
+          "labels": {
+            "quiet": "Quiet — low recent activity",
+            "steady": "Steady — consistent baseline",
+            "growing": "Growing — momentum building",
+            "thriving": "Thriving — strong signals"
+          }
+        }
+      },
+      "topVideos": {
+        "title": "Top videos",
+        "subtitle": "{count, plural, =0 {No videos yet} one {# highest-viewed upload} other {# highest-viewed uploads}}",
+        "watchOnYouTube": "Watch on YouTube"
+      },
+      "aiSummary": {
+        "title": "AI Insights",
+        "badge": "Coming soon",
+        "placeholderTitle": "AI insights coming soon.",
+        "placeholderBody": "We're building an AI layer that will summarize a channel's growth trajectory, monetization opportunities, and content strategy in plain English. It will plug into this section without changing the rest of the report."
+      },
+      "related": {
+        "title": "Related free tools",
+        "subtitle": "Use the numbers above as inputs to any of our other creator calculators.",
+        "links": {
+          "money": {
+            "title": "YouTube Money Calculator",
+            "description": "Estimate a channel's monthly revenue."
+          },
+          "rpm": {
+            "title": "RPM Calculator",
+            "description": "Revenue per 1,000 monetized views."
+          },
+          "cpm": {
+            "title": "CPM Calculator",
+            "description": "Advertiser cost per 1,000 impressions."
+          },
+          "shorts": {
+            "title": "Shorts Calculator",
+            "description": "Estimate Shorts Creator Pool payouts."
+          },
+          "sponsorship": {
+            "title": "Sponsorship Calculator",
+            "description": "Estimate brand deal rates."
+          }
+        }
+      },
+      "loading": {
+        "sr": "Analyzing channel…"
+      },
+      "results": {
+        "emptyTitle": "Paste a YouTube channel to get started",
+        "emptyBody": "The Channel Analyzer accepts any YouTube channel URL, handle, or channel ID. Try one of these formats:",
+        "emptyExamples": {
+          "url": "youtube.com/@MrBeast",
+          "handle": "@MrBeast",
+          "id": "UCX6OQ3DkcsbYNE6H8uQQuVA",
+          "name": "MrBeast"
+        },
+        "noVideosTitle": "No recent uploads found",
+        "noVideosBody": "This channel doesn't have any recent uploads we can sample. Earnings and engagement estimates need a video sample to be reliable.",
+        "errors": {
+          "echoInput": "You entered: {input}",
+          "invalid-input": {
+            "title": "That input doesn't look right",
+            "body": "Please double-check the URL, handle, or channel ID and try again."
+          },
+          "not-found": {
+            "title": "We couldn't find that channel",
+            "body": "No public YouTube channel matched that input. Try pasting the full channel URL or the @handle exactly as it appears on YouTube."
+          },
+          "not-configured": {
+            "title": "Channel Analyzer isn't fully configured",
+            "body": "The server is missing a YouTube API key. If you're the operator, set YOUTUBE_API_KEY in your environment."
+          },
+          "quota-exceeded": {
+            "title": "Daily API quota reached",
+            "body": "We've temporarily hit YouTube's daily API quota. Please try again in a few hours."
+          },
+          "upstream-unavailable": {
+            "title": "YouTube is not responding",
+            "body": "YouTube's API is currently unreachable or timing out. Please try again shortly."
+          },
+          "empty-input": {
+            "title": "Enter a channel to analyze",
+            "body": "Paste a YouTube channel URL, @handle, channel ID, or channel name above."
+          },
+          "unknown-error": {
+            "title": "Something went wrong",
+            "body": "We couldn't complete the analysis for that channel. Please try again in a moment."
+          }
+        }
+      },
+      "routeError": {
+        "title": "Channel Analyzer ran into a problem",
+        "body": "Something unexpected happened while rendering the report. Please try again — your input is preserved in the URL.",
+        "startOver": "Start over"
+      },
+      "meta": {
+        "title": "YouTube チャンネル分析 — 収益・統計・トップ動画",
+        "description": "任意の YouTube チャンネルを数秒で分析。推定収益、RPM、CPM、エンゲージメント、トップ動画、成長スコア。無料・登録不要。",
+        "ogDescription": "YouTube チャンネルの URL やハンドルを貼り付けて、推定月間収益、RPM、CPM、エンゲージメント、トップ動画を確認。"
+      }
+    }
   }
 }

@@ -63,6 +63,15 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/tools/channel-analyzer"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+                data-testid="footer-channel-analyzer-link"
+              >
+                {t("channelAnalyzer")}
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/youtube-rpm-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
