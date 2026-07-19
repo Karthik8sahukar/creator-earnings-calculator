@@ -460,7 +460,37 @@ export async function searchChannels(
       ];
     }
 
-    const q = parsed.kind === "handle" ? `@${parsed.value}` : parsed.value;
+    // Handle path — use the 1-unit `channels.list?forHandle=` endpoint
+    // instead of the 100-unit `search.list` endpoint. Both callers
+    // that pass a handle (`creatorAvatars.ts`, `creatorProfile.ts`)
+    // want the specific channel that owns the handle — not a fuzzy
+    // list of related channels — so the direct-lookup endpoint is
+    // both strictly correct AND 99% cheaper.
+    //
+    // The old handle path (`search.list?type=channel&q=@X` → enrich
+    // via `channels.list`) was exhausting the daily YouTube quota
+    // after just a few `/creators` page loads (see the
+    // `getChannelByHandle` docstring for the failure mode).
+    if (parsed.kind === "handle") {
+      const details = await getChannelByHandle(parsed.value);
+      if (!details) return [];
+      return [
+        {
+          channelId: details.channelId,
+          title: details.title,
+          handle: details.handle,
+          description: details.description,
+          thumbnail: details.thumbnail,
+          subscriberCount: details.hiddenSubscriberCount
+            ? null
+            : details.subscriberCount,
+          hiddenSubscriberCount: details.hiddenSubscriberCount,
+        },
+      ];
+    }
+
+    // Free-text name search — unchanged.
+    const q = parsed.value;
     if (!q.trim()) return [];
 
     const search = await ytFetch<YtSearchResponse>("search", {
@@ -508,6 +538,76 @@ export async function getChannelById(
     const c = res.items[0];
     if (!c) return null;
     return mapChannel(c);
+  });
+}
+
+/**
+ * Resolve a YouTube channel from its handle (e.g. `@MrBeast`) using
+ * the `channels.list?forHandle=` endpoint.
+ *
+ * Quota cost:
+ *
+ *   * `channels.list?forHandle=@X`     — **1 unit**   ← what this uses
+ *   * `search.list?type=channel&q=@X`  — 100 units    (avoided)
+ *
+ * Historically the handle case flowed through `search.list`, which
+ * cost 100 units per lookup. With 20 curated creators on `/creators`
+ * every cold-cache warm-up cost 20 × 101 = 2,020 units, so the daily
+ * 10,000-unit YouTube project quota was exhausted after just a few
+ * page loads. In production this manifested as most creator cards
+ * falling back to their initial avatars while whichever handful of
+ * requests happened to win the race got cached and continued to
+ * render. This 1-unit path removes the pressure entirely.
+ *
+ * We also seed the `channel:<id>` cache entry with the same
+ * `ChannelDetails` so a subsequent `getChannelById()` (used by the
+ * profile page's `resolveChannel()`) is a free cache hit rather
+ * than a second 1-unit round trip.
+ *
+ * Never throws in E2E mock mode — delegates to the same fixtures
+ * `getChannelById` uses so tests remain deterministic.
+ */
+export async function getChannelByHandle(
+  handle: string,
+): Promise<ChannelDetails | null> {
+  const normalized = handle.startsWith("@") ? handle : `@${handle}`;
+  const cacheKey = `handle:${normalized.toLowerCase()}`;
+
+  if (isE2EMockModeActive()) {
+    announceE2EMockIfActive();
+    markCache("miss");
+    markUpstream("success");
+    // The mocked search always returns Alpha/Bravo/Charlie fixtures
+    // regardless of query — take the top result's id and route it
+    // through the mocked channel-by-id fixture so the returned shape
+    // is a full ChannelDetails.
+    const results = await mockedSearchChannels(normalized);
+    const top = results[0];
+    if (!top) return null;
+    return mockedGetChannelById(top.channelId);
+  }
+
+  return (channelCache as {
+    getOrLoad(
+      key: string,
+      loader: () => Promise<ChannelDetails | null>,
+    ): Promise<ChannelDetails | null>;
+  }).getOrLoad(cacheKey, async () => {
+    const res = await ytFetch<YtChannelResponse>("channels", {
+      part: "snippet,statistics,contentDetails,brandingSettings",
+      forHandle: normalized,
+      maxResults: 1,
+    });
+    const c = res.items[0];
+    if (!c) return null;
+    const details = mapChannel(c);
+    // Warm the by-id cache too — the profile page (resolveChannel in
+    // creatorProfile.ts) calls getChannelById after this, and this
+    // makes that call free.
+    (channelCache as {
+      set(key: string, value: ChannelDetails): void;
+    }).set(`channel:${details.channelId}`, details);
+    return details;
   });
 }
 
