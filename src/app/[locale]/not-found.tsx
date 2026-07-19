@@ -1,25 +1,47 @@
 import { getTranslations } from "next-intl/server";
 
-import { Link } from "@/i18n/navigation";
+import { NotFoundBody } from "./_not-found/NotFoundBody";
 
 /**
- * Locale-aware 404.
+ * Locale-aware 404 boundary.
  *
- * `not-found.tsx` under a segment cannot receive route params directly,
- * so we resolve translations via `getTranslations()` which reads the
- * active locale from the request context.
+ * Rendered whenever Next.js walks the not-found boundary tree and
+ * lands here — most importantly when the `[slug]` segment inside
+ * `/[locale]/creator/[slug]/` is rejected by `dynamicParams = false`.
+ * In that case Next.js does not enter the `[slug]/` folder and does
+ * not treat sibling `creator/not-found.tsx` as a boundary either, so
+ * without any conditional branching this file was rendering the
+ * generic "Page not found" heading on every unknown-creator URL.
+ *
+ * The fix routes the decision through `<NotFoundBody/>`, a small
+ * client component that reads `usePathname()` and picks between
+ * the generic 404 copy and the creator-specific 404 copy. Both
+ * translation blocks are resolved server-side and passed down as
+ * plain strings so the client component ships zero i18n runtime.
+ *
+ * Layout / spacing / typography are unchanged; only the copy and
+ * the CTA destination switch when the failed URL lives under
+ * `/creator/`.
  */
 export default async function NotFound() {
-  const t = await getTranslations("notFound");
-  const tCommon = await getTranslations("common.actions");
+  const tGeneric = await getTranslations("notFound");
+  const tCreator = await getTranslations("creator.notFound");
+  const tActions = await getTranslations("common.actions");
+
   return (
-    <div className="text-center py-24">
-      <p className="text-sm font-medium text-brand-600">{t("code")}</p>
-      <h1 className="mt-2 text-3xl font-bold text-slate-900">{t("title")}</h1>
-      <p className="mt-2 text-slate-600">{t("body")}</p>
-      <Link href="/" className="btn-primary mt-6 inline-flex">
-        {tCommon("backToHome")}
-      </Link>
-    </div>
+    <NotFoundBody
+      generic={{
+        code: tGeneric("code"),
+        title: tGeneric("title"),
+        body: tGeneric("body"),
+        ctaLabel: tActions("backToHome"),
+      }}
+      creator={{
+        code: tCreator("code"),
+        title: tCreator("title"),
+        body: tCreator("body"),
+        ctaLabel: tCreator("browseAll"),
+      }}
+    />
   );
 }
