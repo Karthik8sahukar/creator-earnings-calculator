@@ -176,15 +176,15 @@ const EN_CHANNEL_ANALYZER = {
       "This channel doesn't have any recent uploads we can sample. Earnings and engagement estimates need a video sample to be reliable.",
     errors: {
       echoInput: "You entered: {input}",
+      "not-found": {
+        title: "No YouTube channel found",
+        body:
+          "No YouTube channel found. Try a valid @handle, channel URL, or channel ID.",
+      },
       "invalid-input": {
         title: "That input doesn't look right",
         body:
-          "Please double-check the URL, handle, or channel ID and try again.",
-      },
-      "not-found": {
-        title: "We couldn't find that channel",
-        body:
-          "No public YouTube channel matched that input. Try pasting the full channel URL or the @handle exactly as it appears on YouTube.",
+          "We couldn't recognize that as a YouTube channel URL, handle, or ID. Please double-check and try again.",
       },
       "not-configured": {
         title: "Channel Analyzer isn't fully configured",
@@ -208,7 +208,7 @@ const EN_CHANNEL_ANALYZER = {
       "unknown-error": {
         title: "Something went wrong",
         body:
-          "We couldn't complete the analysis for that channel. Please try again in a moment.",
+          "YouTube returned an unexpected response. Please try again in a moment or check that the URL, handle, or channel ID is valid.",
       },
     },
   },

@@ -106,13 +106,27 @@ export interface AnalyzerResult {
 }
 
 /**
- * Map a `YouTubeApiError` to a `AnalyzerFallbackReason`.
+ * Map a `YouTubeApiError` to an `AnalyzerFallbackReason`.
  *
- * Mirrors the mapping in `creatorProfile.ts` so the two features
- * classify the same upstream failure identically. The one difference
- * is `NOT_FOUND` — for the analyzer this maps to `"not-found"` (a
- * user-facing "we couldn't find that channel"), whereas for the
- * creator profile it maps to `"not-found"` for the same reason.
+ * Buckets (matching the taxonomy the product spec requires):
+ *
+ *   • not-configured       — the server is misconfigured
+ *   • quota-exceeded       — daily YouTube quota exhausted
+ *   • upstream-unavailable — 5xx / timeout / network — a *real*
+ *                            failure to reach or hear back from
+ *                            YouTube. The user should retry.
+ *   • not-found            — YouTube responded successfully but no
+ *                            channel matches. NOT an error.
+ *   • unknown-error        — YouTube returned an unexpected shape
+ *                            or an unrecognised status/reason. Rare
+ *                            and worth logging.
+ *
+ * `UPSTREAM_ERROR` (returned by `youtube.ts` for genuinely weird
+ * upstream statuses) and `MALFORMED_UPSTREAM` (returned when the
+ * JSON parse fails) are unusual-response conditions — they belong
+ * in `unknown-error`, NOT `upstream-unavailable`, otherwise the
+ * user gets a "try again later" message for a bug we should
+ * actually investigate.
  */
 function mapErrorToReason(err: unknown): AnalyzerFallbackReason {
   if (!(err instanceof YouTubeApiError)) return "unknown-error";
@@ -125,15 +139,57 @@ function mapErrorToReason(err: unknown): AnalyzerFallbackReason {
     case "UPSTREAM_UNAVAILABLE":
     case "UPSTREAM_TIMEOUT":
     case "NETWORK_ERROR":
-    case "UPSTREAM_ERROR":
-    case "MALFORMED_UPSTREAM":
-    case "FORBIDDEN":
       return "upstream-unavailable";
+    case "FORBIDDEN":
+      // 403 that isn't quota / bad-key — the API rejected the
+      // specific request. Bucketing under "not-configured" surfaces
+      // an operator-actionable message rather than telling users
+      // to retry an already-refused request.
+      return "not-configured";
     case "NOT_FOUND":
       return "not-found";
+    case "UPSTREAM_ERROR":
+    case "MALFORMED_UPSTREAM":
+      return "unknown-error";
     default:
       return "unknown-error";
   }
+}
+
+/**
+ * Confidence check for free-text ("name") searches.
+ *
+ * YouTube's search endpoint is very lenient — a random keystroke
+ * like "hjbhj" can return unrelated channels that happen to have
+ * "hjbhj" in their tags or description. Showing one of those to the
+ * user as "your analyzed channel" is worse UX than saying we
+ * couldn't find a match.
+ *
+ * We consider a result plausible when EITHER:
+ *
+ *   1. Its handle (case-insensitive, `@` stripped) contains the
+ *      query, or
+ *   2. Its title (case-insensitive) contains the query,
+ *
+ * anywhere. This is a deliberately weak substring check — it lets
+ * "kurzgesagt" match "Kurzgesagt – In a Nutshell" and "mrbeast"
+ * match "MrBeast" — but rules out low-signal single-word typos.
+ *
+ * Handle-kind searches use a stricter exact-match check further
+ * down the call site; this helper is only for name lookups.
+ */
+function isPlausibleNameMatch(
+  query: string,
+  result: {
+    title?: string | null;
+    handle?: string | null;
+  },
+): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return false;
+  const title = (result.title ?? "").toLowerCase();
+  const handle = (result.handle ?? "").toLowerCase().replace(/^@/, "");
+  return title.includes(q) || handle.includes(q);
 }
 
 /**
@@ -179,10 +235,14 @@ async function resolveChannel(
     return getChannelById(picked.channelId);
   }
 
-  // Free-text: take the top result. YouTube's search is decent at
-  // this for well-known channel names and there's no reliable
-  // signal to do better without more user input.
-  return getChannelById(results[0].channelId);
+  // Free-text: pick the first result whose title or handle
+  // *actually* contains the user's query. This filters out
+  // low-signal matches (YouTube search will surface unrelated
+  // channels for random / typo queries like "hjbhj") while still
+  // resolving well-known channel names via a plain substring.
+  const plausible = results.find((r) => isPlausibleNameMatch(input.value, r));
+  if (!plausible) return null;
+  return getChannelById(plausible.channelId);
 }
 
 /**
@@ -194,11 +254,23 @@ export async function analyzeChannel(
   const input = normalizeChannelInput(rawInput);
 
   if (!input.usable) {
+    // Distinguish "user typed nothing" (a natural landing state) from
+    // "user typed something we couldn't parse" (an error banner). The
+    // normalizer's `invalidReason` is the single source of truth for
+    // which is which.
+    if (input.invalidReason === "empty") {
+      return {
+        status: "empty",
+        input,
+        analysis: null,
+        fallbackReason: "empty-input",
+      };
+    }
     return {
-      status: "empty",
+      status: "error",
       input,
       analysis: null,
-      fallbackReason: "empty-input",
+      fallbackReason: "invalid-input",
     };
   }
 

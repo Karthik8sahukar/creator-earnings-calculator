@@ -60,8 +60,75 @@ describe("normalizeChannelInput", () => {
     for (const raw of ["", "   ", "\n\t"]) {
       const r = normalizeChannelInput(raw);
       expect(r.usable).toBe(false);
+      expect(r.invalidReason).toBe("empty");
       expect(r.raw).toBe("");
       expect(r.displayHint).toBe("");
+    }
+  });
+
+  it("flags UC-like strings that fail the id regex as 'malformed-channel-id'", () => {
+    // Each of these starts with UC and uses the channel-id charset
+    // (`[A-Za-z0-9_-]`) so the user's intent was clearly "channel
+    // ID", but the length is out of the strict [22, 42] range that
+    // real YouTube ids sit in.
+    for (const raw of [
+      "UC123",
+      "UCTooShort",
+      "UC-still-too-short-",
+      "UCabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ", // 47 chars — too long
+    ]) {
+      const r = normalizeChannelInput(raw);
+      expect(r.usable, `for ${raw}`).toBe(false);
+      expect(r.invalidReason, `for ${raw}`).toBe("malformed-channel-id");
+    }
+  });
+
+  it("does NOT flag names that happen to start with UC (e.g. 'UCLA basketball')", () => {
+    // Free-text queries that happen to begin with "UC" but contain
+    // characters (spaces, punctuation) that can't appear in a
+    // channel id must NOT be flagged — they're legitimate name
+    // searches.
+    for (const raw of [
+      "UCLA basketball",
+      "UC Berkeley",
+      "UC!!!!!!!!!!!!!!!!!!!!!!",
+    ]) {
+      const r = normalizeChannelInput(raw);
+      expect(r.usable, `for ${raw}`).toBe(true);
+      expect(r.kind, `for ${raw}`).toBe("name");
+    }
+  });
+
+  it("flags YouTube URLs with no channel identifier as 'invalid-youtube-url'", () => {
+    for (const raw of [
+      "https://www.youtube.com/",
+      "https://youtube.com/watch?v=abc",
+      "https://www.youtube.com/results?search_query=foo",
+      "youtube.com/feed/trending",
+    ]) {
+      const r = normalizeChannelInput(raw);
+      expect(r.usable, `for ${raw}`).toBe(false);
+      expect(r.invalidReason, `for ${raw}`).toBe("invalid-youtube-url");
+    }
+  });
+
+  it("flags a bare '@' as 'empty-handle'", () => {
+    const r = normalizeChannelInput("@");
+    expect(r.usable).toBe(false);
+    expect(r.invalidReason).toBe("empty-handle");
+  });
+
+  it("marks all valid inputs as usable with invalidReason null", () => {
+    for (const raw of [
+      "@MrBeast",
+      "MrBeast",
+      "UCX6OQ3DkcsbYNE6H8uQQuVA",
+      "https://www.youtube.com/@MrBeast",
+      "https://www.youtube.com/channel/UCX6OQ3DkcsbYNE6H8uQQuVA",
+    ]) {
+      const r = normalizeChannelInput(raw);
+      expect(r.usable, `for ${raw}`).toBe(true);
+      expect(r.invalidReason, `for ${raw}`).toBeNull();
     }
   });
 
