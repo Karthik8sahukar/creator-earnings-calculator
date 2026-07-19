@@ -41,6 +41,26 @@ export async function generateMetadata({
     },
     description: t("description"),
     applicationName: publicConfig.siteName,
+    // Site icons.
+    //
+    // The actual assets live under Next.js App Router file conventions
+    // at `src/app/{favicon.ico,icon.png,apple-icon.png}` and are
+    // regenerated from the compact BeHumler brand mark via
+    // `scripts/generate-favicons.mjs`. The metadata block below
+    // declares the URLs explicitly so Google Search picks up the
+    // 512×512 PNG (its preferred size for search-result site icons)
+    // and so iOS home-screen and legacy browsers get a dedicated
+    // apple-touch and .ico entry respectively.
+    icons: {
+      icon: [
+        { url: "/favicon.ico" },
+        { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: [
+        { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+      ],
+    },
     keywords: [
       "YouTube",
       "YouTube money calculator",
