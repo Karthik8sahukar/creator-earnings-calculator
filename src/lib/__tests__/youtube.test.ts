@@ -269,6 +269,123 @@ describe("youtube service", () => {
       const { searchChannels } = await loadYoutube();
       expect(await searchChannels("qwertyxyzzz")).toEqual([]);
     });
+
+    // ─── Handle path (channels.list?forHandle=) ────────────────────
+    //
+    // The tests below verify the fix that avoids the 100-search-per-day
+    // Search Queries quota bucket by resolving handles through the
+    // general-quota `channels.list?forHandle=` endpoint. See the
+    // docstring on `getChannelByHandle` for the quota model.
+
+    it("resolves an @handle via channels.list?forHandle= (1 upstream call, no search.list)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      const results = await searchChannels("@testchannel");
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [callArgs] = fetchMock.mock.calls as unknown as [[string]];
+      const url = new URL(callArgs[0]);
+      expect(url.pathname).toContain("/channels");
+      expect(url.pathname).not.toContain("/search");
+      expect(url.searchParams.get("forHandle")).toBe("@testchannel");
+      // Two Search-Queries-quota params must NOT be present.
+      expect(url.searchParams.get("q")).toBeNull();
+      expect(url.searchParams.get("type")).toBeNull();
+
+      expect(results).toHaveLength(1);
+      expect(results[0].channelId).toBe("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      expect(results[0].handle).toBe("@testchannel");
+    });
+  });
+
+  describe("getChannelByHandle", () => {
+    it("hits channels.list with forHandle exactly once", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { getChannelByHandle } = await loadYoutube();
+      const channel = await getChannelByHandle("@testchannel");
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [callArgs] = fetchMock.mock.calls as unknown as [[string]];
+      const url = new URL(callArgs[0]);
+      expect(url.pathname).toContain("/channels");
+      expect(url.searchParams.get("forHandle")).toBe("@testchannel");
+      // Requesting the parts the profile page needs so a follow-up
+      // `getChannelById` doesn't have to fetch again.
+      const part = url.searchParams.get("part") ?? "";
+      expect(part).toContain("snippet");
+      expect(part).toContain("statistics");
+      expect(part).toContain("contentDetails");
+
+      expect(channel).not.toBeNull();
+      expect(channel!.channelId).toBe("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      expect(channel!.title).toBe("Test Channel");
+    });
+
+    it("normalizes handles that lack the leading '@'", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { getChannelByHandle } = await loadYoutube();
+      await getChannelByHandle("bareHandle");
+      const [callArgs] = fetchMock.mock.calls as unknown as [[string]];
+      const url = new URL(callArgs[0]);
+      expect(url.searchParams.get("forHandle")).toBe("@bareHandle");
+    });
+
+    it("returns null when the API returns items: []", async () => {
+      mockFetchSequence([{ ok: true, body: { items: [] } }]);
+      const { getChannelByHandle } = await loadYoutube();
+      expect(await getChannelByHandle("@nonexistent")).toBeNull();
+    });
+
+    it("propagates YouTubeApiError so callers can render initials fallback", async () => {
+      // We simulate the exact quota-exhausted response the old
+      // `search.list` path used to return in production. The caller
+      // (`resolveCreatorAvatar` in `creatorAvatars.ts`) catches this
+      // error and returns null, which the card renders as an initial
+      // — see the `returns null (never throws) on any YouTubeApiError`
+      // test in `creatorAvatars.test.ts` for the caller side.
+      mockFetchSequence([
+        {
+          ok: false,
+          status: 403,
+          body: { error: { errors: [{ reason: "quotaExceeded" }] } },
+        },
+      ]);
+      const { getChannelByHandle, YouTubeApiError } = await loadYoutube();
+      await expect(getChannelByHandle("@test")).rejects.toBeInstanceOf(
+        YouTubeApiError,
+      );
+      try {
+        await getChannelByHandle("@test");
+      } catch (err) {
+        expect((err as { code: string }).code).toBe("QUOTA_EXCEEDED");
+      }
+    });
+
+    it("seeds the channel:<id> cache — subsequent getChannelById is a free hit", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { getChannelByHandle, getChannelById } = await loadYoutube();
+
+      // First call: real upstream fetch via forHandle.
+      const byHandle = await getChannelByHandle("@testchannel");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(byHandle!.channelId).toBe("UC_xxxxxxxxxxxxxxxxxxxxxx");
+
+      // Second call: same channelId; must be served from the cache
+      // that `getChannelByHandle` seeded, with zero additional fetches.
+      // This is why the fix costs 1 quota unit per creator instead of
+      // 2 — the profile page's `resolveChannel()` calls both.
+      const byId = await getChannelById(byHandle!.channelId);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(byId).toEqual(byHandle);
+    });
   });
 
   describe("getRecentVideos", () => {

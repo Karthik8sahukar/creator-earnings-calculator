@@ -460,17 +460,21 @@ export async function searchChannels(
       ];
     }
 
-    // Handle path — use the 1-unit `channels.list?forHandle=` endpoint
-    // instead of the 100-unit `search.list` endpoint. Both callers
-    // that pass a handle (`creatorAvatars.ts`, `creatorProfile.ts`)
-    // want the specific channel that owns the handle — not a fuzzy
-    // list of related channels — so the direct-lookup endpoint is
-    // both strictly correct AND 99% cheaper.
+    // Handle path — use `channels.list?forHandle=` (general quota,
+    // 1 unit) instead of `search.list` (Search Queries quota, 1 unit
+    // — but capped at only 100 calls/day). Both callers that pass a
+    // handle (`creatorAvatars.ts`, `creatorProfile.ts`) want the
+    // specific channel that owns the handle — not a fuzzy list of
+    // related channels — so the direct-lookup endpoint is both
+    // strictly correct AND avoids the tight Search Queries bucket
+    // entirely.
     //
-    // The old handle path (`search.list?type=channel&q=@X` → enrich
-    // via `channels.list`) was exhausting the daily YouTube quota
-    // after just a few `/creators` page loads (see the
-    // `getChannelByHandle` docstring for the failure mode).
+    // The old handle path went through `search.list?type=channel&q=@X`
+    // + `channels.list` enrichment. With 20 curated creators, every
+    // cold-cache warm-up spent 20 search queries; the 100/day cap
+    // therefore allowed roughly 5 warm-ups before subsequent calls
+    // hit `403 quotaExceeded`. See `getChannelByHandle`'s docstring
+    // for the full failure mode.
     if (parsed.kind === "handle") {
       const details = await getChannelByHandle(parsed.value);
       if (!details) return [];
@@ -545,19 +549,33 @@ export async function getChannelById(
  * Resolve a YouTube channel from its handle (e.g. `@MrBeast`) using
  * the `channels.list?forHandle=` endpoint.
  *
- * Quota cost:
+ * Quota model (YouTube Data API v3 as of 2026-07):
  *
- *   * `channels.list?forHandle=@X`     — **1 unit**   ← what this uses
- *   * `search.list?type=channel&q=@X`  — 100 units    (avoided)
+ *   * `channels.list?forHandle=@X`   — 1 unit from the general
+ *                                      quota (default 10,000/day).
  *
- * Historically the handle case flowed through `search.list`, which
- * cost 100 units per lookup. With 20 curated creators on `/creators`
- * every cold-cache warm-up cost 20 × 101 = 2,020 units, so the daily
- * 10,000-unit YouTube project quota was exhausted after just a few
- * page loads. In production this manifested as most creator cards
- * falling back to their initial avatars while whichever handful of
- * requests happened to win the race got cached and continued to
- * render. This 1-unit path removes the pressure entirely.
+ *   * `search.list?type=channel&q=@X` — 1 unit from the general
+ *                                      quota AND 1 call from the
+ *                                      **Search Queries** quota
+ *                                      bucket (default 100/day).
+ *                                      The Search Queries cap is the
+ *                                      tight limit, not the general
+ *                                      one.
+ *
+ * Historically the handle case flowed through `search.list`, so every
+ * creator lookup consumed one entry from the 100/day Search Queries
+ * bucket. On `/creators` a cold-cache warm-up therefore spent 20
+ * search queries; only about **five warm-ups per day** were possible
+ * before subsequent `search.list` calls returned `403 quotaExceeded`.
+ * On serverless (where the process-local `TtlCache` doesn't persist
+ * across function invocations) that cap was easy to hit under
+ * routine traffic, and the symptom was: most creator cards fell back
+ * to their initial-based avatar while whichever handful of requests
+ * won the race got cached and continued to render.
+ *
+ * Routing handle lookups through `channels.list?forHandle=` sidesteps
+ * the Search Queries bucket entirely. The general 10,000-units-per-day
+ * quota easily absorbs any realistic number of warm-ups.
  *
  * We also seed the `channel:<id>` cache entry with the same
  * `ChannelDetails` so a subsequent `getChannelById()` (used by the
