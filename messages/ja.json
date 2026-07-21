@@ -97,7 +97,10 @@
     "error": "問題が発生しました。",
     "subsSuffix": "登録者",
     "subsHidden": "非公開",
-    "unsupported": "有効なYouTube @ハンドル、チャンネルURL、またはチャンネルIDを入力してください。"
+    "unsupported": "有効なYouTube @ハンドル、チャンネルURL、またはチャンネルIDを入力してください。",
+    "searchButton": "チャンネル検索",
+    "searchButtonLoading": "検索中...",
+    "helperText": "YouTubeの@ハンドル、チャンネルURL、またはチャンネルIDを入力し、検索をクリックしてください。"
   },
   "recent": {
     "title": "最近の検索",

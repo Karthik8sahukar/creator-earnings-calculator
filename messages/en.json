@@ -97,7 +97,10 @@
     "error": "Something went wrong.",
     "subsSuffix": "subs",
     "subsHidden": "Hidden",
-    "unsupported": "Enter a valid YouTube @handle, channel URL, or channel ID."
+    "unsupported": "Enter a valid YouTube @handle, channel URL, or channel ID.",
+    "searchButton": "Search Channel",
+    "searchButtonLoading": "Searching...",
+    "helperText": "Enter a YouTube @handle, channel URL, or channel ID, then click Search."
   },
   "recent": {
     "title": "Recent searches",

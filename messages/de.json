@@ -97,7 +97,10 @@
     "error": "Etwas ist schiefgelaufen.",
     "subsSuffix": "Abos",
     "subsHidden": "Ausgeblendet",
-    "unsupported": "Bitte gib einen gültigen YouTube @Handle, eine Kanal-URL oder Kanal-ID ein."
+    "unsupported": "Bitte gib einen gültigen YouTube @Handle, eine Kanal-URL oder Kanal-ID ein.",
+    "searchButton": "Kanal suchen",
+    "searchButtonLoading": "Suche...",
+    "helperText": "Gib einen YouTube @Handle, eine Kanal-URL oder Kanal-ID ein und klicke auf Suchen."
   },
   "recent": {
     "title": "Kürzlich gesucht",

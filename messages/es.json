@@ -97,7 +97,10 @@
     "error": "Algo salió mal.",
     "subsSuffix": "suscripciones",
     "subsHidden": "Oculto",
-    "unsupported": "Ingresa un @handle de YouTube válido, URL del canal o ID del canal."
+    "unsupported": "Ingresa un @handle de YouTube válido, URL del canal o ID del canal.",
+    "searchButton": "Buscar canal",
+    "searchButtonLoading": "Buscando...",
+    "helperText": "Ingresa un @handle de YouTube, URL del canal o ID del canal, luego haz clic en Buscar."
   },
   "recent": {
     "title": "Búsquedas recientes",

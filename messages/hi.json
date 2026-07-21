@@ -97,7 +97,10 @@
     "error": "कुछ ग़लत हुआ।",
     "subsSuffix": "सब्सक्राइबर",
     "subsHidden": "छिपा हुआ",
-    "unsupported": "एक वैध YouTube @handle, चैनल URL, या चैनल ID दर्ज करें।"
+    "unsupported": "एक वैध YouTube @handle, चैनल URL, या चैनल ID दर्ज करें।",
+    "searchButton": "चैनल खोजें",
+    "searchButtonLoading": "खोज रहे हैं...",
+    "helperText": "YouTube @handle, चैनल URL, या चैनल ID दर्ज करें, फिर खोजें पर क्लिक करें।"
   },
   "recent": {
     "title": "हाल की खोजें",
