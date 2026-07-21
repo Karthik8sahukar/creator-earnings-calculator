@@ -42,9 +42,9 @@ test("Enter with invalid input shows validation message", async ({
   await input.fill("gaming channel");
   await input.press("Enter");
 
-  const alert = page.getByRole("alert");
-  await expect(alert).toBeVisible();
-  await expect(alert).toContainText(
+  const error = page.getByTestId("channel-search-error");
+  await expect(error).toBeVisible();
+  await expect(error).toContainText(
     /valid YouTube @handle, channel URL, or channel ID/i,
   );
 });
