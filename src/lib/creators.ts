@@ -13,15 +13,10 @@
 import { COUNTRIES, NICHES, findCountry, findNiche } from "./rpmData";
 import { CREATORS_DATASET } from "@/data/creators/dataset";
 import { getRelatedCreators } from "@/data/creators/related";
-import type { CreatorEntry } from "@/data/creators/schema";
+import type { CreatorEntry, CreatorContentType, CreatorCountryCode, CreatorNicheId } from "@/data/creators/schema";
 
-/** ISO-3166 alpha-2 country code that maps to an `rpmData` COUNTRY entry. */
-export type CreatorCountryCode = (typeof COUNTRIES)[number]["id"];
-/** Niche id that maps to an `rpmData` NICHE entry. */
-export type CreatorNicheId = (typeof NICHES)[number]["id"];
-
-/** The default content mix an earnings estimate should assume. */
-export type CreatorContentType = "long" | "shorts" | "mixed";
+// Re-export canonical types so existing consumers don't break.
+export type { CreatorCountryCode, CreatorNicheId, CreatorContentType };
 
 /**
  * A single creator record. The public shape consumed by pages,

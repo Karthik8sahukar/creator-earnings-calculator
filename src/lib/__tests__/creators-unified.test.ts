@@ -123,3 +123,62 @@ describe("unified creator catalog", () => {
     }
   });
 });
+
+
+
+describe("unverified creator profile — no YouTube API calls", () => {
+  it("does not call any YouTube API method for unverified creator", async () => {
+    // Mock the youtube module to track calls
+    const { vi } = await import("vitest");
+    vi.resetModules();
+
+    const getChannelById = vi.fn();
+    const getChannelByHandle = vi.fn();
+    const getRecentVideos = vi.fn();
+
+    vi.doMock("../youtube", () => ({
+      getChannelById,
+      getChannelByHandle,
+      getRecentVideos,
+      YouTubeApiError: class extends Error {
+        status: number;
+        code: string;
+        constructor(s: number, c: string, m: string) {
+          super(m);
+          this.status = s;
+          this.code = c;
+        }
+      },
+    }));
+
+    const { getCreatorProfile } = await import("../creatorProfile");
+
+    // Create an unverified creator (empty channelId)
+    const unverifiedCreator = {
+      slug: "test-unverified",
+      displayName: "Test Unverified",
+      youtubeHandle: "@TestUnverified",
+      channelId: "", // <-- empty = unverified
+      country: "United States",
+      countryCode: "US" as const,
+      category: "Entertainment",
+      nicheId: "entertainment" as const,
+      contentType: "long" as const,
+      description: "A test unverified creator.",
+      relatedCreators: [],
+    };
+
+    const profile = await getCreatorProfile(unverifiedCreator);
+
+    // CRITICAL: No YouTube API method should have been called
+    expect(getChannelById).not.toHaveBeenCalled();
+    expect(getChannelByHandle).not.toHaveBeenCalled();
+    expect(getRecentVideos).not.toHaveBeenCalled();
+
+    // Profile should render with fallback
+    expect(profile.fallbackReason).toBe("not-verified");
+    expect(profile.channel.title).toBe("Test Unverified");
+    expect(profile.videos).toEqual([]);
+    expect(profile.earnings.monthlyViews).toBe(0);
+  });
+});

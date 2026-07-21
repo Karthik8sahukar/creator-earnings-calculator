@@ -2,7 +2,7 @@ import "server-only";
 
 import type { Creator } from "./creators";
 import { YouTubeApiError } from "./errors";
-import { getChannelById, getChannelByHandle } from "./youtube";
+import { getChannelById } from "./youtube";
 
 /**
  * Server-only helper: resolve creator records to their YouTube
@@ -49,6 +49,9 @@ import { getChannelById, getChannelByHandle } from "./youtube";
 /**
  * Resolve a single creator to an avatar URL. Returns `null` when
  * unavailable — never throws.
+ *
+ * For unverified creators (empty channelId), returns null immediately
+ * without making any YouTube API call.
  */
 async function resolveCreatorAvatar(creator: Creator): Promise<string | null> {
   try {
@@ -57,13 +60,9 @@ async function resolveCreatorAvatar(creator: Creator): Promise<string | null> {
       return details?.thumbnail?.trim() ? details.thumbnail : null;
     }
 
-    const handle = creator.youtubeHandle.replace(/^@/, "");
-    if (!handle) return null;
-
-    // Use channels.list(forHandle) — NEVER search.list
-    const details = await getChannelByHandle(handle);
-    if (!details) return null;
-    return details.thumbnail?.trim() ? details.thumbnail : null;
+    // Unverified creator — do NOT call the YouTube API.
+    // Return null so the UI renders its initial-based placeholder.
+    return null;
   } catch (err) {
     console.error("creator-avatar:resolve failed", {
       slug: creator.slug,

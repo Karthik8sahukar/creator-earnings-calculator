@@ -14,7 +14,6 @@ import { REFERENCE_MONETIZATION_PCT } from "./rpmData";
 import { calculateSponsorship } from "./simpleCalculators";
 import {
   getChannelById,
-  getChannelByHandle,
   getRecentVideos,
 } from "./youtube";
 import type {
@@ -39,6 +38,7 @@ export type CreatorFallbackReason =
   | "quota-exceeded"        // Daily API quota exhausted.
   | "upstream-unavailable"  // YouTube is 5xx-ing.
   | "not-found"             // Channel handle could not be resolved.
+  | "not-verified"          // Creator has no verified channel ID — static profile only.
   | "unknown-error";        // Anything else — logged server-side.
 
 export interface CreatorEarningsSnapshot {
@@ -157,20 +157,21 @@ function mapErrorToReason(err: unknown): CreatorFallbackReason {
  *
  * Priority:
  *   1. If `creator.channelId` is set, use it directly (cheapest path).
- *   2. Otherwise, use channels.list(forHandle=@handle) — 1 quota unit.
+ *   2. If channelId is empty (unverified creator), return null immediately.
+ *      NO YouTube API call is made. The page renders a static profile
+ *      with a "not-verified" fallback reason.
  *
- * NEVER uses search.list. Any `YouTubeApiError` propagates up so the
- * caller can convert it into a `CreatorFallbackReason`.
+ * This prevents unverified creators from consuming API quota when
+ * Googlebot or users browse their profile pages.
  */
 async function resolveChannel(creator: Creator): Promise<ChannelDetails | null> {
   if (creator.channelId) {
     return getChannelById(creator.channelId);
   }
 
-  const handle = creator.youtubeHandle.replace(/^@/, "");
-  if (!handle) return null;
-
-  return getChannelByHandle(handle);
+  // Unverified creator — do NOT call the YouTube API.
+  // The caller will set fallbackReason = "not-verified".
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -333,7 +334,7 @@ export async function getCreatorProfile(
   try {
     channel = await resolveChannel(creator);
     if (!channel) {
-      fallbackReason = "not-found";
+      fallbackReason = creator.channelId ? "not-found" : "not-verified";
     }
   } catch (err) {
     fallbackReason = mapErrorToReason(err);

@@ -13,9 +13,34 @@
  *     derived automatically from the data
  *   - Backward-compatible with the existing Creator interface in
  *     src/lib/creators.ts (which remains the runtime adapter)
+ *
+ * DEPENDENCY RULE: This file must NOT import from src/lib/.
+ * All shared types are defined here. src/lib/creators.ts imports from here.
  */
 
-import type { CreatorContentType, CreatorCountryCode, CreatorNicheId } from "@/lib/creators";
+// ─── Shared Canonical Types ─────────────────────────────────────────
+
+/**
+ * ISO-3166 alpha-2 country code matching the rpmData COUNTRIES table.
+ * Defined here so the data layer does not depend on the service layer.
+ */
+export type CreatorCountryCode =
+  | "US" | "GB" | "CA" | "AU" | "DE" | "FR" | "NL" | "SE"
+  | "JP" | "KR" | "IN" | "BR" | "MX" | "ES" | "IT" | "ID"
+  | "PH" | "ZA" | "AE" | "OTHER";
+
+/**
+ * Niche ID matching the rpmData NICHES table.
+ * Defined here so the data layer does not depend on the service layer.
+ */
+export type CreatorNicheId =
+  | "finance" | "business" | "marketing" | "tech" | "education"
+  | "health" | "auto" | "science" | "beauty" | "lifestyle"
+  | "food" | "travel" | "news" | "diy" | "sports"
+  | "entertainment" | "gaming" | "music" | "kids" | "other";
+
+/** The default content mix an earnings estimate should assume. */
+export type CreatorContentType = "long" | "shorts" | "mixed";
 
 // ─── Core Types ─────────────────────────────────────────────────────
 

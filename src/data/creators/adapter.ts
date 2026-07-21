@@ -9,9 +9,28 @@
  * Uses `import type` to avoid circular runtime dependencies.
  */
 
-import type { Creator } from "@/lib/creators";
-import type { CreatorEntry } from "./schema";
+import type { CreatorEntry, CreatorContentType, CreatorCountryCode, CreatorNicheId } from "./schema";
 import { getRelatedCreators } from "./related";
+
+/**
+ * The Creator interface — matches src/lib/creators.ts Creator type.
+ * Defined here to avoid circular imports.
+ */
+interface Creator {
+  slug: string;
+  displayName: string;
+  youtubeHandle: string;
+  channelId: string;
+  country: string;
+  countryCode?: CreatorCountryCode;
+  category: string;
+  nicheId?: CreatorNicheId;
+  contentType?: CreatorContentType;
+  description: string;
+  fallbackAvatarUrl?: string;
+  fallbackBannerUrl?: string;
+  relatedCreators: string[];
+}
 
 /**
  * Convert a CreatorEntry to the legacy Creator interface.
