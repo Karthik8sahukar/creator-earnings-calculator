@@ -137,25 +137,42 @@ export class TtlCache<V> {
  * Global cache instances for the YouTube service. Sized generously enough
  * to matter for real traffic but small enough to stay bounded in RAM.
  *
- * TTLs:
- *   - Search results   : 45 minutes  (queries are noisy, small TTL is fine)
- *   - Channel details  : 6 hours     (stats update slowly)
- *   - Recent videos    : 2 hours     (new uploads matter but not hot-path)
+ * TTLs (Phase 5 — quota fix):
+ *   - Search / handle→channel : 30 days  (handles rarely change)
+ *   - Channel details          : 24 hours (stats update slowly)
+ *   - Recent videos            : 6 hours  (new uploads matter but not hot-path)
+ *   - Not-found lookups        : 1 hour   (retry failed lookups sooner)
+ *
+ * The cache abstraction gracefully falls back to in-memory when no
+ * external provider (Redis, Upstash, Vercel KV) is configured. This
+ * is intentional — the in-memory cache provides quota protection for
+ * single-instance deployments and development.
  */
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 
 export const searchCache = new TtlCache<unknown>({
-  maxSize: 500,
-  ttlMs: 45 * MINUTE,
+  maxSize: 1000,
+  ttlMs: 30 * DAY,
 });
 
 export const channelCache = new TtlCache<unknown>({
-  maxSize: 500,
-  ttlMs: 6 * HOUR,
+  maxSize: 1000,
+  ttlMs: 24 * HOUR,
 });
 
 export const videosCache = new TtlCache<unknown>({
   maxSize: 500,
-  ttlMs: 2 * HOUR,
+  ttlMs: 6 * HOUR,
+});
+
+/**
+ * Not-found cache: caches null/empty results for a shorter TTL
+ * to avoid repeatedly hammering the API for invalid inputs,
+ * while still allowing retry after a reasonable period.
+ */
+export const notFoundCache = new TtlCache<unknown>({
+  maxSize: 200,
+  ttlMs: 1 * HOUR,
 });

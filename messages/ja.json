@@ -90,13 +90,17 @@
   },
   "search": {
     "srLabel": "チャンネルを検索",
-    "placeholder": "チャンネル名、@handle、URL、チャンネル ID で検索",
+    "placeholder": "@ハンドル、チャンネルURL、またはチャンネルIDを入力",
     "clearAria": "検索をクリア",
     "loading": "検索中…",
     "empty": "チャンネルが見つかりません。別の名前で試すか、チャンネル URL を貼り付けてください。",
     "error": "問題が発生しました。",
     "subsSuffix": "登録者",
-    "subsHidden": "非公開"
+    "subsHidden": "非公開",
+    "unsupported": "有効なYouTube @ハンドル、チャンネルURL、またはチャンネルIDを入力してください。",
+    "searchButton": "チャンネル検索",
+    "searchButtonLoading": "検索中...",
+    "helperText": "YouTubeの@ハンドル、チャンネルURL、またはチャンネルIDを入力し、検索をクリックしてください。"
   },
   "recent": {
     "title": "最近の検索",

@@ -2,7 +2,7 @@ import "server-only";
 
 import type { Creator } from "./creators";
 import { YouTubeApiError } from "./errors";
-import { getChannelById, searchChannels } from "./youtube";
+import { getChannelById, getChannelByHandle } from "./youtube";
 
 /**
  * Server-only helper: resolve creator records to their YouTube
@@ -19,11 +19,12 @@ import { getChannelById, searchChannels } from "./youtube";
  *       cached 6h). Returns the full `ChannelDetails` — we take
  *       only `.thumbnail`.
  *
- *     * `channelId` empty     → `searchChannels("@handle")`, which
- *       returns `ChannelSearchResult[]` (thumbnail already mapped
- *       via `pickThumb` — high → medium → default → …). We take
- *       the entry whose handle matches exactly (case-insensitively);
- *       fall back to the top result. Cached 45m.
+ *     * `channelId` empty     → `getChannelByHandle("handle")`,
+ *       which uses channels.list(forHandle=@handle) — 1 quota unit,
+ *       cached 6h. Returns the full `ChannelDetails` — we take
+ *       only `.thumbnail`.
+ *
+ *   NEVER uses search.list.
  *
  *   Both underlying calls share the same TtlCache used by
  *   `getCreatorProfile()` — so if a user has visited any creator's
@@ -59,19 +60,10 @@ async function resolveCreatorAvatar(creator: Creator): Promise<string | null> {
     const handle = creator.youtubeHandle.replace(/^@/, "");
     if (!handle) return null;
 
-    const results = await searchChannels(`@${handle}`);
-    if (results.length === 0) return null;
-
-    // Prefer an exact handle match (case-insensitive). Falling back
-    // to the top result is intentional — in E2E mock mode the
-    // fixtures do not carry the creator's real handle, but they still
-    // give us a valid thumbnail URL to render.
-    const wanted = `@${handle.toLowerCase()}`;
-    const exact = results.find(
-      (r) => r.handle && r.handle.toLowerCase() === wanted,
-    );
-    const picked = exact ?? results[0];
-    return picked.thumbnail?.trim() ? picked.thumbnail : null;
+    // Use channels.list(forHandle) — NEVER search.list
+    const details = await getChannelByHandle(handle);
+    if (!details) return null;
+    return details.thumbnail?.trim() ? details.thumbnail : null;
   } catch (err) {
     console.error("creator-avatar:resolve failed", {
       slug: creator.slug,
