@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { listCategorySlugs, listCountrySlugs } from "@/data/creators";
+import { listLeaderboardSlugs } from "@/data/creators/leaderboards";
 import { HREFLANG_MAP, routing } from "@/i18n/routing";
 import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
 import { publicConfig } from "@/lib/config";
@@ -93,6 +95,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const creator of listCreators()) {
     entries.push(
       ...perLocaleWithAlternates(`/creator/${creator.slug}`, 0.6, "weekly"),
+    );
+  }
+
+  // Category pages: /creators/[category]
+  for (const slug of listCategorySlugs()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/creators/${slug}`, 0.6, "weekly"),
+    );
+  }
+
+  // Country pages: /creators/country/[country]
+  for (const slug of listCountrySlugs()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/creators/country/${slug}`, 0.6, "weekly"),
+    );
+  }
+
+  // Leaderboard pages: /leaderboard/[slug]
+  for (const slug of listLeaderboardSlugs()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/leaderboard/${slug}`, 0.6, "weekly"),
     );
   }
 
