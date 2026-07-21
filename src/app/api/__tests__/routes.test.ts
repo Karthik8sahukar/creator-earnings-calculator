@@ -61,7 +61,7 @@ describe("GET /api/search", () => {
   it("returns results on success", async () => {
     resolveChannelFromInput.mockResolvedValueOnce([
       {
-        channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx",
+        channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA",
         title: "T",
         handle: "@t",
         description: "",
@@ -165,18 +165,18 @@ describe("GET /api/channel", () => {
   it("returns 404 when channel is not found", async () => {
     getChannelById.mockResolvedValueOnce(null);
     const res = await channelGET(
-      new Request("http://x/api/channel?channelId=UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      new Request("http://x/api/channel?channelId=UCX6OQ3DkcsbYNE6H8uQQuVA"),
     );
     expect(res.status).toBe(404);
   });
 
   it("returns the channel on success", async () => {
     getChannelById.mockResolvedValueOnce({
-      channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx",
+      channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA",
       title: "T",
     });
     const res = await channelGET(
-      new Request("http://x/api/channel?channelId=UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      new Request("http://x/api/channel?channelId=UCX6OQ3DkcsbYNE6H8uQQuVA"),
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -197,7 +197,7 @@ describe("GET /api/videos", () => {
     getRecentVideos.mockResolvedValueOnce([{ videoId: "v1" }]);
     const res = await videosGET(
       new Request(
-        "http://x/api/videos?playlistId=UU_xxxxxxxxxxxxxxxxxxxxxx&limit=5",
+        "http://x/api/videos?playlistId=UUX6OQ3DkcsbYNE6H8uQQuVA&limit=5",
       ),
     );
     expect(res.status).toBe(200);
@@ -209,12 +209,12 @@ describe("GET /api/videos", () => {
     getRecentVideos.mockResolvedValueOnce([]);
     const res = await videosGET(
       new Request(
-        "http://x/api/videos?playlistId=UU_xxxxxxxxxxxxxxxxxxxxxx&limit=9999",
+        "http://x/api/videos?playlistId=UUX6OQ3DkcsbYNE6H8uQQuVA&limit=9999",
       ),
     );
     expect(res.status).toBe(200);
     expect(getRecentVideos).toHaveBeenCalledWith(
-      "UU_xxxxxxxxxxxxxxxxxxxxxx",
+      "UUX6OQ3DkcsbYNE6H8uQQuVA",
       50,
     );
   });

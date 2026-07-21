@@ -105,13 +105,13 @@ describe("route observability logging", () => {
 
   it("records rateLimit=allowed on the successful path", async () => {
     getChannelById.mockResolvedValueOnce({
-      channelId: "UCXXXXXXXXXXXXXXXXXXXXXX",
+      channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA",
       title: "T",
-      uploadsPlaylistId: "UUXXXXXXXXXXXXXXXXXXXXXX",
+      uploadsPlaylistId: "UUX6OQ3DkcsbYNE6H8uQQuVA",
     });
     const res = await channelGET(
       new Request(
-        "http://x/api/channel?channelId=UCXXXXXXXXXXXXXXXXXXXXXX",
+        "http://x/api/channel?channelId=UCX6OQ3DkcsbYNE6H8uQQuVA",
       ),
     );
     expect(res.status).toBe(200);
