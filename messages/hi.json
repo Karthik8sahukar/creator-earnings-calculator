@@ -1038,7 +1038,8 @@
         "quota-exceeded": "The daily YouTube API quota has been reached — showing catalog metadata and estimated numbers. Live figures return once the quota resets.",
         "upstream-unavailable": "The YouTube API is temporarily unavailable — the profile is rendered with catalog metadata and estimated numbers.",
         "not-found": "We could not resolve this creator's YouTube channel right now — showing catalog metadata and estimated numbers.",
-        "unknown-error": "Live YouTube data could not be loaded right now — showing catalog metadata and estimated numbers."
+        "unknown-error": "Live YouTube data could not be loaded right now — showing catalog metadata and estimated numbers.",
+        "not-verified": "इस क्रिएटर के चैनल की अभी तक पुष्टि नहीं हुई है — केवल कैटलॉग डेटा दिखाया गया है। लाइव आँकड़े जल्द आ रहे हैं।"
       }
     },
     "loading": {
