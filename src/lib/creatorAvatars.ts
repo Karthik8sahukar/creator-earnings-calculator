@@ -2,47 +2,48 @@ import "server-only";
 
 import type { Creator } from "./creators";
 import { YouTubeApiError } from "./errors";
-import { getChannelById, searchChannels } from "./youtube";
+import { getChannelById, getChannelByHandle } from "./youtube";
 
 /**
  * Server-only helper: resolve creator records to their YouTube
- * profile-picture URLs, reusing the existing YouTube cache layer.
+ * profile-picture URLs using ONLY the cheap 1-quota-unit endpoints.
  *
- * Why a dedicated helper instead of `getCreatorProfile`?
+ * Why this file exists:
  *
- *   The profile page's `getCreatorProfile()` also fetches recent
- *   videos and runs performance analysis — expensive work we don't
- *   need to render 20 avatars on `/creators`. This helper takes the
- *   cheapest path that still gives us a thumbnail:
+ *   Rendering the 20-creator homepage strip used to call
+ *   `searchChannels("@handle")` once per creator whose `channelId`
+ *   was unknown — that endpoint costs **100 quota units** per call.
+ *   Twenty creators × 100 = 2 000 units per cold cache render, which
+ *   alone could burn 20 % of the free-tier daily quota (10 000 units).
  *
- *     * `channelId` present  → `getChannelById()` (1 quota unit,
- *       cached 6h). Returns the full `ChannelDetails` — we take
- *       only `.thumbnail`.
+ *   This helper takes the cheapest path in every branch:
  *
- *     * `channelId` empty     → `searchChannels("@handle")`, which
- *       returns `ChannelSearchResult[]` (thumbnail already mapped
- *       via `pickThumb` — high → medium → default → …). We take
- *       the entry whose handle matches exactly (case-insensitively);
- *       fall back to the top result. Cached 45m.
+ *     * `channelId` present  → `getChannelById()` (1 unit,
+ *       cached 24 h). Returns full `ChannelDetails`; we take only
+ *       `.thumbnail`.
  *
- *   Both underlying calls share the same TtlCache used by
- *   `getCreatorProfile()` — so if a user has visited any creator's
- *   detail page recently, that creator's avatar lookup here is a
- *   free cache hit. No extra API request is issued.
+ *     * `channelId` empty    → `getChannelByHandle()` which uses
+ *       `channels.list?forHandle=@…` (1 unit, cached 24 h). This
+ *       replaces the previous `search.list` path (100 units) with a
+ *       function that costs 1 unit — a 99 % reduction.
  *
- * Design rules:
+ *   Result: rendering the homepage strip on a fully cold cache now
+ *   costs at most 20 quota units instead of 2 000. Steady-state with
+ *   warm caches: 0 units.
  *
- *   1. **Never throws.** A single creator's failure must not
- *      prevent the other 19 avatars from resolving. Errors are
- *      logged with just the slug + error code (never the raw
- *      YouTube error message, which may carry internal details).
+ * Design rules (unchanged):
+ *
+ *   1. **Never throws.** A single creator's failure must not prevent
+ *      the other 19 avatars from resolving. Errors are logged with
+ *      just the slug + error code (never the raw YouTube error
+ *      message, which may carry internal details).
  *
  *   2. **Never fabricates a URL.** If the API can't be reached, we
  *      return `null` and the UI renders its initial-based fallback.
  *
  *   3. **Batch is parallel via `Promise.allSettled`** — one slow
- *      lookup can't extend total wall-clock past the youtube
- *      timeout budget.
+ *      lookup can't extend total wall-clock past the YouTube timeout
+ *      budget.
  */
 
 /**
@@ -51,27 +52,20 @@ import { getChannelById, searchChannels } from "./youtube";
  */
 async function resolveCreatorAvatar(creator: Creator): Promise<string | null> {
   try {
+    // Prefer a known channelId — cheapest and most stable.
     if (creator.channelId) {
       const details = await getChannelById(creator.channelId);
       return details?.thumbnail?.trim() ? details.thumbnail : null;
     }
 
+    // No channelId on the record — resolve via the handle. This path
+    // now uses `channels.list?forHandle=` (1 unit), NOT `search.list`
+    // (100 units). See getChannelByHandle() in `youtube.ts`.
     const handle = creator.youtubeHandle.replace(/^@/, "");
     if (!handle) return null;
 
-    const results = await searchChannels(`@${handle}`);
-    if (results.length === 0) return null;
-
-    // Prefer an exact handle match (case-insensitive). Falling back
-    // to the top result is intentional — in E2E mock mode the
-    // fixtures do not carry the creator's real handle, but they still
-    // give us a valid thumbnail URL to render.
-    const wanted = `@${handle.toLowerCase()}`;
-    const exact = results.find(
-      (r) => r.handle && r.handle.toLowerCase() === wanted,
-    );
-    const picked = exact ?? results[0];
-    return picked.thumbnail?.trim() ? picked.thumbnail : null;
+    const details = await getChannelByHandle(handle);
+    return details?.thumbnail?.trim() ? details.thumbnail : null;
   } catch (err) {
     console.error("creator-avatar:resolve failed", {
       slug: creator.slug,

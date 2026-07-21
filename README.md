@@ -776,6 +776,64 @@ frontend renders. Common codes you might see in production:
 - **`RATE_LIMITED`** — you're hammering the local API too fast. Raise
   the limit via `RATE_LIMIT_MAX` or slow down.
 
+## Quota efficiency
+
+The YouTube Data API has a small daily quota (10 000 units on the free
+tier). `search.list` costs **100 units** per call, `channels.list`
+costs **1 unit**. This app is designed so a normal browsing session
+consumes single-digit quota units, not hundreds.
+
+### Where the cost lives
+
+| Endpoint            | Cost | When it's used                                              |
+| ------------------- | ---- | ----------------------------------------------------------- |
+| `channels.list?id=` | 1    | User pastes a `UC…` id or `/channel/UC…` URL, cache miss    |
+| `channels.list?forHandle=` | 1 | User pastes `@handle`, `/@handle`, or a featured creator's avatar refreshes |
+| `search.list`       | 100  | Free-text search that isn't already cached                  |
+| `playlistItems.list`| 1    | Recent-videos strip on the channel-detail page              |
+| `videos.list`       | 1    | Recent-videos enrichment (batched)                          |
+
+### What we do to keep the cost down
+
+- **Prefer the cheapest endpoint that answers the question.** The
+  channel-search entry point (`searchChannels`) routes:
+  - raw `UC…` ids → `channels.list?id=` (1 unit)
+  - `@handle` / URLs with a handle → `channels.list?forHandle=` (1 unit)
+  - free text → `search.list` (100 units) + a 1-unit enrichment
+- **Server-side TTL cache.** `searchCache` = 12 h, `channelCache` = 24 h,
+  `videosCache` = 6 h. All keyed on the *normalized* query so
+  "Mr Beast", "mr beast" and "  mr  beast  " all share one entry.
+- **In-process request coalescing.** Concurrent identical calls share
+  a single in-flight promise — no thundering-herd on cold cache.
+- **Circuit breaker.** After a real `QUOTA_EXCEEDED`, every YouTube
+  call is short-circuited for 10 minutes without hitting Google. One
+  probe request is allowed after the cooldown to test recovery.
+- **Client-side debounce + minimum length.** The channel-search box
+  waits 700 ms after the last keystroke and requires at least 3
+  non-whitespace characters before firing.
+- **Client-side dedup + short cache.** Repeated identical queries are
+  served from a small in-memory cache (5 minutes, up to 20 entries) —
+  no network round-trip at all.
+- **Search-specific rate limit.** `/api/search` enforces a stricter
+  limit (10 unique searches / minute / client) on cache misses only.
+  Cache hits do not consume tokens.
+- **No `search.list` on the homepage.** Featured-creator avatars are
+  resolved by `getChannelByHandle()` (1 unit) or `getChannelById()`
+  (1 unit) — never by `searchChannels()`. A cold-cache render of the
+  20-creator strip costs at most 20 units instead of 2 000.
+
+### Tuning the values
+
+- Cache TTLs: `src/lib/cache.ts`
+- Circuit breaker cooldown (`QUOTA_COOLDOWN_MS`): `src/lib/youtube.ts`
+- Debounce (`DEBOUNCE_MS`) and minimum-chars (`MIN_SEARCH_CHARS`):
+  `src/components/ChannelSearch.tsx`
+- Client-side cache (`CLIENT_CACHE_TTL_MS`, `CLIENT_CACHE_MAX`):
+  `src/components/ChannelSearch.tsx`
+- Search-specific rate limit
+  (`SEARCH_RATE_LIMIT_MAX`, `SEARCH_RATE_LIMIT_WINDOW_MS`):
+  `src/lib/rateLimit.ts`
+
 ### Verifying a Vercel deployment
 
 After adding `YOUTUBE_API_KEY` and redeploying, verify the deployment:

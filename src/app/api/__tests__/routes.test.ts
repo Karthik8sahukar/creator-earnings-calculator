@@ -14,6 +14,7 @@ import { YouTubeApiError } from "@/lib/errors";
 const searchChannels = vi.fn();
 const getChannelById = vi.fn();
 const getRecentVideos = vi.fn();
+const isSearchCached = vi.fn().mockReturnValue(false);
 
 vi.mock("@/lib/youtube", () => ({
   // Re-export the same error class so `instanceof` checks succeed in
@@ -23,6 +24,8 @@ vi.mock("@/lib/youtube", () => ({
   searchChannels: (...args: unknown[]) => searchChannels(...args),
   getChannelById: (...args: unknown[]) => getChannelById(...args),
   getRecentVideos: (...args: unknown[]) => getRecentVideos(...args),
+  isSearchCached: (...args: unknown[]) => isSearchCached(...args),
+  searchCacheKeyFor: (raw: string) => `test:${raw}`,
 }));
 
 // Load routes once so all handlers share the same rate-limiter instance
@@ -30,14 +33,16 @@ vi.mock("@/lib/youtube", () => ({
 import { GET as searchGET } from "../search/route";
 import { GET as channelGET } from "../channel/route";
 import { GET as videosGET } from "../videos/route";
-import { apiLimiter } from "@/lib/rateLimit";
+import { apiLimiter, searchLimiter } from "@/lib/rateLimit";
 
 beforeEach(() => {
   process.env.YOUTUBE_API_KEY = "test-key";
   searchChannels.mockReset();
   getChannelById.mockReset();
   getRecentVideos.mockReset();
+  isSearchCached.mockReset().mockReturnValue(false);
   apiLimiter.clear();
+  searchLimiter.clear();
 });
 
 afterEach(() => {
@@ -253,6 +258,55 @@ describe("GET /api/search", () => {
       }
     }
     expect(sawRateLimit).toBe(true);
+  });
+
+  it("skips the strict search rate limit for cache hits", async () => {
+    // Simulate 20 identical requests. If they were cache hits, the
+    // strict search limiter (10/min) would NEVER fire even though we
+    // exceed its budget many times over.
+    isSearchCached.mockReturnValue(true);
+    searchChannels.mockResolvedValue([]);
+    for (let i = 0; i < 20; i++) {
+      const res = await searchGET(new Request("http://x/api/search?q=hit"));
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.success).toBe(true);
+    }
+  });
+
+  it("applies the strict search rate limit ONLY on cache misses (blocks excessive unique searches)", async () => {
+    // 15 distinct queries in a row on a cache miss. The strict limiter
+    // is 10 unique searches per minute per client — request #11 must
+    // be rate-limited with RATE_LIMITED (not the generic API limit).
+    isSearchCached.mockReturnValue(false);
+    searchChannels.mockResolvedValue([]);
+    let firstBlockedAt = -1;
+    let blockedBody: { success?: boolean; error?: { code?: string } } = {};
+    for (let i = 0; i < 15; i++) {
+      const res = await searchGET(
+        new Request(`http://x/api/search?q=distinct${i}`),
+      );
+      if (res.status === 429) {
+        firstBlockedAt = i;
+        blockedBody = await res.json();
+        break;
+      }
+    }
+    expect(firstBlockedAt).toBeGreaterThanOrEqual(10);
+    expect(firstBlockedAt).toBeLessThanOrEqual(11);
+    expect(blockedBody.success).toBe(false);
+    expect(blockedBody.error?.code).toBe("RATE_LIMITED");
+  });
+
+  it("passes a channelId-shaped query through to the service (which routes to channels.list, not search.list)", async () => {
+    // The route trusts the service to pick the right endpoint. This
+    // test asserts the query reaches searchChannels intact — the
+    // service-level guarantee is covered by youtube.test.ts.
+    searchChannels.mockResolvedValueOnce([]);
+    await searchGET(
+      new Request("http://x/api/search?q=UC_xxxxxxxxxxxxxxxxxxxxxx"),
+    );
+    expect(searchChannels).toHaveBeenCalledWith("UC_xxxxxxxxxxxxxxxxxxxxxx");
   });
 });
 
