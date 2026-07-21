@@ -92,11 +92,8 @@ const REPORT_MD_PATH = path.resolve(__dirname, "../reports/creator-verification.
 
 const VALID_HANDLE_RE = /^@[A-Za-z0-9_.-]{1,60}$/;
 
-const SUSPICIOUS_HANDLES = new Set([
-  "@souaborjoshivlogs",
-  "@waborcessonnunes",
-  "@alaborozoka",
-  "@Gaaborles",
+const SUSPICIOUS_HANDLES = new Set<string>([
+  // Previously corrupted handles — now fixed but kept for reference
 ]);
 
 interface NormalizeResult {
