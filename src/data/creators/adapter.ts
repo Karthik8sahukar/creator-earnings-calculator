@@ -1,9 +1,12 @@
 /**
- * Adapter: converts CreatorEntry (new platform) → Creator (existing interface).
+ * Adapter: converts CreatorEntry (data platform) → Creator (service layer).
  *
- * This ensures backward compatibility. The existing pages, components,
- * and logic in src/lib/creators.ts continue to work unchanged.
- * New pages can import directly from the data platform.
+ * NOTE: The primary conversion now lives in `src/lib/creators.ts` which
+ * imports the dataset directly. This adapter remains available for any
+ * code that needs to convert individual entries without going through
+ * the service layer.
+ *
+ * Uses `import type` to avoid circular runtime dependencies.
  */
 
 import type { Creator } from "@/lib/creators";
@@ -12,7 +15,6 @@ import { getRelatedCreators } from "./related";
 
 /**
  * Convert a CreatorEntry to the legacy Creator interface.
- * Used by the existing creator profile system.
  */
 export function toCreator(entry: CreatorEntry): Creator {
   const related = getRelatedCreators(entry, 4);
