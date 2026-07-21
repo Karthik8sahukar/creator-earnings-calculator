@@ -33,17 +33,19 @@ interface MockResponse {
 
 function mockFetchSequence(responses: MockResponse[]) {
   let i = 0;
-  const fetchMock = vi.fn(async () => {
-    const r = responses[Math.min(i, responses.length - 1)];
-    i++;
-    return {
-      ok: r.ok ?? true,
-      status: r.status ?? 200,
-      async json() {
-        return r.body;
-      },
-    } as unknown as Response;
-  });
+  const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(
+    async () => {
+      const r = responses[Math.min(i, responses.length - 1)];
+      i++;
+      return {
+        ok: r.ok ?? true,
+        status: r.status ?? 200,
+        async json() {
+          return r.body;
+        },
+      } as unknown as Response;
+    },
+  );
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
 }
@@ -79,8 +81,9 @@ describe("QUOTA REGRESSION: search.list must remain zero", () => {
     expect(counters["youtube.search.list"]).toBe(0);
     expect(counters["youtube.channels.list"]).toBe(1);
     // Verify the URL used forHandle
-    const url = fetchMock.mock.calls[0][0] as string;
-    expect(url).toContain("forHandle");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [requestUrl] = fetchMock.mock.calls[0];
+    expect(String(requestUrl)).toContain("forHandle");
   });
 
   it("Handle URL uses channels.list(forHandle) — 0 search.list", async () => {
@@ -92,8 +95,9 @@ describe("QUOTA REGRESSION: search.list must remain zero", () => {
     const counters = getApiCounters();
     expect(counters["youtube.search.list"]).toBe(0);
     expect(counters["youtube.channels.list"]).toBe(1);
-    const url = fetchMock.mock.calls[0][0] as string;
-    expect(url).toContain("forHandle");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [requestUrl] = fetchMock.mock.calls[0];
+    expect(String(requestUrl)).toContain("forHandle");
   });
 
   it("Channel URL uses channels.list(id) — 0 search.list", async () => {
@@ -107,8 +111,9 @@ describe("QUOTA REGRESSION: search.list must remain zero", () => {
     const counters = getApiCounters();
     expect(counters["youtube.search.list"]).toBe(0);
     expect(counters["youtube.channels.list"]).toBe(1);
-    const url = fetchMock.mock.calls[0][0] as string;
-    expect(url).toContain("id=UCX6OQ3DkcsbYNE6H8uQQuVA");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [requestUrl] = fetchMock.mock.calls[0];
+    expect(String(requestUrl)).toContain("id=UCX6OQ3DkcsbYNE6H8uQQuVA");
   });
 
   it("Channel ID uses channels.list(id) — 0 search.list", async () => {
@@ -120,8 +125,9 @@ describe("QUOTA REGRESSION: search.list must remain zero", () => {
     const counters = getApiCounters();
     expect(counters["youtube.search.list"]).toBe(0);
     expect(counters["youtube.channels.list"]).toBe(1);
-    const url = fetchMock.mock.calls[0][0] as string;
-    expect(url).toContain("id=UCX6OQ3DkcsbYNE6H8uQQuVA");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [requestUrl] = fetchMock.mock.calls[0];
+    expect(String(requestUrl)).toContain("id=UCX6OQ3DkcsbYNE6H8uQQuVA");
   });
 
   it("Plain 'MrBeast' NEVER calls search.list", async () => {

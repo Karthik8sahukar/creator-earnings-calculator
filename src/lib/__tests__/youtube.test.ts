@@ -28,17 +28,19 @@ interface MockResponse {
 
 function mockFetchSequence(responses: MockResponse[]) {
   let i = 0;
-  const fetchMock = vi.fn(async () => {
-    const r = responses[Math.min(i, responses.length - 1)];
-    i++;
-    return {
-      ok: r.ok ?? true,
-      status: r.status ?? 200,
-      async json() {
-        return r.body;
-      },
-    } as unknown as Response;
-  });
+  const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(
+    async () => {
+      const r = responses[Math.min(i, responses.length - 1)];
+      i++;
+      return {
+        ok: r.ok ?? true,
+        status: r.status ?? 200,
+        async json() {
+          return r.body;
+        },
+      } as unknown as Response;
+    },
+  );
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
 }
@@ -235,10 +237,11 @@ describe("youtube service", () => {
       expect(channel).not.toBeNull();
       expect(channel!.title).toBe("Test Channel");
       // Verify it used forHandle parameter, not search
-      const calledUrl = fetchMock.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("channels");
-      expect(calledUrl).toContain("forHandle");
-      expect(calledUrl).not.toContain("/search");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("channels");
+      expect(String(calledUrl)).toContain("forHandle");
+      expect(String(calledUrl)).not.toContain("/search");
     });
 
     it("returns null when handle is not found", async () => {
@@ -268,10 +271,11 @@ describe("youtube service", () => {
       expect(results).toHaveLength(1);
       expect(results[0].channelId).toBe("UC_xxxxxxxxxxxxxxxxxxxxxx");
       // Verify no search.list calls
-      const calledUrl = fetchMock.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("/channels?");
-      expect(calledUrl).toContain("forHandle");
-      expect(calledUrl).not.toContain("/search");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("/channels?");
+      expect(String(calledUrl)).toContain("forHandle");
+      expect(String(calledUrl)).not.toContain("/search");
     });
 
     it("resolves a handle URL using channels.list(forHandle)", async () => {
@@ -281,9 +285,10 @@ describe("youtube service", () => {
       const { searchChannels } = await loadYoutube();
       const results = await searchChannels("https://youtube.com/@MrBeast");
       expect(results).toHaveLength(1);
-      const calledUrl = fetchMock.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("forHandle");
-      expect(calledUrl).not.toContain("/search");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("forHandle");
+      expect(String(calledUrl)).not.toContain("/search");
     });
 
     it("resolves a channel URL using channels.list(id)", async () => {
@@ -295,10 +300,11 @@ describe("youtube service", () => {
         "https://www.youtube.com/channel/UC_xxxxxxxxxxxxxxxxxxxxxx",
       );
       expect(results).toHaveLength(1);
-      const calledUrl = fetchMock.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("/channels?");
-      expect(calledUrl).toContain("id=UC_xxxxxxxxxxxxxxxxxxxxxx");
-      expect(calledUrl).not.toContain("/search");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("/channels?");
+      expect(String(calledUrl)).toContain("id=UC_xxxxxxxxxxxxxxxxxxxxxx");
+      expect(String(calledUrl)).not.toContain("/search");
     });
 
     it("resolves a raw channel ID using channels.list(id)", async () => {
@@ -309,9 +315,9 @@ describe("youtube service", () => {
       const results = await searchChannels("UC_xxxxxxxxxxxxxxxxxxxxxx");
       expect(results).toHaveLength(1);
       expect(fetchMock).toHaveBeenCalledTimes(1);
-      const calledUrl = fetchMock.mock.calls[0][0] as string;
-      expect(calledUrl).toContain("/channels?");
-      expect(calledUrl).not.toContain("/search");
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("/channels?");
+      expect(String(calledUrl)).not.toContain("/search");
     });
 
     it("rejects plain 'MrBeast' — NEVER calls search.list", async () => {
@@ -466,9 +472,9 @@ describe("youtube service", () => {
       expect(videos).toHaveLength(3);
       // Verify exactly 2 fetch calls: 1 playlistItems + 1 videos (batched)
       expect(fetchMock).toHaveBeenCalledTimes(2);
-      const videosUrl = fetchMock.mock.calls[1][0] as string;
-      expect(videosUrl).toContain("videos");
-      expect(videosUrl).toContain("id=vid1%2Cvid2%2Cvid3");
+      const [videosUrl] = fetchMock.mock.calls[1];
+      expect(String(videosUrl)).toContain("videos");
+      expect(String(videosUrl)).toContain("id=vid1%2Cvid2%2Cvid3");
     });
 
     it("skips missing videos (deleted / private)", async () => {
