@@ -8,13 +8,13 @@
  *
  * Design rules:
  *
- *   1. **`channelId` is optional.**  Real YouTube channel IDs are
- *      strong "UC…" identifiers that change hands only when a
- *      channel is renamed via a lawyer, so pinning one is ideal.
+ *   1. **`channelId` is preferred.**  Real YouTube channel IDs are
+ *      strong "UC…" identifiers. When set, the server resolver
+ *      uses `getChannelById()` directly — cheapest path (1 unit).
  *      When we don't have a verified id we leave it empty and the
- *      server resolver falls back to `searchChannels("@handle")` at
- *      request time. The result is cached like any other YouTube
- *      response (see `src/lib/cache.ts`).
+ *      server resolver falls back to `getChannelByHandle()` at
+ *      request time (also 1 unit, cached 24h). search.list is
+ *      NEVER used.
  *
  *   2. **`countryCode` / `nicheId` are internal `rpmData` ids.**  The
  *      user-facing `country` string ("USA", "India") is for display;
@@ -103,9 +103,11 @@ export interface Creator {
 
 /**
  * The Phase 1 catalog. Any additional creators can simply be appended.
- * `channelId` is intentionally left blank — the runtime resolver will
- * look each handle up via `searchChannels()` on first request and
- * cache the result for six hours.
+ *
+ * Phase 4 (quota fix): Channel IDs have been populated for all
+ * creators whose official handle resolves unambiguously via
+ * channels.list(forHandle). This eliminates runtime search.list
+ * calls for the entire catalog.
  */
 export const CREATORS: readonly Creator[] = [
   // ── Global ────────────────────────────────────────────────────
@@ -113,7 +115,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "mrbeast",
     displayName: "MrBeast",
     youtubeHandle: "@MrBeast",
-    channelId: "",
+    channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA",
     country: "USA",
     countryCode: "US",
     category: "Entertainment",
@@ -141,7 +143,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "markiplier",
     displayName: "Markiplier",
     youtubeHandle: "@markiplier",
-    channelId: "",
+    channelId: "UC7_YxT-KID8kRbqZo7MyscQ",
     country: "USA",
     countryCode: "US",
     category: "Gaming",
@@ -155,7 +157,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "coryxkenshin",
     displayName: "CoryxKenshin",
     youtubeHandle: "@CoryxKenshin",
-    channelId: "",
+    channelId: "UCpB959t8iPrxQWj7G6n0ctQ",
     country: "USA",
     countryCode: "US",
     category: "Gaming",
@@ -169,7 +171,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "sidemen",
     displayName: "Sidemen",
     youtubeHandle: "@Sidemen",
-    channelId: "",
+    channelId: "UCDogdKl7t7NHzQ95aEwkdMw",
     country: "UK",
     countryCode: "GB",
     category: "Entertainment",
@@ -183,7 +185,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "ksi",
     displayName: "KSI",
     youtubeHandle: "@KSI",
-    channelId: "",
+    channelId: "UCGSfMkBdr4YjBKGRhKKbEgQ",
     country: "UK",
     countryCode: "GB",
     category: "Entertainment",
@@ -197,7 +199,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "pewdiepie",
     displayName: "PewDiePie",
     youtubeHandle: "@PewDiePie",
-    channelId: "",
+    channelId: "UC-lHJZR3Gqxm24_Vd_AJ5Yw",
     country: "Japan",
     countryCode: "JP",
     category: "Gaming",
@@ -211,7 +213,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "loganpaul",
     displayName: "Logan Paul",
     youtubeHandle: "@LoganPaulVlogs",
-    channelId: "",
+    channelId: "UCG8rbF3g2AMX70yOd8vqIZg",
     country: "USA",
     countryCode: "US",
     category: "Entertainment",
@@ -225,7 +227,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "jakepaul",
     displayName: "Jake Paul",
     youtubeHandle: "@JakePaul",
-    channelId: "",
+    channelId: "UCcgVECVN4OKV6DH1jLkqmcA",
     country: "USA",
     countryCode: "US",
     category: "Entertainment",
@@ -239,7 +241,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "joerogan",
     displayName: "Joe Rogan",
     youtubeHandle: "@joerogan",
-    channelId: "",
+    channelId: "UCzQUP1qoWDoEbmsQxvdjxgQ",
     country: "USA",
     countryCode: "US",
     category: "Podcast",
@@ -255,7 +257,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "carryminati",
     displayName: "CarryMinati",
     youtubeHandle: "@CarryMinati",
-    channelId: "",
+    channelId: "UCj22tfcQrWMFIGCeyKP9hQg",
     country: "India",
     countryCode: "IN",
     category: "Comedy",
@@ -269,7 +271,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "techburner",
     displayName: "Tech Burner",
     youtubeHandle: "@TechBurner",
-    channelId: "",
+    channelId: "UCbqKJy3U8sNtbJYjxBP3LZg",
     country: "India",
     countryCode: "IN",
     category: "Technology",
@@ -283,7 +285,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "ashishchanchlani",
     displayName: "Ashish Chanchlani",
     youtubeHandle: "@ashishchanchlanivines",
-    channelId: "",
+    channelId: "UCMwKavFBXaEW6FVUiRF9Kdw",
     country: "India",
     countryCode: "IN",
     category: "Comedy",
@@ -297,7 +299,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "bbkivines",
     displayName: "BB Ki Vines",
     youtubeHandle: "@BBKiVines",
-    channelId: "",
+    channelId: "UCqwUrj10mAEsqezcItqvwEw",
     country: "India",
     countryCode: "IN",
     category: "Comedy",
@@ -311,7 +313,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "triggeredinsaan",
     displayName: "Triggered Insaan",
     youtubeHandle: "@TriggeredInsaan",
-    channelId: "",
+    channelId: "UCqEt2weBhiTlHSqdN-HMbXA",
     country: "India",
     countryCode: "IN",
     category: "Comedy",
@@ -325,7 +327,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "totalgaming",
     displayName: "Total Gaming",
     youtubeHandle: "@TotalGaming093",
-    channelId: "",
+    channelId: "UCnJ8-gGDIbz8B2z0jPr8lUg",
     country: "India",
     countryCode: "IN",
     category: "Gaming",
@@ -339,7 +341,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "round2hell",
     displayName: "Round2Hell",
     youtubeHandle: "@Round2hell",
-    channelId: "",
+    channelId: "UCbsIQsLJGEPVb1sG0LMBFcQ",
     country: "India",
     countryCode: "IN",
     category: "Comedy",
@@ -353,7 +355,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "samayraina",
     displayName: "Samay Raina",
     youtubeHandle: "@SamayRainaOfficial",
-    channelId: "",
+    channelId: "UCuyS_bMHAa9S8GCOp2Q4Mig",
     country: "India",
     countryCode: "IN",
     category: "Comedy",
@@ -367,7 +369,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "sandeepmaheshwari",
     displayName: "Sandeep Maheshwari",
     youtubeHandle: "@SandeepSeminars",
-    channelId: "",
+    channelId: "UCRlICXvO4XR4HMeEB9JjDlA",
     country: "India",
     countryCode: "IN",
     category: "Education",
@@ -381,7 +383,7 @@ export const CREATORS: readonly Creator[] = [
     slug: "dhruvrathee",
     displayName: "Dhruv Rathee",
     youtubeHandle: "@dhruvrathee",
-    channelId: "",
+    channelId: "UCBDuTFk0h3K7gP66o_CVe8A",
     country: "India",
     countryCode: "IN",
     category: "Education",

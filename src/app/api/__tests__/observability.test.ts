@@ -14,11 +14,13 @@ import { YouTubeApiError } from "@/lib/errors";
 
 const REAL_KEY = "AIzaSyC-abcdefghijklmnopqrstuvwxyz1234";
 const searchChannels = vi.fn();
+const resolveChannelFromInput = vi.fn();
 const getChannelById = vi.fn();
 
 vi.mock("@/lib/youtube", () => ({
   YouTubeApiError,
   searchChannels: (...args: unknown[]) => searchChannels(...args),
+  resolveChannelFromInput: (...args: unknown[]) => resolveChannelFromInput(...args),
   getChannelById: (...args: unknown[]) => getChannelById(...args),
   getRecentVideos: vi.fn(),
 }));
@@ -46,6 +48,7 @@ describe("route observability logging", () => {
     apiLimiter.clear();
     spy = new ConsoleSpy();
     searchChannels.mockReset();
+    resolveChannelFromInput.mockReset();
     getChannelById.mockReset();
   });
   afterEach(() => {
@@ -54,8 +57,8 @@ describe("route observability logging", () => {
   });
 
   it("emits one api.request summary per successful search", async () => {
-    searchChannels.mockResolvedValueOnce([]);
-    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    resolveChannelFromInput.mockResolvedValueOnce([]);
+    const res = await searchGET(new Request("http://x/api/search?q=@test"));
     expect(res.status).toBe(200);
     // At least one log line whose event is api.request.
     const summary = spy.log.find((l) => l.includes('"event":"api.request"'));
@@ -67,22 +70,22 @@ describe("route observability logging", () => {
   });
 
   it("does not include the API key in the summary log", async () => {
-    searchChannels.mockResolvedValueOnce([]);
-    await searchGET(new Request("http://x/api/search?q=test"));
+    resolveChannelFromInput.mockResolvedValueOnce([]);
+    await searchGET(new Request("http://x/api/search?q=@test"));
     assertNoLeak([...spy.log, ...spy.warn, ...spy.error]);
   });
 
   it("does not include the API key when an upstream error occurs", async () => {
     // Simulate a YouTubeApiError with a message that (hypothetically)
     // was built by a careless caller with the key embedded.
-    searchChannels.mockRejectedValueOnce(
+    resolveChannelFromInput.mockRejectedValueOnce(
       new YouTubeApiError(
         502,
         "UPSTREAM_UNAVAILABLE",
         `Upstream failed while calling https://googleapis.com/foo?key=${REAL_KEY}`,
       ),
     );
-    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    const res = await searchGET(new Request("http://x/api/search?q=@test"));
     expect(res.status).toBe(502);
     assertNoLeak([...spy.log, ...spy.warn, ...spy.error]);
   });
@@ -118,11 +121,11 @@ describe("route observability logging", () => {
   });
 
   it("records rateLimit=blocked when the limiter denies the request", async () => {
-    searchChannels.mockResolvedValue([]);
+    resolveChannelFromInput.mockResolvedValue([]);
     // Blow past the default limit (60 in the test env unless overridden).
     let blockedSummary: Record<string, unknown> | undefined;
     for (let i = 0; i < 200; i++) {
-      const res = await searchGET(new Request("http://x/api/search?q=test"));
+      const res = await searchGET(new Request("http://x/api/search?q=@test"));
       if (res.status === 429) {
         const line = [...spy.log, ...spy.warn, ...spy.error]
           .reverse()

@@ -6,7 +6,7 @@ import {
   withRouteObservability,
 } from "@/lib/apiHelpers";
 import { searchQuerySchema } from "@/lib/schemas";
-import { searchChannels } from "@/lib/youtube";
+import { YouTubeApiError, resolveChannelFromInput } from "@/lib/youtube";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     }
 
     try {
-      const results = await searchChannels(parsed.data.q);
+      const results = await resolveChannelFromInput(parsed.data.q);
       return NextResponse.json(
         { results },
         {
@@ -38,6 +38,16 @@ export async function GET(request: Request) {
         },
       );
     } catch (err) {
+      // Return UNSUPPORTED_INPUT as a 400 with a friendly message
+      if (
+        err instanceof YouTubeApiError &&
+        err.code === "UNSUPPORTED_INPUT"
+      ) {
+        return NextResponse.json(
+          { error: "UNSUPPORTED_INPUT", message: err.message },
+          { status: 400 },
+        );
+      }
       return safeErrorResponse(err);
     }
   });

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { SearchIcon, XIcon, UsersIcon } from "./icons";
 import { track } from "@/lib/analytics";
 import { formatCompact } from "@/lib/format";
@@ -20,13 +20,19 @@ interface Props {
 }
 
 interface State {
-  status: "idle" | "loading" | "success" | "error" | "empty";
+  status: "idle" | "loading" | "success" | "error" | "empty" | "unsupported";
   results: ChannelSearchResult[];
   error?: string;
 }
 
 /**
  * Channel search combobox.
+ *
+ * PHASE 7 — Request Protection:
+ *   - Explicit form submission (Enter key or button click)
+ *   - Prevents duplicate submissions while pending
+ *   - AbortController cancels stale requests
+ *   - Unsupported inputs show a friendly validation message
  *
  * ARIA structure is preserved verbatim from the pre-i18n version so
  * every E2E selector (`role="combobox"`, `role="listbox"`,
@@ -43,7 +49,85 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const pendingQueryRef = useRef<string | null>(null);
 
+  /**
+   * Submit the search. Only called explicitly (Enter key or button).
+   * Prevents duplicate submissions for the same query while pending.
+   */
+  const submitSearch = useCallback(async (searchQuery: string) => {
+    const trimmed = searchQuery.trim();
+    if (!trimmed) {
+      setState({ status: "idle", results: [] });
+      return;
+    }
+
+    // Prevent duplicate submission for same query
+    if (pendingQueryRef.current === trimmed) return;
+
+    // Abort any stale request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    pendingQueryRef.current = trimmed;
+
+    setState((s) => ({ ...s, status: "loading" }));
+    setOpen(true);
+
+    try {
+      const res = await fetch(
+        `/api/search?q=${encodeURIComponent(trimmed)}`,
+        { signal: controller.signal },
+      );
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as {
+          error?: string;
+          message?: string;
+        };
+
+        // Handle UNSUPPORTED_INPUT specifically
+        if (body.error === "UNSUPPORTED_INPUT") {
+          setState({
+            status: "unsupported",
+            results: [],
+            error: body.message ?? t("unsupported"),
+          });
+          setOpen(true);
+          return;
+        }
+        throw new Error(body.message ?? `Search failed (${res.status})`);
+      }
+
+      const body = (await res.json()) as { results: ChannelSearchResult[] };
+      if (body.results.length === 0) {
+        setState({ status: "empty", results: [] });
+      } else {
+        setState({ status: "success", results: body.results });
+      }
+      track({
+        name: "search.submitted",
+        queryLength: trimmed.length,
+        resultCount: body.results.length,
+      });
+      setOpen(true);
+      setActiveIndex(-1);
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      setState({
+        status: "error",
+        results: [],
+        error: (err as Error).message,
+      });
+      setOpen(true);
+    } finally {
+      if (pendingQueryRef.current === trimmed) {
+        pendingQueryRef.current = null;
+      }
+    }
+  }, [t]);
+
+  // Auto-search on debounce (400ms after typing stops)
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) {
@@ -52,48 +136,12 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
       return;
     }
 
-    const timer = setTimeout(async () => {
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
-
-      setState((s) => ({ ...s, status: "loading" }));
-      setOpen(true);
-      try {
-        const res = await fetch(
-          `/api/search?q=${encodeURIComponent(trimmed)}`,
-          { signal: controller.signal },
-        );
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.message ?? `Search failed (${res.status})`);
-        }
-        const body = (await res.json()) as { results: ChannelSearchResult[] };
-        if (body.results.length === 0) {
-          setState({ status: "empty", results: [] });
-        } else {
-          setState({ status: "success", results: body.results });
-        }
-        track({
-          name: "search.submitted",
-          queryLength: trimmed.length,
-          resultCount: body.results.length,
-        });
-        setOpen(true);
-        setActiveIndex(-1);
-      } catch (err) {
-        if ((err as Error).name === "AbortError") return;
-        setState({
-          status: "error",
-          results: [],
-          error: (err as Error).message,
-        });
-        setOpen(true);
-      }
+    const timer = setTimeout(() => {
+      void submitSearch(trimmed);
     }, 400);
 
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, submitSearch]);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -106,6 +154,18 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
   }, []);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      if (activeIndex >= 0 && state.results[activeIndex]) {
+        e.preventDefault();
+        pick(state.results[activeIndex]);
+        return;
+      }
+      // Explicit submission on Enter
+      e.preventDefault();
+      void submitSearch(query);
+      return;
+    }
+
     if (!open || state.results.length === 0) {
       if (e.key === "ArrowDown" && state.results.length > 0) {
         setOpen(true);
@@ -119,11 +179,6 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((i) => (i <= 0 ? state.results.length - 1 : i - 1));
-    } else if (e.key === "Enter") {
-      if (activeIndex >= 0 && state.results[activeIndex]) {
-        e.preventDefault();
-        pick(state.results[activeIndex]);
-      }
     } else if (e.key === "Escape") {
       setOpen(false);
     }
@@ -140,6 +195,8 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
     });
     onSelect(item.channelId);
   }
+
+  const isLoading = state.status === "loading";
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -168,16 +225,19 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
           autoFocus={autoFocus}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => query && setOpen(true)}
+          onFocus={() => query && state.results.length > 0 && setOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder ?? t("placeholder")}
-          className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-12 py-4 text-base sm:text-lg text-slate-900 placeholder:text-slate-400 shadow-card focus:border-brand-400 focus:ring-4 focus:ring-brand-100 focus:outline-none"
+          disabled={isLoading}
+          aria-busy={isLoading}
+          className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-12 py-4 text-base sm:text-lg text-slate-900 placeholder:text-slate-400 shadow-card focus:border-brand-400 focus:ring-4 focus:ring-brand-100 focus:outline-none disabled:opacity-60"
         />
         {query && (
           <button
             type="button"
             aria-label={t("clearAria")}
             onClick={() => {
+              abortRef.current?.abort();
               setQuery("");
               setState({ status: "idle", results: [] });
               setOpen(false);
@@ -200,6 +260,12 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
 
           {state.status === "empty" && (
             <p className="p-4 text-sm text-slate-500">{t("empty")}</p>
+          )}
+
+          {state.status === "unsupported" && (
+            <p className="p-4 text-sm text-amber-600">
+              {state.error ?? t("unsupported")}
+            </p>
           )}
 
           {state.status === "error" && (

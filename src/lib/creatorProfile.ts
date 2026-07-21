@@ -14,8 +14,8 @@ import { REFERENCE_MONETIZATION_PCT } from "./rpmData";
 import { calculateSponsorship } from "./simpleCalculators";
 import {
   getChannelById,
+  getChannelByHandle,
   getRecentVideos,
-  searchChannels,
 } from "./youtube";
 import type {
   ChannelDetails,
@@ -157,15 +157,10 @@ function mapErrorToReason(err: unknown): CreatorFallbackReason {
  *
  * Priority:
  *   1. If `creator.channelId` is set, use it directly (cheapest path).
- *   2. Otherwise, run `searchChannels("@handle")` and take the top
- *      result whose handle matches the requested handle
- *      case-insensitively — this avoids picking up unrelated channels
- *      with a similar name.
- *   3. If the top result's handle doesn't match at all, we still
- *      return it (better than nothing), but log a warning.
+ *   2. Otherwise, use channels.list(forHandle=@handle) — 1 quota unit.
  *
- * Any `YouTubeApiError` propagates up so the caller can convert it
- * into a `CreatorFallbackReason`.
+ * NEVER uses search.list. Any `YouTubeApiError` propagates up so the
+ * caller can convert it into a `CreatorFallbackReason`.
  */
 async function resolveChannel(creator: Creator): Promise<ChannelDetails | null> {
   if (creator.channelId) {
@@ -173,19 +168,9 @@ async function resolveChannel(creator: Creator): Promise<ChannelDetails | null> 
   }
 
   const handle = creator.youtubeHandle.replace(/^@/, "");
-  const results = await searchChannels(`@${handle}`);
-  if (results.length === 0) return null;
+  if (!handle) return null;
 
-  // Prefer an exact handle match (case-insensitive). Fall through to
-  // the top result if nothing matches — a common case in E2E mock
-  // mode, and better than surfacing a hard 404 to the user.
-  const exact = results.find(
-    (r) =>
-      r.handle && r.handle.toLowerCase() === `@${handle.toLowerCase()}`,
-  );
-  const picked = exact ?? results[0];
-  const details = await getChannelById(picked.channelId);
-  return details;
+  return getChannelByHandle(handle);
 }
 
 // ─────────────────────────────────────────────────────────────────

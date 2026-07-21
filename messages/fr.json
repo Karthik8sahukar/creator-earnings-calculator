@@ -90,13 +90,14 @@
   },
   "search": {
     "srLabel": "Rechercher une chaîne",
-    "placeholder": "Recherchez par nom, @handle, URL ou identifiant de chaîne",
+    "placeholder": "Entrez un @handle, URL de chaîne ou ID de chaîne",
     "clearAria": "Effacer la recherche",
     "loading": "Recherche…",
     "empty": "Aucune chaîne trouvée. Essayez un autre nom ou collez l'URL de la chaîne.",
     "error": "Une erreur est survenue.",
     "subsSuffix": "abonnés",
-    "subsHidden": "Masqué"
+    "subsHidden": "Masqué",
+    "unsupported": "Entrez un @handle YouTube valide, une URL de chaîne ou un ID de chaîne."
   },
   "recent": {
     "title": "Recherches récentes",

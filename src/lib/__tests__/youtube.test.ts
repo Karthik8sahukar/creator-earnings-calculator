@@ -225,54 +225,150 @@ describe("youtube service", () => {
     });
   });
 
-  describe("searchChannels", () => {
-    it("resolves a raw channel id directly (single upstream call)", async () => {
+  describe("getChannelByHandle", () => {
+    it("resolves a handle via channels.list(forHandle)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { getChannelByHandle } = await loadYoutube();
+      const channel = await getChannelByHandle("MrBeast");
+      expect(channel).not.toBeNull();
+      expect(channel!.title).toBe("Test Channel");
+      // Verify it used forHandle parameter, not search
+      const calledUrl = fetchMock.mock.calls[0][0] as string;
+      expect(calledUrl).toContain("channels");
+      expect(calledUrl).toContain("forHandle");
+      expect(calledUrl).not.toContain("/search");
+    });
+
+    it("returns null when handle is not found", async () => {
+      mockFetchSequence([{ ok: true, body: { items: [] } }]);
+      const { getChannelByHandle } = await loadYoutube();
+      expect(await getChannelByHandle("nonexistent")).toBeNull();
+    });
+
+    it("caches handle lookups", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { getChannelByHandle } = await loadYoutube();
+      await getChannelByHandle("MrBeast");
+      await getChannelByHandle("MrBeast");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("resolveChannelFromInput (searchChannels)", () => {
+    it("resolves @MrBeast using channels.list(forHandle) — NOT search.list", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      const results = await searchChannels("@MrBeast");
+      expect(results).toHaveLength(1);
+      expect(results[0].channelId).toBe("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      // Verify no search.list calls
+      const calledUrl = fetchMock.mock.calls[0][0] as string;
+      expect(calledUrl).toContain("/channels?");
+      expect(calledUrl).toContain("forHandle");
+      expect(calledUrl).not.toContain("/search");
+    });
+
+    it("resolves a handle URL using channels.list(forHandle)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      const results = await searchChannels("https://youtube.com/@MrBeast");
+      expect(results).toHaveLength(1);
+      const calledUrl = fetchMock.mock.calls[0][0] as string;
+      expect(calledUrl).toContain("forHandle");
+      expect(calledUrl).not.toContain("/search");
+    });
+
+    it("resolves a channel URL using channels.list(id)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      const results = await searchChannels(
+        "https://www.youtube.com/channel/UC_xxxxxxxxxxxxxxxxxxxxxx",
+      );
+      expect(results).toHaveLength(1);
+      const calledUrl = fetchMock.mock.calls[0][0] as string;
+      expect(calledUrl).toContain("/channels?");
+      expect(calledUrl).toContain("id=UC_xxxxxxxxxxxxxxxxxxxxxx");
+      expect(calledUrl).not.toContain("/search");
+    });
+
+    it("resolves a raw channel ID using channels.list(id)", async () => {
       const fetchMock = mockFetchSequence([
         { ok: true, body: { items: [CHANNEL_ITEM] } },
       ]);
       const { searchChannels } = await loadYoutube();
       const results = await searchChannels("UC_xxxxxxxxxxxxxxxxxxxxxx");
       expect(results).toHaveLength(1);
-      expect(results[0].channelId).toBe("UC_xxxxxxxxxxxxxxxxxxxxxx");
       expect(fetchMock).toHaveBeenCalledTimes(1);
+      const calledUrl = fetchMock.mock.calls[0][0] as string;
+      expect(calledUrl).toContain("/channels?");
+      expect(calledUrl).not.toContain("/search");
     });
 
-    it("performs a name search + channel enrichment (two upstream calls)", async () => {
+    it("rejects plain 'MrBeast' — NEVER calls search.list", async () => {
+      const fetchMock = mockFetchSequence([]);
+      const { searchChannels, YouTubeApiError } = await loadYoutube();
+      await expect(searchChannels("MrBeast")).rejects.toMatchObject({
+        code: "UNSUPPORTED_INPUT",
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it("rejects 'hjbhj' — NEVER calls search.list", async () => {
+      const fetchMock = mockFetchSequence([]);
+      const { searchChannels } = await loadYoutube();
+      await expect(searchChannels("hjbhj")).rejects.toMatchObject({
+        code: "UNSUPPORTED_INPUT",
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it("returns [] when handle is not found (no error)", async () => {
+      mockFetchSequence([{ ok: true, body: { items: [] } }]);
+      const { searchChannels } = await loadYoutube();
+      expect(await searchChannels("@nonexistentchannel123")).toEqual([]);
+    });
+
+    it("cached requests produce no additional YouTube calls", async () => {
       const fetchMock = mockFetchSequence([
-        {
-          ok: true,
-          body: {
-            items: [
-              {
-                id: { channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx" },
-                snippet: {
-                  title: "T",
-                  description: "",
-                  channelTitle: "T",
-                  thumbnails: {},
-                  publishedAt: "2020-01-01T00:00:00Z",
-                },
-              },
-            ],
-          },
-        },
         { ok: true, body: { items: [CHANNEL_ITEM] } },
       ]);
       const { searchChannels } = await loadYoutube();
-      const results = await searchChannels("test");
-      expect(results).toHaveLength(1);
-      expect(fetchMock).toHaveBeenCalledTimes(2);
+      await searchChannels("@MrBeast");
+      await searchChannels("@MrBeast");
+      await searchChannels("@MrBeast");
+      // Only 1 upstream call despite 3 invocations
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
-    it("returns [] when search finds nothing", async () => {
-      mockFetchSequence([{ ok: true, body: { items: [] } }]);
+    it("simultaneous identical requests perform one upstream lookup", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
       const { searchChannels } = await loadYoutube();
-      expect(await searchChannels("qwertyxyzzz")).toEqual([]);
+      // Fire 3 concurrent requests for the same input
+      const [r1, r2, r3] = await Promise.all([
+        searchChannels("@MrBeast"),
+        searchChannels("@MrBeast"),
+        searchChannels("@MrBeast"),
+      ]);
+      expect(r1).toEqual(r2);
+      expect(r2).toEqual(r3);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("getRecentVideos", () => {
-    it("maps playlist items + video details", async () => {
+    it("maps playlist items + video details (batched)", async () => {
       mockFetchSequence([
         {
           ok: true,
@@ -325,6 +421,54 @@ describe("youtube service", () => {
       expect(videos[1].isShort).toBe(true);
       expect(videos[1].viewCount).toBe(0); // statistics missing
       expect(videos[1].url).toContain("shorts/");
+    });
+
+    it("videos.list is batched (one call for multiple IDs)", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          ok: true,
+          body: {
+            items: [
+              { contentDetails: { videoId: "vid1" } },
+              { contentDetails: { videoId: "vid2" } },
+              { contentDetails: { videoId: "vid3" } },
+            ],
+          },
+        },
+        {
+          ok: true,
+          body: {
+            items: [
+              {
+                id: "vid1",
+                snippet: { title: "V1", description: "", publishedAt: "2025-01-01T00:00:00Z", thumbnails: {} },
+                contentDetails: { duration: "PT5M" },
+                statistics: { viewCount: "100" },
+              },
+              {
+                id: "vid2",
+                snippet: { title: "V2", description: "", publishedAt: "2025-01-01T00:00:00Z", thumbnails: {} },
+                contentDetails: { duration: "PT3M" },
+                statistics: { viewCount: "200" },
+              },
+              {
+                id: "vid3",
+                snippet: { title: "V3", description: "", publishedAt: "2025-01-01T00:00:00Z", thumbnails: {} },
+                contentDetails: { duration: "PT10M" },
+                statistics: { viewCount: "300" },
+              },
+            ],
+          },
+        },
+      ]);
+      const { getRecentVideos } = await loadYoutube();
+      const videos = await getRecentVideos("UU_xxxxxxxxxxxxxxxxxxxxxx", 12);
+      expect(videos).toHaveLength(3);
+      // Verify exactly 2 fetch calls: 1 playlistItems + 1 videos (batched)
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      const videosUrl = fetchMock.mock.calls[1][0] as string;
+      expect(videosUrl).toContain("videos");
+      expect(videosUrl).toContain("id=vid1%2Cvid2%2Cvid3");
     });
 
     it("skips missing videos (deleted / private)", async () => {

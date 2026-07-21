@@ -90,13 +90,14 @@
   },
   "search": {
     "srLabel": "Kanal suchen",
-    "placeholder": "Suche nach Kanalname, @Handle, URL oder Kanal-ID",
+    "placeholder": "@Handle, Kanal-URL oder Kanal-ID eingeben",
     "clearAria": "Suche leeren",
     "loading": "Suche läuft…",
     "empty": "Keine Kanäle gefunden. Versuche einen anderen Namen oder füge eine Kanal-URL ein.",
     "error": "Etwas ist schiefgelaufen.",
     "subsSuffix": "Abos",
-    "subsHidden": "Ausgeblendet"
+    "subsHidden": "Ausgeblendet",
+    "unsupported": "Bitte gib einen gültigen YouTube @Handle, eine Kanal-URL oder Kanal-ID ein."
   },
   "recent": {
     "title": "Kürzlich gesucht",

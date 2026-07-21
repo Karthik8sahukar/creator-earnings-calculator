@@ -90,13 +90,14 @@
   },
   "search": {
     "srLabel": "चैनल खोजें",
-    "placeholder": "चैनल के नाम, @handle, URL या चैनल ID से खोजें",
+    "placeholder": "@handle, चैनल URL, या चैनल ID दर्ज करें",
     "clearAria": "खोज साफ़ करें",
     "loading": "खोजा जा रहा है…",
     "empty": "कोई चैनल नहीं मिला। कोई और नाम आज़माएँ या चैनल का URL पेस्ट करें।",
     "error": "कुछ ग़लत हुआ।",
     "subsSuffix": "सब्सक्राइबर",
-    "subsHidden": "छिपा हुआ"
+    "subsHidden": "छिपा हुआ",
+    "unsupported": "एक वैध YouTube @handle, चैनल URL, या चैनल ID दर्ज करें।"
   },
   "recent": {
     "title": "हाल की खोजें",

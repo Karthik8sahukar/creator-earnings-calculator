@@ -90,13 +90,14 @@
   },
   "search": {
     "srLabel": "Search channel",
-    "placeholder": "Search by channel name, @handle, channel URL or channel ID",
+    "placeholder": "Enter @handle, channel URL, or channel ID",
     "clearAria": "Clear search",
     "loading": "Searching…",
     "empty": "No channels found. Try a different name or paste a channel URL.",
     "error": "Something went wrong.",
     "subsSuffix": "subs",
-    "subsHidden": "Hidden"
+    "subsHidden": "Hidden",
+    "unsupported": "Enter a valid YouTube @handle, channel URL, or channel ID."
   },
   "recent": {
     "title": "Recent searches",

@@ -6,6 +6,7 @@ import { YouTubeApiError } from "../errors";
 // values inline via `vi.mocked(...).mockResolvedValueOnce(...)`.
 vi.mock("../youtube", () => ({
   getChannelById: vi.fn(),
+  getChannelByHandle: vi.fn(),
   getRecentVideos: vi.fn(),
   searchChannels: vi.fn(),
 }));
@@ -39,15 +40,13 @@ function makeChannelFixture(overrides: Partial<Record<string, unknown>> = {}) {
 describe("getCreatorProfile — happy path", () => {
   beforeEach(() => {
     vi.mocked(youtube.getChannelById).mockReset();
+    vi.mocked(youtube.getChannelByHandle).mockReset();
     vi.mocked(youtube.getRecentVideos).mockReset();
     vi.mocked(youtube.searchChannels).mockReset();
   });
 
   it("computes an earnings snapshot from live channel data", async () => {
-    vi.mocked(youtube.searchChannels).mockResolvedValueOnce([
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { channelId: "UCTEST123", title: "MrBeast", handle: "@mrbeast" } as any,
-    ]);
+    // MrBeast now has a channelId set, so it uses getChannelById directly
     vi.mocked(youtube.getChannelById).mockResolvedValueOnce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       makeChannelFixture() as any,
@@ -67,9 +66,11 @@ describe("getCreatorProfile — happy path", () => {
     // Monthly views inferred from viewCount / months since publish
     expect(profile.earnings.monthlyViews).toBeGreaterThan(0);
     expect(profile.earnings.earnings.expected.monthly).toBeGreaterThan(0);
+    // search.list is NEVER called
+    expect(youtube.searchChannels).not.toHaveBeenCalled();
   });
 
-  it("uses channelId directly when provided (skips search)", async () => {
+  it("uses channelId directly when provided (skips search and handle lookup)", async () => {
     const creator = {
       slug: "test",
       displayName: "Test",
@@ -90,19 +91,46 @@ describe("getCreatorProfile — happy path", () => {
 
     const profile = await getCreatorProfile(creator);
     expect(youtube.searchChannels).not.toHaveBeenCalled();
+    expect(youtube.getChannelByHandle).not.toHaveBeenCalled();
     expect(profile.channel.channelId).toBe("UCTESTDIRECT");
+  });
+
+  it("uses getChannelByHandle when channelId is empty", async () => {
+    const creator = {
+      slug: "test",
+      displayName: "Test",
+      youtubeHandle: "@TestHandle",
+      channelId: "",
+      country: "USA",
+      countryCode: "US" as const,
+      category: "Gaming",
+      nicheId: "gaming" as const,
+      description: "",
+      relatedCreators: [],
+    };
+    vi.mocked(youtube.getChannelByHandle).mockResolvedValueOnce(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      makeChannelFixture({ channelId: "UCRESOLVED" }) as any,
+    );
+    vi.mocked(youtube.getRecentVideos).mockResolvedValueOnce([]);
+
+    const profile = await getCreatorProfile(creator);
+    expect(youtube.searchChannels).not.toHaveBeenCalled();
+    expect(youtube.getChannelByHandle).toHaveBeenCalledWith("TestHandle");
+    expect(profile.channel.channelId).toBe("UCRESOLVED");
   });
 });
 
 describe("getCreatorProfile — graceful fallback", () => {
   beforeEach(() => {
     vi.mocked(youtube.getChannelById).mockReset();
+    vi.mocked(youtube.getChannelByHandle).mockReset();
     vi.mocked(youtube.getRecentVideos).mockReset();
     vi.mocked(youtube.searchChannels).mockReset();
   });
 
   it("falls back to placeholder data when the quota is exceeded", async () => {
-    vi.mocked(youtube.searchChannels).mockRejectedValueOnce(
+    vi.mocked(youtube.getChannelById).mockRejectedValueOnce(
       new YouTubeApiError(429, "QUOTA_EXCEEDED", "quota exceeded"),
     );
 
@@ -122,7 +150,7 @@ describe("getCreatorProfile — graceful fallback", () => {
   });
 
   it("maps MISSING_API_KEY to 'not-configured' fallback", async () => {
-    vi.mocked(youtube.searchChannels).mockRejectedValueOnce(
+    vi.mocked(youtube.getChannelById).mockRejectedValueOnce(
       new YouTubeApiError(500, "MISSING_API_KEY", "not configured"),
     );
     const creator = getCreatorBySlug("mrbeast")!;
@@ -131,7 +159,7 @@ describe("getCreatorProfile — graceful fallback", () => {
   });
 
   it("maps UPSTREAM_UNAVAILABLE to 'upstream-unavailable'", async () => {
-    vi.mocked(youtube.searchChannels).mockRejectedValueOnce(
+    vi.mocked(youtube.getChannelById).mockRejectedValueOnce(
       new YouTubeApiError(502, "UPSTREAM_UNAVAILABLE", "down"),
     );
     const profile = await getCreatorProfile(getCreatorBySlug("mrbeast")!);
@@ -139,16 +167,12 @@ describe("getCreatorProfile — graceful fallback", () => {
   });
 
   it("maps a resolved-but-null channel to 'not-found'", async () => {
-    vi.mocked(youtube.searchChannels).mockResolvedValueOnce([]);
+    vi.mocked(youtube.getChannelById).mockResolvedValueOnce(null);
     const profile = await getCreatorProfile(getCreatorBySlug("mrbeast")!);
     expect(profile.fallbackReason).toBe("not-found");
   });
 
   it("swallows a video-fetch error without crashing", async () => {
-    vi.mocked(youtube.searchChannels).mockResolvedValueOnce([
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { channelId: "UCTEST", title: "Test", handle: "@test" } as any,
-    ]);
     vi.mocked(youtube.getChannelById).mockResolvedValueOnce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       makeChannelFixture() as any,
@@ -165,10 +189,6 @@ describe("getCreatorProfile — graceful fallback", () => {
   });
 
   it("sorts topVideos by view count descending", async () => {
-    vi.mocked(youtube.searchChannels).mockResolvedValueOnce([
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { channelId: "UCTEST", title: "Test", handle: "@test" } as any,
-    ]);
     vi.mocked(youtube.getChannelById).mockResolvedValueOnce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       makeChannelFixture() as any,
