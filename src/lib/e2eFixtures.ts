@@ -146,7 +146,8 @@ export function announceE2EMockIfActive(): void {
 export async function mockedSearchChannels(
   rawQuery: string,
 ): Promise<ChannelSearchResult[]> {
-  const q = rawQuery.trim().toLowerCase();
+  // Normalize: strip leading @ and lowercase for fixture matching
+  const q = rawQuery.trim().toLowerCase().replace(/^@/, "");
   if (q === "" || q === "empty") return [];
   if (q === "quota") {
     throw new YouTubeApiError(

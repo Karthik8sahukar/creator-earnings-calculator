@@ -1,5 +1,6 @@
 import "server-only";
 
+import { trackApiCall } from "./apiCounter";
 import { channelCache, searchCache, videosCache } from "./cache";
 import { youtube } from "./config";
 import {
@@ -17,7 +18,7 @@ import {
   markUpstream,
   type UpstreamCategory,
 } from "./observability";
-import { parseChannelQuery } from "./parseQuery";
+import { parseChannelQuery, UNSUPPORTED_INPUT_MESSAGE } from "./parseQuery";
 import type {
   ChannelDetails,
   ChannelSearchResult,
@@ -28,6 +29,12 @@ export { YouTubeApiError } from "./errors";
 
 /**
  * Server-only YouTube Data API v3 wrapper.
+ *
+ * QUOTA-OPTIMIZED (Phase 2):
+ *   - Handle resolution uses channels.list(forHandle=@handle) — 1 unit
+ *   - Channel ID resolution uses channels.list(id=UC...) — 1 unit
+ *   - search.list is NEVER called in supported flows
+ *   - Unsupported inputs are rejected before reaching YouTube
  *
  * Rules:
  *   - The API key is never sent to the browser.
@@ -161,6 +168,12 @@ async function ytFetch<T>(
   }
   url.searchParams.set("key", key);
 
+  // Track API calls for instrumentation
+  if (path === "channels") trackApiCall("youtube.channels.list");
+  else if (path === "playlistItems") trackApiCall("youtube.playlistItems.list");
+  else if (path === "videos") trackApiCall("youtube.videos.list");
+  else if (path === "search") trackApiCall("youtube.search.list");
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
@@ -236,21 +249,6 @@ interface YtThumbnailSet {
   high?: YtThumbnail;
   standard?: YtThumbnail;
   maxres?: YtThumbnail;
-}
-
-interface YtSearchItem {
-  id: { kind: string; channelId?: string };
-  snippet: {
-    title: string;
-    description: string;
-    channelTitle: string;
-    thumbnails: YtThumbnailSet;
-    publishedAt: string;
-  };
-}
-
-interface YtSearchResponse {
-  items: YtSearchItem[];
 }
 
 interface YtChannelItem {
@@ -419,21 +417,77 @@ export function mapVideo(v: YtVideoItem): VideoItem {
 // ---------- Public API ----------
 
 /**
- * Smart search:
- *   - Recognizes raw channel ids and returns just that channel.
- *   - Recognizes @handles / channel URLs and resolves them via search.
- *   - Otherwise runs a free-text `type=channel` search.
+ * Resolve a channel by handle using channels.list(forHandle=@handle).
+ *
+ * This replaces the old searchChannels("@handle") flow and uses
+ * only 1 quota unit instead of 100.
  */
-export async function searchChannels(
+export async function getChannelByHandle(
+  handle: string,
+): Promise<ChannelDetails | null> {
+  if (isE2EMockModeActive()) {
+    announceE2EMockIfActive();
+    markCache("miss");
+    markUpstream("success");
+    // In E2E mode, simulate handle resolution via the mock search
+    const results = await mockedSearchChannels(`@${handle}`);
+    if (results.length === 0) return null;
+    const picked = results.find(
+      (r) => r.handle?.toLowerCase() === `@${handle.toLowerCase()}`,
+    ) ?? results[0];
+    return mockedGetChannelById(picked.channelId);
+  }
+
+  const normalizedHandle = handle.startsWith("@") ? handle : `@${handle}`;
+  const cacheKey = `handle:${normalizedHandle.toLowerCase()}`;
+
+  return (channelCache as {
+    getOrLoad(
+      key: string,
+      loader: () => Promise<ChannelDetails | null>,
+    ): Promise<ChannelDetails | null>;
+  }).getOrLoad(cacheKey, async () => {
+    const res = await ytFetch<YtChannelResponse>("channels", {
+      part: "snippet,statistics,contentDetails,brandingSettings",
+      forHandle: normalizedHandle,
+      maxResults: 1,
+    });
+    const c = res.items[0];
+    if (!c) return null;
+    return mapChannel(c);
+  });
+}
+
+/**
+ * Resolve a channel lookup from user input.
+ *
+ * QUOTA-OPTIMIZED:
+ *   - Handle → channels.list(forHandle) — 1 unit
+ *   - Channel ID → channels.list(id) — 1 unit
+ *   - Unsupported input → rejects immediately, 0 units
+ *
+ * search.list is NEVER called.
+ */
+export async function resolveChannelFromInput(
   rawQuery: string,
 ): Promise<ChannelSearchResult[]> {
+  const parsed = parseChannelQuery(rawQuery);
+
+  if (parsed.kind === "unsupported") {
+    throw new YouTubeApiError(
+      400,
+      "UNSUPPORTED_INPUT",
+      UNSUPPORTED_INPUT_MESSAGE,
+    );
+  }
+
   if (isE2EMockModeActive()) {
     announceE2EMockIfActive();
     markCache("miss");
     markUpstream("success");
     return mockedSearchChannels(rawQuery);
   }
-  const parsed = parseChannelQuery(rawQuery);
+
   const cacheKey = `${parsed.kind}:${parsed.value.toLowerCase()}`;
 
   return (searchCache as {
@@ -460,29 +514,37 @@ export async function searchChannels(
       ];
     }
 
-    const q = parsed.kind === "handle" ? `@${parsed.value}` : parsed.value;
-    if (!q.trim()) return [];
-
-    const search = await ytFetch<YtSearchResponse>("search", {
-      part: "snippet",
-      type: "channel",
-      q,
-      maxResults: youtube.searchMaxResults,
-    });
-
-    const ids = search.items
-      .map((it) => it.id.channelId)
-      .filter((v): v is string => Boolean(v));
-    if (ids.length === 0) return [];
-
-    const enriched = await ytFetch<YtChannelResponse>("channels", {
-      part: "snippet,statistics",
-      id: ids.join(","),
-      maxResults: ids.length,
-    });
-
-    return enriched.items.map(mapChannelSearchResult);
+    // kind === "handle" — use channels.list(forHandle)
+    const channel = await getChannelByHandle(parsed.value);
+    if (!channel) return [];
+    return [
+      {
+        channelId: channel.channelId,
+        title: channel.title,
+        handle: channel.handle,
+        description: channel.description,
+        thumbnail: channel.thumbnail,
+        subscriberCount: channel.hiddenSubscriberCount
+          ? null
+          : channel.subscriberCount,
+        hiddenSubscriberCount: channel.hiddenSubscriberCount,
+      },
+    ];
   });
+}
+
+/**
+ * Legacy name kept for backward compatibility with existing callers.
+ * Now routes through the quota-optimized resolveChannelFromInput.
+ *
+ * IMPORTANT: This function NO LONGER calls search.list. It uses
+ * channels.list(forHandle) for handles and channels.list(id) for
+ * channel IDs. Unsupported inputs throw UNSUPPORTED_INPUT.
+ */
+export async function searchChannels(
+  rawQuery: string,
+): Promise<ChannelSearchResult[]> {
+  return resolveChannelFromInput(rawQuery);
 }
 
 export async function getChannelById(
@@ -539,6 +601,7 @@ export async function getRecentVideos(
       .filter(Boolean);
     if (videoIds.length === 0) return [];
 
+    // Phase 6: Batch video statistics in ONE request
     const videos = await ytFetch<YtVideosResponse>("videos", {
       part: "snippet,contentDetails,statistics",
       id: videoIds.join(","),

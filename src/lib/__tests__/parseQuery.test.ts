@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseChannelQuery } from "../parseQuery";
+import { parseChannelQuery, UNSUPPORTED_INPUT_MESSAGE } from "../parseQuery";
 
 const REAL_CID = "UCX6OQ3DkcsbYNE6H8uQQuVA"; // MrBeast — this file uses only its shape
 const OTHER_CID = "UC-lHJZR3Gqxm24_Vd_AJ5Yw";
@@ -20,10 +20,31 @@ describe("parseChannelQuery", () => {
     });
   });
 
-  it("treats a plain name as a name search", () => {
+  it("rejects plain text as unsupported (no fuzzy search)", () => {
     expect(parseChannelQuery("MrBeast")).toEqual({
-      kind: "name",
+      kind: "unsupported",
       value: "MrBeast",
+    });
+  });
+
+  it("rejects random gibberish as unsupported", () => {
+    expect(parseChannelQuery("hjbhj")).toEqual({
+      kind: "unsupported",
+      value: "hjbhj",
+    });
+  });
+
+  it("rejects 'Gaming channel' as unsupported", () => {
+    expect(parseChannelQuery("Gaming channel")).toEqual({
+      kind: "unsupported",
+      value: "Gaming channel",
+    });
+  });
+
+  it("rejects 'PewDiePie' (no @) as unsupported", () => {
+    expect(parseChannelQuery("PewDiePie")).toEqual({
+      kind: "unsupported",
+      value: "PewDiePie",
     });
   });
 
@@ -72,29 +93,28 @@ describe("parseChannelQuery", () => {
     });
   });
 
-  it("returns empty name for empty input", () => {
-    expect(parseChannelQuery("")).toEqual({ kind: "name", value: "" });
-    expect(parseChannelQuery("   ")).toEqual({ kind: "name", value: "" });
+  it("returns unsupported for empty input", () => {
+    expect(parseChannelQuery("")).toEqual({ kind: "unsupported", value: "" });
+    expect(parseChannelQuery("   ")).toEqual({ kind: "unsupported", value: "" });
   });
 
-  it("falls back to name search when URL is malformed", () => {
+  it("returns unsupported for malformed URL", () => {
     const q = "https://youtube.com/@this is not a real url";
     const result = parseChannelQuery(q);
-    // Whatever we do it must not throw and must not be typed as channelId.
-    expect(result.kind).not.toBe("channelId");
+    expect(result.kind).toBe("unsupported");
   });
 
-  it("falls back to name for legacy /c/ URLs", () => {
+  it("rejects legacy /c/ URLs as unsupported", () => {
     expect(parseChannelQuery("https://youtube.com/c/PewDiePie")).toEqual({
-      kind: "name",
-      value: "PewDiePie",
+      kind: "unsupported",
+      value: "https://youtube.com/c/PewDiePie",
     });
   });
 
-  it("falls back to name for legacy /user/ URLs", () => {
+  it("rejects legacy /user/ URLs as unsupported", () => {
     expect(parseChannelQuery("https://youtube.com/user/pewdiepie")).toEqual({
-      kind: "name",
-      value: "pewdiepie",
+      kind: "unsupported",
+      value: "https://youtube.com/user/pewdiepie",
     });
   });
 
@@ -105,16 +125,16 @@ describe("parseChannelQuery", () => {
     });
   });
 
-  it("does not misclassify a UC-prefixed name that's the wrong shape", () => {
+  it("does not misclassify a UC-prefixed string that's the wrong length", () => {
     // UC + 5 chars is too short to be a channel id
     const result = parseChannelQuery("UCxx");
-    expect(result.kind).toBe("name");
+    expect(result.kind).toBe("unsupported");
   });
 
   it("does not throw on very long input", () => {
     const long = "a".repeat(5000);
     expect(() => parseChannelQuery(long)).not.toThrow();
-    expect(parseChannelQuery(long).kind).toBe("name");
+    expect(parseChannelQuery(long).kind).toBe("unsupported");
   });
 
   it("safely handles malicious-looking input", () => {
@@ -128,5 +148,11 @@ describe("parseChannelQuery", () => {
     for (const raw of inputs) {
       expect(() => parseChannelQuery(raw)).not.toThrow();
     }
+  });
+
+  it("exports UNSUPPORTED_INPUT_MESSAGE", () => {
+    expect(UNSUPPORTED_INPUT_MESSAGE).toContain("@handle");
+    expect(UNSUPPORTED_INPUT_MESSAGE).toContain("channel URL");
+    expect(UNSUPPORTED_INPUT_MESSAGE).toContain("channel ID");
   });
 });

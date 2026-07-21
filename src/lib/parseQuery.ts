@@ -1,68 +1,99 @@
 /**
- * Detect what kind of YouTube identifier the user typed.
+ * Input normalization layer for YouTube channel lookups.
  *
- * Supports:
- *   - Raw channel id: UC...
- *   - @handle
- *   - youtube.com/@handle
- *   - youtube.com/channel/UC...
- *   - youtube.com/c/name  (legacy - we treat as name search)
- *   - youtube.com/user/name (legacy - we treat as name search)
- *   - Anything else -> free-text channel name search
+ * Supported inputs (Phase 3 — quota fix):
+ *   - @handle (bare)
+ *   - https://youtube.com/@handle
+ *   - https://www.youtube.com/@handle
+ *   - https://youtube.com/channel/UC...
+ *   - https://www.youtube.com/channel/UC...
+ *   - Raw UC... channel IDs
+ *
+ * Everything else is classified as "unsupported" and must be rejected
+ * before reaching the YouTube API. No fuzzy searching is performed.
  */
 
 export type ParsedQuery =
   | { kind: "channelId"; value: string }
   | { kind: "handle"; value: string }
-  | { kind: "name"; value: string };
+  | { kind: "unsupported"; value: string };
 
-const CHANNEL_ID_RE = /^UC[A-Za-z0-9_-]{20,40}$/;
+const CHANNEL_ID_RE = /^UC[A-Za-z0-9_-]{22}$/;
+const HANDLE_RE = /^@[A-Za-z0-9_.-]{1,60}$/;
 
+/**
+ * Parse a raw user query string into a structured lookup type.
+ *
+ * Returns `kind: "unsupported"` for anything that would previously
+ * have triggered a search.list call (plain text, legacy /c/ URLs,
+ * /user/ URLs, malformed input, etc.).
+ */
 export function parseChannelQuery(raw: string): ParsedQuery {
   const trimmed = raw.trim();
-  if (!trimmed) return { kind: "name", value: "" };
+  if (!trimmed) return { kind: "unsupported", value: "" };
 
-  // Raw channel id
+  // Raw channel id (UC + 22 characters)
   if (CHANNEL_ID_RE.test(trimmed)) {
     return { kind: "channelId", value: trimmed };
   }
 
-  // @handle (no URL)
+  // @handle (no URL, no slash)
   if (trimmed.startsWith("@") && !trimmed.includes("/")) {
-    return { kind: "handle", value: trimmed.slice(1) };
+    const handle = trimmed.slice(1);
+    if (HANDLE_RE.test(`@${handle}`) && handle.length > 0) {
+      return { kind: "handle", value: handle };
+    }
+    return { kind: "unsupported", value: trimmed };
   }
 
-  // Try URL
-  const looksLikeUrl = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(trimmed);
+  // Try URL parsing for youtube.com links
+  const looksLikeUrl =
+    /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(trimmed);
   if (looksLikeUrl) {
     try {
       const url = new URL(
         trimmed.startsWith("http") ? trimmed : `https://${trimmed}`,
       );
+
+      // Only accept youtube.com hosts
+      const host = url.hostname.replace(/^www\./, "");
+      if (host !== "youtube.com") {
+        return { kind: "unsupported", value: trimmed };
+      }
+
       const parts = url.pathname.split("/").filter(Boolean);
-      if (parts.length === 0) return { kind: "name", value: trimmed };
+      if (parts.length === 0) return { kind: "unsupported", value: trimmed };
 
       // /channel/UC...
-      if (parts[0] === "channel" && parts[1] && CHANNEL_ID_RE.test(parts[1])) {
+      if (
+        parts[0] === "channel" &&
+        parts[1] &&
+        CHANNEL_ID_RE.test(parts[1])
+      ) {
         return { kind: "channelId", value: parts[1] };
       }
 
       // /@handle
       if (parts[0].startsWith("@")) {
-        return { kind: "handle", value: parts[0].slice(1) };
+        const handle = parts[0].slice(1);
+        if (HANDLE_RE.test(`@${handle}`) && handle.length > 0) {
+          return { kind: "handle", value: handle };
+        }
       }
 
-      // /c/name or /user/name -> fall back to name
-      if ((parts[0] === "c" || parts[0] === "user") && parts[1]) {
-        return { kind: "name", value: decodeURIComponent(parts[1]) };
-      }
-
-      // last resort
-      return { kind: "name", value: decodeURIComponent(parts.join(" ")) };
+      // /c/name, /user/name, or anything else — unsupported
+      return { kind: "unsupported", value: trimmed };
     } catch {
-      // fall through
+      return { kind: "unsupported", value: trimmed };
     }
   }
 
-  return { kind: "name", value: trimmed };
+  // Plain text (e.g. "MrBeast", "Gaming channel", "hjbhj") — unsupported
+  return { kind: "unsupported", value: trimmed };
 }
+
+/**
+ * Human-friendly validation message for unsupported inputs.
+ */
+export const UNSUPPORTED_INPUT_MESSAGE =
+  "Enter a valid YouTube @handle, channel URL, or channel ID.";

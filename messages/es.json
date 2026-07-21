@@ -90,13 +90,17 @@
   },
   "search": {
     "srLabel": "Buscar canal",
-    "placeholder": "Busca por nombre, @handle, URL o ID del canal",
+    "placeholder": "Ingresa @handle, URL del canal o ID del canal",
     "clearAria": "Borrar búsqueda",
     "loading": "Buscando…",
     "empty": "No se encontraron canales. Prueba con otro nombre o pega la URL del canal.",
     "error": "Algo salió mal.",
     "subsSuffix": "suscripciones",
-    "subsHidden": "Oculto"
+    "subsHidden": "Oculto",
+    "unsupported": "Ingresa un @handle de YouTube válido, URL del canal o ID del canal.",
+    "searchButton": "Buscar canal",
+    "searchButtonLoading": "Buscando...",
+    "helperText": "Ingresa un @handle de YouTube, URL del canal o ID del canal, luego haz clic en Buscar."
   },
   "recent": {
     "title": "Búsquedas recientes",
