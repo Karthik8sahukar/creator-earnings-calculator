@@ -256,20 +256,25 @@ function readDatasetCreators(): DatasetCreator[] {
     try {
       // Parse individual fields from the matched entry
       const entry = match[0];
-      const get = (key: string) => {
-        const m = entry.match(new RegExp(`${key}:\\s*(?:"([^"]*)"|(null|true|false))`));
+      const getString = (key: string): string | null | undefined => {
+        const m = entry.match(new RegExp(`${key}:\\s*(?:"([^"]*)"|(null))`));
         if (!m) return undefined;
-        return m[1] ?? (m[2] === "null" ? null : m[2] === "true" ? true : m[2] === "false" ? false : m[2]);
+        if (m[2] === "null") return null;
+        return m[1] ?? undefined;
+      };
+      const getBool = (key: string): boolean => {
+        const m = entry.match(new RegExp(`${key}:\\s*(true|false)`));
+        return m?.[1] === "true";
       };
       entries.push({
-        id: get("id") as string,
-        slug: get("slug") as string,
-        name: get("name") as string,
-        handle: get("handle") as string,
-        youtubeChannelId: get("youtubeChannelId") as string | null,
-        country: get("country") as string,
-        countryCode: get("countryCode") as string,
-        verified: get("verified") === true || get("verified") === "true",
+        id: getString("id") as string,
+        slug: getString("slug") as string,
+        name: getString("name") as string,
+        handle: getString("handle") as string,
+        youtubeChannelId: getString("youtubeChannelId") ?? null,
+        country: getString("country") as string,
+        countryCode: getString("countryCode") as string,
+        verified: getBool("verified"),
       });
     } catch {
       // Skip malformed entries
