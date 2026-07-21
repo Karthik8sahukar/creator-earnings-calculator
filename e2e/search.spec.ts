@@ -85,7 +85,9 @@ test.describe("channel search workflow", () => {
     await page.goto("/");
     await page.getByRole("textbox").fill("@empty");
     await page.getByRole("button", { name: /search channel/i }).click();
-    await expect(page.getByText(/no channels found/i)).toBeVisible();
+    const alert = page.getByRole("alert");
+    await expect(alert).toBeVisible();
+    await expect(alert).toContainText(/no channels found/i);
   });
 
   test("invalid plain text is rejected with validation message", async ({
@@ -94,8 +96,10 @@ test.describe("channel search workflow", () => {
     await page.goto("/");
     await page.getByRole("textbox").fill("MrBeast");
     await page.getByRole("button", { name: /search channel/i }).click();
-    await expect(
-      page.getByText(/enter a valid youtube/i),
-    ).toBeVisible();
+    const alert = page.getByRole("alert");
+    await expect(alert).toBeVisible();
+    await expect(alert).toContainText(
+      /valid YouTube @handle, channel URL, or channel ID/i,
+    );
   });
 });

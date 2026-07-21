@@ -21,7 +21,9 @@ test.describe("error workflows", () => {
     await page.goto("/");
     await page.getByRole("textbox").fill("@empty");
     await page.getByRole("button", { name: /search channel/i }).click();
-    await expect(page.getByText(/no channels found/i)).toBeVisible();
+    const alert = page.getByRole("alert");
+    await expect(alert).toBeVisible();
+    await expect(alert).toContainText(/no channels found/i);
   });
 
   test("invalid channel id in URL → not-found segment", async ({ page }) => {
@@ -40,9 +42,9 @@ test.describe("error workflows", () => {
     await page.goto("/");
     await page.getByRole("textbox").fill("@quota");
     await page.getByRole("button", { name: /search channel/i }).click();
-    await expect(
-      page.getByText(/quota has been exceeded/i),
-    ).toBeVisible();
+    const alert = page.getByRole("alert");
+    await expect(alert).toBeVisible();
+    await expect(alert).toContainText(/quota has been exceeded/i);
   });
 
   test("YouTube upstream unavailable on search shows a safe message", async ({
@@ -51,9 +53,9 @@ test.describe("error workflows", () => {
     await page.goto("/");
     await page.getByRole("textbox").fill("@unavailable");
     await page.getByRole("button", { name: /search channel/i }).click();
-    await expect(
-      page.getByText(/currently unavailable/i),
-    ).toBeVisible();
+    const alert = page.getByRole("alert");
+    await expect(alert).toBeVisible();
+    await expect(alert).toContainText(/currently unavailable/i);
   });
 
   test("YouTube quota exceeded on channel page renders the error boundary", async ({

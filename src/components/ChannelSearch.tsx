@@ -166,17 +166,17 @@ export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Prop
       {state.status !== "idle" && state.status !== "loading" && (
         <div className="mt-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-pop">
           {state.status === "empty" && (
-            <p className="p-4 text-sm text-slate-500">{t("empty")}</p>
+            <p role="alert" aria-live="polite" className="p-4 text-sm text-slate-500">{t("empty")}</p>
           )}
 
           {state.status === "unsupported" && (
-            <p className="p-4 text-sm text-amber-600">
+            <p role="alert" aria-live="polite" className="p-4 text-sm text-amber-600">
               {state.error ?? t("unsupported")}
             </p>
           )}
 
           {state.status === "error" && (
-            <p className="p-4 text-sm text-rose-600">
+            <p role="alert" aria-live="polite" className="p-4 text-sm text-rose-600">
               {state.error ?? t("error")}
             </p>
           )}

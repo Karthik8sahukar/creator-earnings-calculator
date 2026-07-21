@@ -471,13 +471,6 @@ export async function getChannelByHandle(
 export async function resolveChannelFromInput(
   rawQuery: string,
 ): Promise<ChannelSearchResult[]> {
-  if (isE2EMockModeActive()) {
-    announceE2EMockIfActive();
-    markCache("miss");
-    markUpstream("success");
-    return mockedSearchChannels(rawQuery);
-  }
-
   const parsed = parseChannelQuery(rawQuery);
 
   if (parsed.kind === "unsupported") {
@@ -486,6 +479,13 @@ export async function resolveChannelFromInput(
       "UNSUPPORTED_INPUT",
       UNSUPPORTED_INPUT_MESSAGE,
     );
+  }
+
+  if (isE2EMockModeActive()) {
+    announceE2EMockIfActive();
+    markCache("miss");
+    markUpstream("success");
+    return mockedSearchChannels(rawQuery);
   }
 
   const cacheKey = `${parsed.kind}:${parsed.value.toLowerCase()}`;
