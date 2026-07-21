@@ -26,21 +26,22 @@ interface MockResponse {
   body: unknown;
 }
 
+type FetchFn = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
+
 function mockFetchSequence(responses: MockResponse[]) {
   let i = 0;
-  const fetchMock = vi.fn<(input: string | URL | Request, init?: RequestInit) => Promise<Response>>(
-    async () => {
-      const r = responses[Math.min(i, responses.length - 1)];
-      i++;
-      return {
-        ok: r.ok ?? true,
-        status: r.status ?? 200,
-        async json() {
-          return r.body;
-        },
-      } as unknown as Response;
-    },
-  );
+  const impl: FetchFn = async () => {
+    const r = responses[Math.min(i, responses.length - 1)];
+    i++;
+    return {
+      ok: r.ok ?? true,
+      status: r.status ?? 200,
+      async json() {
+        return r.body;
+      },
+    } as unknown as Response;
+  };
+  const fetchMock = vi.fn<FetchFn>(impl);
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
 }
@@ -322,7 +323,7 @@ describe("youtube service", () => {
 
     it("rejects plain 'MrBeast' — NEVER calls search.list", async () => {
       const fetchMock = mockFetchSequence([]);
-      const { searchChannels, YouTubeApiError } = await loadYoutube();
+      const { searchChannels } = await loadYoutube();
       await expect(searchChannels("MrBeast")).rejects.toMatchObject({
         code: "UNSUPPORTED_INPUT",
       });
