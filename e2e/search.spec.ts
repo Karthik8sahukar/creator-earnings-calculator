@@ -4,59 +4,68 @@ import { CHANNEL_IDS } from "./fixtures/ids";
 
 /**
  * Channel search + full channel workspace workflow.
+ *
+ * The search UX uses explicit submission:
+ *   - plain textbox (no combobox/autocomplete)
+ *   - "Search Channel" button
+ *   - Enter key also submits
+ *   - no suggestion dropdown while typing
  */
 
 test.describe("channel search workflow", () => {
-  test("search → select → channel dashboard renders", async ({ page }) => {
+  test("search → submit → channel result → navigate to dashboard", async ({
+    page,
+  }) => {
     await page.goto("/");
 
-    // 1. Homepage
+    // 1. Homepage renders
     await expect(
-      page.getByRole("heading", { level: 1, name: /youtube money calculator/i }),
+      page.getByRole("heading", {
+        level: 1,
+        name: /youtube money calculator/i,
+      }),
     ).toBeVisible();
 
-    // 2. Enter a channel name
-    const input = page.getByRole("combobox");
-    await input.fill("test");
+    // 2. Enter a query into the textbox
+    const input = page.getByRole("textbox");
+    await input.fill("@MrBeast");
 
-    // 3+4. Suggestions load with multiple results
-    const listbox = page.getByRole("listbox");
-    await expect(listbox).toBeVisible();
-    const options = listbox.getByRole("option");
-    await expect(options).toHaveCount(3);
+    // 3. Click the Search Channel button
+    const searchBtn = page.getByRole("button", { name: /search channel/i });
+    await expect(searchBtn).toBeVisible();
+    await searchBtn.click();
 
-    // 5. Verify profile images appear
-    const optionImages = listbox.locator("img");
-    await expect(optionImages).toHaveCount(3);
+    // 4. Results appear (E2E mock returns 3 channels for any valid query)
+    await expect(page.getByText("Alpha Test Channel")).toBeVisible();
 
-    // 6. Select the first channel
-    await options.first().click();
+    // 5. Click the first result to navigate
+    await page.getByText("Alpha Test Channel").click();
 
-    // 7. Profile card loads (Alpha fixture)
+    // 6. Channel dashboard loads
     await expect(
       page.getByRole("heading", { level: 1, name: "Alpha Test Channel" }),
     ).toBeVisible();
+
     // Includes the "View on YouTube" link
-    const viewLink = page.getByRole("link", { name: /view alpha test channel on youtube/i });
-    await expect(viewLink).toHaveAttribute(
-      "href",
-      /youtube\.com/,
-    );
+    const viewLink = page.getByRole("link", {
+      name: /view alpha test channel on youtube/i,
+    });
+    await expect(viewLink).toHaveAttribute("href", /youtube\.com/);
     await expect(viewLink).toHaveAttribute("target", "_blank");
     await expect(viewLink).toHaveAttribute("rel", /noopener/);
 
-    // 8. Recent videos load
+    // 7. Recent videos load
     await expect(
       page.getByRole("heading", { name: /recent videos/i }),
     ).toBeVisible();
     await expect(page.getByText("How to test end to end")).toBeVisible();
 
-    // 9. Performance statistics
+    // 8. Performance statistics
     await expect(
       page.getByRole("heading", { name: /performance analysis/i }),
     ).toBeVisible();
 
-    // 10. Earnings calculator
+    // 9. Earnings calculator
     await expect(
       page.getByRole("heading", { name: /earnings estimator/i }),
     ).toBeVisible();
@@ -66,16 +75,27 @@ test.describe("channel search workflow", () => {
     page,
   }) => {
     await page.goto("/");
-    await page.getByRole("combobox").fill("test");
-    await page.getByRole("listbox").getByRole("option").first().click();
+    await page.getByRole("textbox").fill("@alpha");
+    await page.getByRole("button", { name: /search channel/i }).click();
+    await page.getByText("Alpha Test Channel").click();
     await page.waitForURL(new RegExp(`/channel/${CHANNEL_IDS.alpha}`));
   });
 
   test("empty results state renders a helpful message", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("combobox").fill("empty");
+    await page.getByRole("textbox").fill("@empty");
+    await page.getByRole("button", { name: /search channel/i }).click();
+    await expect(page.getByText(/no channels found/i)).toBeVisible();
+  });
+
+  test("invalid plain text is rejected with validation message", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.getByRole("textbox").fill("MrBeast");
+    await page.getByRole("button", { name: /search channel/i }).click();
     await expect(
-      page.getByText(/no channels found/i),
+      page.getByText(/enter a valid youtube/i),
     ).toBeVisible();
   });
 });

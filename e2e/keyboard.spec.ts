@@ -1,48 +1,48 @@
 import { expect, test } from "@playwright/test";
 
 /**
- * Keyboard-only interactions on the search combobox.
- * Verifies arrow-key navigation, Enter to select, Escape to close.
+ * Keyboard interactions for the channel search.
+ *
+ * The new UX has no combobox, no arrow-key navigation, no Escape.
+ * Enter submits the search, just like clicking "Search Channel".
  */
 
-test("keyboard workflow: arrow keys navigate, enter selects, escape closes", async ({
+test("pressing Enter submits the search and loads results", async ({
   page,
 }) => {
   await page.goto("/");
-  const input = page.getByRole("combobox");
+  const input = page.getByRole("textbox");
   await input.focus();
-  await input.fill("test");
-
-  const listbox = page.getByRole("listbox");
-  await expect(listbox).toBeVisible();
-  const options = listbox.getByRole("option");
-  await expect(options).toHaveCount(3);
-
-  // Arrow Down → first option becomes active
-  await input.press("ArrowDown");
-  await expect(options.nth(0)).toHaveAttribute("aria-selected", "true");
-
-  // Arrow Down twice more → third option
-  await input.press("ArrowDown");
-  await input.press("ArrowDown");
-  await expect(options.nth(2)).toHaveAttribute("aria-selected", "true");
-
-  // Arrow Up → second option
-  await input.press("ArrowUp");
-  await expect(options.nth(1)).toHaveAttribute("aria-selected", "true");
-
-  // Enter → selects, navigates, and the listbox goes away
+  await input.fill("@test");
   await input.press("Enter");
-  await expect(listbox).toBeHidden();
+
+  // Results appear after submission
+  await expect(page.getByText("Alpha Test Channel")).toBeVisible();
+});
+
+test("pressing Enter navigates to channel after clicking a result", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const input = page.getByRole("textbox");
+  await input.fill("@test");
+  await input.press("Enter");
+
+  // Wait for result and click it
+  await expect(page.getByText("Alpha Test Channel")).toBeVisible();
+  await page.getByText("Alpha Test Channel").click();
   await page.waitForURL(/\/channel\//);
 });
 
-test("Escape closes the suggestion list", async ({ page }) => {
+test("Enter with invalid input shows validation message", async ({
+  page,
+}) => {
   await page.goto("/");
-  const input = page.getByRole("combobox");
-  await input.fill("test");
-  const listbox = page.getByRole("listbox");
-  await expect(listbox).toBeVisible();
-  await input.press("Escape");
-  await expect(listbox).toBeHidden();
+  const input = page.getByRole("textbox");
+  await input.fill("gaming channel");
+  await input.press("Enter");
+
+  await expect(
+    page.getByText(/enter a valid youtube/i),
+  ).toBeVisible();
 });
