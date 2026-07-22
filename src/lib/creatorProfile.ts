@@ -16,6 +16,10 @@ import {
   getChannelById,
   getRecentVideos,
 } from "./youtube";
+import {
+  attemptBackgroundResolution,
+  getBackgroundResolvedChannelId,
+} from "./backgroundEnrichment";
 import type {
   ChannelDetails,
   EarningsResult,
@@ -161,9 +165,10 @@ function mapErrorToReason(err: unknown): CreatorFallbackReason {
  *
  * Priority:
  *   1. If `creator.channelId` is set, use it directly (cheapest path).
- *   2. If channelId is empty (unverified creator), return null immediately.
- *      NO YouTube API call is made. The page renders a static profile
- *      with a "not-verified" fallback reason.
+ *   2. Check if a background resolution previously found this channel.
+ *   3. If channelId is empty (unverified creator), attempt background
+ *      resolution (fire-and-forget) and return null for this request.
+ *      Future visits will benefit from the cached result.
  *
  * This prevents unverified creators from consuming API quota when
  * Googlebot or users browse their profile pages.
@@ -173,7 +178,15 @@ async function resolveChannel(creator: Creator): Promise<ChannelDetails | null> 
     return getChannelById(creator.channelId);
   }
 
-  // Unverified creator — do NOT call the YouTube API.
+  // Check if background enrichment previously resolved this creator
+  const backgroundChannelId = getBackgroundResolvedChannelId(creator.slug);
+  if (backgroundChannelId) {
+    return getChannelById(backgroundChannelId);
+  }
+
+  // Fire-and-forget: attempt background resolution for future visits
+  attemptBackgroundResolution(creator);
+
   return null;
 }
 
