@@ -562,14 +562,67 @@ export async function getChannelById(
       loader: () => Promise<ChannelDetails | null>,
     ): Promise<ChannelDetails | null>;
   }).getOrLoad(`channel:${channelId}`, async () => {
-    const res = await ytFetch<YtChannelResponse>("channels", {
-      part: "snippet,statistics,contentDetails,brandingSettings",
-      id: channelId,
-      maxResults: 1,
+    // ─── DIAGNOSTIC: trace YouTube API call ────────────────────────
+    console.info("[yt:getChannelById] ENTER", { channelId });
+    let res: YtChannelResponse;
+    try {
+      res = await ytFetch<YtChannelResponse>("channels", {
+        part: "snippet,statistics,contentDetails,brandingSettings",
+        id: channelId,
+        maxResults: 1,
+      });
+    } catch (fetchErr) {
+      console.error("[yt:getChannelById] ytFetch THREW", {
+        channelId,
+        errorName: (fetchErr as Error).name,
+        errorMessage: (fetchErr as Error).message,
+        stack: (fetchErr as Error).stack?.split("\n").slice(0, 5).join("\n"),
+      });
+      throw fetchErr;
+    }
+
+    console.info("[yt:getChannelById] ytFetch OK", {
+      channelId,
+      itemCount: res.items?.length ?? 0,
+      hasItems: Array.isArray(res.items),
+      firstItemId: res.items?.[0]?.id ?? "(none)",
+      hasSnippet: !!res.items?.[0]?.snippet,
+      hasContentDetails: !!res.items?.[0]?.contentDetails,
+      hasStatistics: !!res.items?.[0]?.statistics,
     });
+
     const c = res.items[0];
-    if (!c) return null;
-    return mapChannel(c);
+    if (!c) {
+      console.info("[yt:getChannelById] EXIT null (no items)", { channelId });
+      return null;
+    }
+
+    try {
+      const mapped = mapChannel(c);
+      console.info("[yt:getChannelById] EXIT mapped", {
+        channelId,
+        title: mapped.title,
+        uploadsPlaylistId: mapped.uploadsPlaylistId,
+      });
+      return mapped;
+    } catch (mapErr) {
+      console.error("[yt:getChannelById] mapChannel THREW", {
+        channelId,
+        errorName: (mapErr as Error).name,
+        errorMessage: (mapErr as Error).message,
+        stack: (mapErr as Error).stack?.split("\n").slice(0, 5).join("\n"),
+        rawItem: JSON.stringify({
+          id: c.id,
+          hasSnippet: !!c.snippet,
+          snippetKeys: c.snippet ? Object.keys(c.snippet) : [],
+          hasContentDetails: !!c.contentDetails,
+          contentDetailsKeys: c.contentDetails ? Object.keys(c.contentDetails) : [],
+          hasStatistics: !!c.statistics,
+        }),
+      });
+      throw mapErr;
+    }
+    // ───────────────────────────────────────────────────────────────
   });
 }
 
