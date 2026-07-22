@@ -6,6 +6,7 @@ import { CHANNEL_IDS } from "./fixtures/ids";
  * Error and edge workflows.
  *
  * Each case is triggered via the deterministic fixture:
+ *   - "@empty"       query → no results
  *   - "quota"        query → QUOTA_EXCEEDED on search
  *   - "unavailable"  query → UPSTREAM_UNAVAILABLE on search
  *   - UCQQQ… id      → QUOTA_EXCEEDED on channel fetch → error boundary
@@ -18,8 +19,11 @@ import { CHANNEL_IDS } from "./fixtures/ids";
 test.describe("error workflows", () => {
   test("no results state", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("combobox").fill("empty");
-    await expect(page.getByText(/no channels found/i)).toBeVisible();
+    await page.getByRole("textbox").fill("@empty");
+    await page.getByRole("button", { name: /search channel/i }).click();
+    const error = page.getByTestId("channel-search-error");
+    await expect(error).toBeVisible();
+    await expect(error).toContainText(/no channels found/i);
   });
 
   test("invalid channel id in URL → not-found segment", async ({ page }) => {
@@ -36,21 +40,22 @@ test.describe("error workflows", () => {
     page,
   }) => {
     await page.goto("/");
-    await page.getByRole("combobox").fill("quota");
-    // The listbox surfaces the safe error message; nothing about internals.
-    await expect(
-      page.getByText(/quota has been exceeded/i),
-    ).toBeVisible();
+    await page.getByRole("textbox").fill("@quota");
+    await page.getByRole("button", { name: /search channel/i }).click();
+    const error = page.getByTestId("channel-search-error");
+    await expect(error).toBeVisible();
+    await expect(error).toContainText(/quota has been exceeded/i);
   });
 
   test("YouTube upstream unavailable on search shows a safe message", async ({
     page,
   }) => {
     await page.goto("/");
-    await page.getByRole("combobox").fill("unavailable");
-    await expect(
-      page.getByText(/currently unavailable/i),
-    ).toBeVisible();
+    await page.getByRole("textbox").fill("@unavailable");
+    await page.getByRole("button", { name: /search channel/i }).click();
+    const error = page.getByTestId("channel-search-error");
+    await expect(error).toBeVisible();
+    await expect(error).toContainText(/currently unavailable/i);
   });
 
   test("YouTube quota exceeded on channel page renders the error boundary", async ({
@@ -82,9 +87,7 @@ test.describe("error workflows", () => {
       page.getByRole("heading", { level: 1, name: /charlie channel/i }),
     ).toBeVisible();
     // The Subscribers stat shows "Hidden".
-    await expect(
-      page.getByText(/^Hidden$/).first(),
-    ).toBeVisible();
+    await expect(page.getByText(/^Hidden$/).first()).toBeVisible();
   });
 
   test("missing API key surfaces a safe error on the search route", async ({
@@ -104,7 +107,8 @@ test.describe("error workflows", () => {
       }),
     );
     await page.goto("/");
-    await page.getByRole("combobox").fill("something");
+    await page.getByRole("textbox").fill("@something");
+    await page.getByRole("button", { name: /search channel/i }).click();
     await expect(
       page.getByText(/not configured on the server/i),
     ).toBeVisible();

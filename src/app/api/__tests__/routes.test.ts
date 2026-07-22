@@ -10,6 +10,7 @@ import { YouTubeApiError } from "@/lib/errors";
 const searchChannels = vi.fn();
 const getChannelById = vi.fn();
 const getRecentVideos = vi.fn();
+const resolveChannelFromInput = vi.fn();
 
 vi.mock("@/lib/youtube", () => ({
   // Re-export the same error class so `instanceof` checks succeed in
@@ -17,6 +18,7 @@ vi.mock("@/lib/youtube", () => ({
   // same module regardless of who imports it, so this works.
   YouTubeApiError,
   searchChannels: (...args: unknown[]) => searchChannels(...args),
+  resolveChannelFromInput: (...args: unknown[]) => resolveChannelFromInput(...args),
   getChannelById: (...args: unknown[]) => getChannelById(...args),
   getRecentVideos: (...args: unknown[]) => getRecentVideos(...args),
 }));
@@ -31,6 +33,7 @@ import { apiLimiter } from "@/lib/rateLimit";
 beforeEach(() => {
   process.env.YOUTUBE_API_KEY = "test-key";
   searchChannels.mockReset();
+  resolveChannelFromInput.mockReset();
   getChannelById.mockReset();
   getRecentVideos.mockReset();
   apiLimiter.clear();
@@ -56,9 +59,9 @@ describe("GET /api/search", () => {
   });
 
   it("returns results on success", async () => {
-    searchChannels.mockResolvedValueOnce([
+    resolveChannelFromInput.mockResolvedValueOnce([
       {
-        channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx",
+        channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA",
         title: "T",
         handle: "@t",
         description: "",
@@ -67,36 +70,51 @@ describe("GET /api/search", () => {
         hiddenSubscriberCount: false,
       },
     ]);
-    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    const res = await searchGET(new Request("http://x/api/search?q=@test"));
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.results).toHaveLength(1);
     expect(body.results[0].title).toBe("T");
   });
 
+  it("returns 400 UNSUPPORTED_INPUT for plain text queries", async () => {
+    resolveChannelFromInput.mockRejectedValueOnce(
+      new YouTubeApiError(
+        400,
+        "UNSUPPORTED_INPUT",
+        "Enter a valid YouTube @handle, channel URL, or channel ID.",
+      ),
+    );
+    const res = await searchGET(new Request("http://x/api/search?q=MrBeast"));
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toBe("UNSUPPORTED_INPUT");
+    expect(body.message).toContain("@handle");
+  });
+
   it("maps QUOTA_EXCEEDED to 429", async () => {
-    searchChannels.mockRejectedValueOnce(
+    resolveChannelFromInput.mockRejectedValueOnce(
       new YouTubeApiError(429, "QUOTA_EXCEEDED", "Quota"),
     );
-    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    const res = await searchGET(new Request("http://x/api/search?q=@test"));
     expect(res.status).toBe(429);
     const body = await res.json();
     expect(body.error).toBe("QUOTA_EXCEEDED");
   });
 
   it("maps UPSTREAM_UNAVAILABLE to 502", async () => {
-    searchChannels.mockRejectedValueOnce(
+    resolveChannelFromInput.mockRejectedValueOnce(
       new YouTubeApiError(502, "UPSTREAM_UNAVAILABLE", "Down"),
     );
-    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    const res = await searchGET(new Request("http://x/api/search?q=@test"));
     expect(res.status).toBe(502);
   });
 
   it("does not leak generic error internals in the message", async () => {
-    searchChannels.mockRejectedValueOnce(
+    resolveChannelFromInput.mockRejectedValueOnce(
       new Error("/etc/passwd is not accessible: leaked path"),
     );
-    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    const res = await searchGET(new Request("http://x/api/search?q=@test"));
     expect(res.status).toBe(500);
     const body = await res.json();
     expect(body.error).toBe("INTERNAL_ERROR");
@@ -105,24 +123,24 @@ describe("GET /api/search", () => {
   });
 
   it("does not leak the API key on network errors", async () => {
-    searchChannels.mockRejectedValueOnce(
+    resolveChannelFromInput.mockRejectedValueOnce(
       new YouTubeApiError(
         504,
         "UPSTREAM_TIMEOUT",
         "The YouTube API took too long to respond.",
       ),
     );
-    const res = await searchGET(new Request("http://x/api/search?q=test"));
+    const res = await searchGET(new Request("http://x/api/search?q=@test"));
     const body = await res.json();
     expect(JSON.stringify(body)).not.toContain("test-key");
   });
 
   it("rate limits repeated requests and returns Retry-After", async () => {
-    searchChannels.mockResolvedValue([]);
+    resolveChannelFromInput.mockResolvedValue([]);
     // Default limiter is 60/min. Hammer past the limit.
     let sawRateLimit = false;
     for (let i = 0; i < 65; i++) {
-      const res = await searchGET(new Request("http://x/api/search?q=test"));
+      const res = await searchGET(new Request("http://x/api/search?q=@test"));
       if (res.status === 429) {
         sawRateLimit = true;
         const body = await res.json();
@@ -147,18 +165,18 @@ describe("GET /api/channel", () => {
   it("returns 404 when channel is not found", async () => {
     getChannelById.mockResolvedValueOnce(null);
     const res = await channelGET(
-      new Request("http://x/api/channel?channelId=UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      new Request("http://x/api/channel?channelId=UCX6OQ3DkcsbYNE6H8uQQuVA"),
     );
     expect(res.status).toBe(404);
   });
 
   it("returns the channel on success", async () => {
     getChannelById.mockResolvedValueOnce({
-      channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx",
+      channelId: "UCX6OQ3DkcsbYNE6H8uQQuVA",
       title: "T",
     });
     const res = await channelGET(
-      new Request("http://x/api/channel?channelId=UC_xxxxxxxxxxxxxxxxxxxxxx"),
+      new Request("http://x/api/channel?channelId=UCX6OQ3DkcsbYNE6H8uQQuVA"),
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -179,7 +197,7 @@ describe("GET /api/videos", () => {
     getRecentVideos.mockResolvedValueOnce([{ videoId: "v1" }]);
     const res = await videosGET(
       new Request(
-        "http://x/api/videos?playlistId=UU_xxxxxxxxxxxxxxxxxxxxxx&limit=5",
+        "http://x/api/videos?playlistId=UUX6OQ3DkcsbYNE6H8uQQuVA&limit=5",
       ),
     );
     expect(res.status).toBe(200);
@@ -191,12 +209,12 @@ describe("GET /api/videos", () => {
     getRecentVideos.mockResolvedValueOnce([]);
     const res = await videosGET(
       new Request(
-        "http://x/api/videos?playlistId=UU_xxxxxxxxxxxxxxxxxxxxxx&limit=9999",
+        "http://x/api/videos?playlistId=UUX6OQ3DkcsbYNE6H8uQQuVA&limit=9999",
       ),
     );
     expect(res.status).toBe(200);
     expect(getRecentVideos).toHaveBeenCalledWith(
-      "UU_xxxxxxxxxxxxxxxxxxxxxx",
+      "UUX6OQ3DkcsbYNE6H8uQQuVA",
       50,
     );
   });

@@ -26,9 +26,11 @@ interface MockResponse {
   body: unknown;
 }
 
+type FetchFn = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
+
 function mockFetchSequence(responses: MockResponse[]) {
   let i = 0;
-  const fetchMock = vi.fn(async () => {
+  const impl: FetchFn = async () => {
     const r = responses[Math.min(i, responses.length - 1)];
     i++;
     return {
@@ -38,13 +40,14 @@ function mockFetchSequence(responses: MockResponse[]) {
         return r.body;
       },
     } as unknown as Response;
-  });
+  };
+  const fetchMock = vi.fn<FetchFn>(impl);
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
 }
 
 const CHANNEL_ITEM = {
-  id: "UC_xxxxxxxxxxxxxxxxxxxxxx",
+  id: "UCX6OQ3DkcsbYNE6H8uQQuVA",
   snippet: {
     title: "Test Channel",
     description: "Hello world",
@@ -59,7 +62,7 @@ const CHANNEL_ITEM = {
     videoCount: "42",
   },
   contentDetails: {
-    relatedPlaylists: { uploads: "UU_xxxxxxxxxxxxxxxxxxxxxx" },
+    relatedPlaylists: { uploads: "UUX6OQ3DkcsbYNE6H8uQQuVA" },
   },
 };
 
@@ -70,13 +73,13 @@ describe("youtube service", () => {
         { ok: true, body: { items: [CHANNEL_ITEM] } },
       ]);
       const { getChannelById } = await loadYoutube();
-      const channel = await getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      const channel = await getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA");
       expect(channel).not.toBeNull();
       expect(channel!.title).toBe("Test Channel");
       expect(channel!.handle).toBe("@testchannel");
       expect(channel!.subscriberCount).toBe(50000);
       expect(channel!.hiddenSubscriberCount).toBe(false);
-      expect(channel!.uploadsPlaylistId).toBe("UU_xxxxxxxxxxxxxxxxxxxxxx");
+      expect(channel!.uploadsPlaylistId).toBe("UUX6OQ3DkcsbYNE6H8uQQuVA");
     });
 
     it("handles hidden subscriber counts", async () => {
@@ -98,7 +101,7 @@ describe("youtube service", () => {
         },
       ]);
       const { getChannelById } = await loadYoutube();
-      const channel = await getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      const channel = await getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA");
       expect(channel!.subscriberCount).toBeNull();
       expect(channel!.hiddenSubscriberCount).toBe(true);
     });
@@ -118,7 +121,7 @@ describe("youtube service", () => {
         },
       ]);
       const { getChannelById } = await loadYoutube();
-      const channel = await getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      const channel = await getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA");
       expect(channel!.subscriberCount).toBe(0);
       expect(channel!.viewCount).toBe(0);
       expect(channel!.videoCount).toBe(0);
@@ -127,7 +130,7 @@ describe("youtube service", () => {
     it("returns null when the channel is not found", async () => {
       mockFetchSequence([{ ok: true, body: { items: [] } }]);
       const { getChannelById } = await loadYoutube();
-      expect(await getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx")).toBeNull();
+      expect(await getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA")).toBeNull();
     });
 
     it("throws QUOTA_EXCEEDED on 403 quotaExceeded", async () => {
@@ -140,10 +143,10 @@ describe("youtube service", () => {
       ]);
       const { getChannelById, YouTubeApiError } = await loadYoutube();
       await expect(
-        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+        getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA"),
       ).rejects.toBeInstanceOf(YouTubeApiError);
       try {
-        await getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+        await getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA");
       } catch (err) {
         expect((err as { code: string }).code).toBe("QUOTA_EXCEEDED");
         expect((err as { status: number }).status).toBe(429);
@@ -160,7 +163,7 @@ describe("youtube service", () => {
       ]);
       const { getChannelById } = await loadYoutube();
       await expect(
-        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+        getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA"),
       ).rejects.toMatchObject({ code: "INVALID_API_KEY" });
     });
 
@@ -168,7 +171,7 @@ describe("youtube service", () => {
       mockFetchSequence([{ ok: false, status: 500, body: {} }]);
       const { getChannelById } = await loadYoutube();
       await expect(
-        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+        getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA"),
       ).rejects.toMatchObject({ code: "UPSTREAM_UNAVAILABLE", status: 502 });
     });
 
@@ -177,7 +180,7 @@ describe("youtube service", () => {
       mockFetchSequence([{ ok: true, body: {} }]);
       const { getChannelById } = await loadYoutube();
       await expect(
-        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+        getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA"),
       ).rejects.toMatchObject({ code: "MISSING_API_KEY" });
     });
 
@@ -190,7 +193,7 @@ describe("youtube service", () => {
       );
       const { getChannelById } = await loadYoutube();
       await expect(
-        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+        getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA"),
       ).rejects.toMatchObject({ code: "NETWORK_ERROR" });
     });
 
@@ -205,7 +208,7 @@ describe("youtube service", () => {
       );
       const { getChannelById } = await loadYoutube();
       await expect(
-        getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx"),
+        getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA"),
       ).rejects.toMatchObject({ code: "UPSTREAM_TIMEOUT" });
     });
 
@@ -218,61 +221,161 @@ describe("youtube service", () => {
       );
       const { getChannelById } = await loadYoutube();
       try {
-        await getChannelById("UC_xxxxxxxxxxxxxxxxxxxxxx");
+        await getChannelById("UCX6OQ3DkcsbYNE6H8uQQuVA");
       } catch (err) {
         expect((err as Error).message).not.toContain("test-key");
       }
     });
   });
 
-  describe("searchChannels", () => {
-    it("resolves a raw channel id directly (single upstream call)", async () => {
+  describe("getChannelByHandle", () => {
+    it("resolves a handle via channels.list(forHandle)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { getChannelByHandle } = await loadYoutube();
+      const channel = await getChannelByHandle("MrBeast");
+      expect(channel).not.toBeNull();
+      expect(channel!.title).toBe("Test Channel");
+      // Verify it used forHandle parameter, not search
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("channels");
+      expect(String(calledUrl)).toContain("forHandle");
+      expect(String(calledUrl)).not.toContain("/search");
+    });
+
+    it("returns null when handle is not found", async () => {
+      mockFetchSequence([{ ok: true, body: { items: [] } }]);
+      const { getChannelByHandle } = await loadYoutube();
+      expect(await getChannelByHandle("nonexistent")).toBeNull();
+    });
+
+    it("caches handle lookups", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { getChannelByHandle } = await loadYoutube();
+      await getChannelByHandle("MrBeast");
+      await getChannelByHandle("MrBeast");
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("resolveChannelFromInput (searchChannels)", () => {
+    it("resolves @MrBeast using channels.list(forHandle) — NOT search.list", async () => {
       const fetchMock = mockFetchSequence([
         { ok: true, body: { items: [CHANNEL_ITEM] } },
       ]);
       const { searchChannels } = await loadYoutube();
-      const results = await searchChannels("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      const results = await searchChannels("@MrBeast");
       expect(results).toHaveLength(1);
-      expect(results[0].channelId).toBe("UC_xxxxxxxxxxxxxxxxxxxxxx");
+      expect(results[0].channelId).toBe("UCX6OQ3DkcsbYNE6H8uQQuVA");
+      // Verify no search.list calls
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("/channels?");
+      expect(String(calledUrl)).toContain("forHandle");
+      expect(String(calledUrl)).not.toContain("/search");
+    });
+
+    it("resolves a handle URL using channels.list(forHandle)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      const results = await searchChannels("https://youtube.com/@MrBeast");
+      expect(results).toHaveLength(1);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("forHandle");
+      expect(String(calledUrl)).not.toContain("/search");
+    });
+
+    it("resolves a channel URL using channels.list(id)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      const results = await searchChannels(
+        "https://www.youtube.com/channel/UCX6OQ3DkcsbYNE6H8uQQuVA",
+      );
+      expect(results).toHaveLength(1);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("/channels?");
+      expect(String(calledUrl)).toContain("id=UCX6OQ3DkcsbYNE6H8uQQuVA");
+      expect(String(calledUrl)).not.toContain("/search");
+    });
+
+    it("resolves a raw channel ID using channels.list(id)", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      const results = await searchChannels("UCX6OQ3DkcsbYNE6H8uQQuVA");
+      expect(results).toHaveLength(1);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [calledUrl] = fetchMock.mock.calls[0];
+      expect(String(calledUrl)).toContain("/channels?");
+      expect(String(calledUrl)).not.toContain("/search");
+    });
+
+    it("rejects plain 'MrBeast' — NEVER calls search.list", async () => {
+      const fetchMock = mockFetchSequence([]);
+      const { searchChannels } = await loadYoutube();
+      await expect(searchChannels("MrBeast")).rejects.toMatchObject({
+        code: "UNSUPPORTED_INPUT",
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it("rejects 'hjbhj' — NEVER calls search.list", async () => {
+      const fetchMock = mockFetchSequence([]);
+      const { searchChannels } = await loadYoutube();
+      await expect(searchChannels("hjbhj")).rejects.toMatchObject({
+        code: "UNSUPPORTED_INPUT",
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it("returns [] when handle is not found (no error)", async () => {
+      mockFetchSequence([{ ok: true, body: { items: [] } }]);
+      const { searchChannels } = await loadYoutube();
+      expect(await searchChannels("@nonexistentchannel123")).toEqual([]);
+    });
+
+    it("cached requests produce no additional YouTube calls", async () => {
+      const fetchMock = mockFetchSequence([
+        { ok: true, body: { items: [CHANNEL_ITEM] } },
+      ]);
+      const { searchChannels } = await loadYoutube();
+      await searchChannels("@MrBeast");
+      await searchChannels("@MrBeast");
+      await searchChannels("@MrBeast");
+      // Only 1 upstream call despite 3 invocations
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
-    it("performs a name search + channel enrichment (two upstream calls)", async () => {
+    it("simultaneous identical requests perform one upstream lookup", async () => {
       const fetchMock = mockFetchSequence([
-        {
-          ok: true,
-          body: {
-            items: [
-              {
-                id: { channelId: "UC_xxxxxxxxxxxxxxxxxxxxxx" },
-                snippet: {
-                  title: "T",
-                  description: "",
-                  channelTitle: "T",
-                  thumbnails: {},
-                  publishedAt: "2020-01-01T00:00:00Z",
-                },
-              },
-            ],
-          },
-        },
         { ok: true, body: { items: [CHANNEL_ITEM] } },
       ]);
       const { searchChannels } = await loadYoutube();
-      const results = await searchChannels("test");
-      expect(results).toHaveLength(1);
-      expect(fetchMock).toHaveBeenCalledTimes(2);
-    });
-
-    it("returns [] when search finds nothing", async () => {
-      mockFetchSequence([{ ok: true, body: { items: [] } }]);
-      const { searchChannels } = await loadYoutube();
-      expect(await searchChannels("qwertyxyzzz")).toEqual([]);
+      // Fire 3 concurrent requests for the same input
+      const [r1, r2, r3] = await Promise.all([
+        searchChannels("@MrBeast"),
+        searchChannels("@MrBeast"),
+        searchChannels("@MrBeast"),
+      ]);
+      expect(r1).toEqual(r2);
+      expect(r2).toEqual(r3);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("getRecentVideos", () => {
-    it("maps playlist items + video details", async () => {
+    it("maps playlist items + video details (batched)", async () => {
       mockFetchSequence([
         {
           ok: true,
@@ -318,13 +421,61 @@ describe("youtube service", () => {
         },
       ]);
       const { getRecentVideos } = await loadYoutube();
-      const videos = await getRecentVideos("UU_xxxxxxxxxxxxxxxxxxxxxx", 12);
+      const videos = await getRecentVideos("UUX6OQ3DkcsbYNE6H8uQQuVA", 12);
       expect(videos).toHaveLength(2);
       expect(videos[0].viewCount).toBe(1000);
       expect(videos[0].isShort).toBe(false);
       expect(videos[1].isShort).toBe(true);
       expect(videos[1].viewCount).toBe(0); // statistics missing
       expect(videos[1].url).toContain("shorts/");
+    });
+
+    it("videos.list is batched (one call for multiple IDs)", async () => {
+      const fetchMock = mockFetchSequence([
+        {
+          ok: true,
+          body: {
+            items: [
+              { contentDetails: { videoId: "vid1" } },
+              { contentDetails: { videoId: "vid2" } },
+              { contentDetails: { videoId: "vid3" } },
+            ],
+          },
+        },
+        {
+          ok: true,
+          body: {
+            items: [
+              {
+                id: "vid1",
+                snippet: { title: "V1", description: "", publishedAt: "2025-01-01T00:00:00Z", thumbnails: {} },
+                contentDetails: { duration: "PT5M" },
+                statistics: { viewCount: "100" },
+              },
+              {
+                id: "vid2",
+                snippet: { title: "V2", description: "", publishedAt: "2025-01-01T00:00:00Z", thumbnails: {} },
+                contentDetails: { duration: "PT3M" },
+                statistics: { viewCount: "200" },
+              },
+              {
+                id: "vid3",
+                snippet: { title: "V3", description: "", publishedAt: "2025-01-01T00:00:00Z", thumbnails: {} },
+                contentDetails: { duration: "PT10M" },
+                statistics: { viewCount: "300" },
+              },
+            ],
+          },
+        },
+      ]);
+      const { getRecentVideos } = await loadYoutube();
+      const videos = await getRecentVideos("UUX6OQ3DkcsbYNE6H8uQQuVA", 12);
+      expect(videos).toHaveLength(3);
+      // Verify exactly 2 fetch calls: 1 playlistItems + 1 videos (batched)
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      const [videosUrl] = fetchMock.mock.calls[1];
+      expect(String(videosUrl)).toContain("videos");
+      expect(String(videosUrl)).toContain("id=vid1%2Cvid2%2Cvid3");
     });
 
     it("skips missing videos (deleted / private)", async () => {
@@ -359,7 +510,7 @@ describe("youtube service", () => {
         },
       ]);
       const { getRecentVideos } = await loadYoutube();
-      const videos = await getRecentVideos("UU_xxxxxxxxxxxxxxxxxxxxxx");
+      const videos = await getRecentVideos("UUX6OQ3DkcsbYNE6H8uQQuVA");
       expect(videos).toHaveLength(1);
       expect(videos[0].videoId).toBe("vid1");
     });
@@ -367,7 +518,7 @@ describe("youtube service", () => {
     it("returns [] on an empty playlist", async () => {
       mockFetchSequence([{ ok: true, body: { items: [] } }]);
       const { getRecentVideos } = await loadYoutube();
-      expect(await getRecentVideos("UU_xxxxxxxxxxxxxxxxxxxxxx")).toEqual([]);
+      expect(await getRecentVideos("UUX6OQ3DkcsbYNE6H8uQQuVA")).toEqual([]);
     });
   });
 });
