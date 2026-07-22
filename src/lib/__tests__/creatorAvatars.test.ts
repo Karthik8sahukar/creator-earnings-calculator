@@ -73,35 +73,26 @@ describe("resolveCreatorAvatar", () => {
     expect(youtube.getChannelById).toHaveBeenCalledWith("UCTEST1");
   });
 
-  it("uses getChannelByHandle when channelId is empty (never calls search.list)", async () => {
-    vi.mocked(youtube.getChannelByHandle).mockResolvedValueOnce(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { ...CHANNEL_STUB, thumbnail: "https://yt3.ggpht.com/handle-resolved.jpg" } as any,
-    );
+  it("returns null immediately when channelId is empty (no API call)", async () => {
     const url = await resolveCreatorAvatar(makeCreator());
-    expect(url).toBe("https://yt3.ggpht.com/handle-resolved.jpg");
+    expect(url).toBeNull();
     expect(youtube.searchChannels).not.toHaveBeenCalled();
-    expect(youtube.getChannelByHandle).toHaveBeenCalledWith("testcreator");
+    expect(youtube.getChannelByHandle).not.toHaveBeenCalled();
+    expect(youtube.getChannelById).not.toHaveBeenCalled();
   });
 
-  it("returns null when handle lookup returns no results", async () => {
-    vi.mocked(youtube.getChannelByHandle).mockResolvedValueOnce(null);
+  it("returns null for unverified creator (never throws)", async () => {
+    // Even if some mock were to throw, the function should not reach it
     expect(await resolveCreatorAvatar(makeCreator())).toBeNull();
+    expect(youtube.getChannelByHandle).not.toHaveBeenCalled();
   });
 
-  it("returns null (never throws) on any YouTubeApiError", async () => {
-    vi.mocked(youtube.getChannelByHandle).mockRejectedValueOnce(
-      new YouTubeApiError(429, "QUOTA_EXCEEDED", "quota"),
-    );
-    expect(await resolveCreatorAvatar(makeCreator())).toBeNull();
-  });
-
-  it("returns null when the resolved thumbnail is empty", async () => {
-    vi.mocked(youtube.getChannelByHandle).mockResolvedValueOnce(
+  it("returns null when getChannelById returns empty thumbnail", async () => {
+    vi.mocked(youtube.getChannelById).mockResolvedValueOnce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { ...CHANNEL_STUB, thumbnail: "" } as any,
     );
-    expect(await resolveCreatorAvatar(makeCreator())).toBeNull();
+    expect(await resolveCreatorAvatar(makeCreator({ channelId: "UCTEST1" }))).toBeNull();
   });
 });
 
@@ -113,18 +104,15 @@ describe("getCreatorAvatars", () => {
   });
 
   it("returns an entry for every creator, even when some fail", async () => {
-    // Two creators: the first resolves cleanly, the second throws.
-    vi.mocked(youtube.getChannelByHandle).mockImplementation(async (h: string) => {
-      if (h === "alpha") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return { ...CHANNEL_STUB, thumbnail: "https://yt3.ggpht.com/alpha.jpg" } as any;
-      }
-      throw new YouTubeApiError(429, "QUOTA_EXCEEDED", "quota");
+    // Creator with channelId resolves, creator without channelId returns null
+    vi.mocked(youtube.getChannelById).mockImplementation(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { ...CHANNEL_STUB, thumbnail: "https://yt3.ggpht.com/alpha.jpg" } as any;
     });
 
     const creators = [
-      makeCreator({ slug: "alpha", youtubeHandle: "@alpha" }),
-      makeCreator({ slug: "beta", youtubeHandle: "@beta" }),
+      makeCreator({ slug: "alpha", channelId: "UCALPHA1234567890123456" }),
+      makeCreator({ slug: "beta", channelId: "" }), // unverified — returns null
     ];
     const map = await getCreatorAvatars(creators);
 
@@ -138,17 +126,17 @@ describe("getCreatorAvatars", () => {
     // Set up slow-resolving fixtures. If the helper serialized
     // requests, total wall time would be ~= 4 * delay.
     const delay = 40;
-    vi.mocked(youtube.getChannelByHandle).mockImplementation(async () => {
+    vi.mocked(youtube.getChannelById).mockImplementation(async () => {
       await new Promise((r) => setTimeout(r, delay));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return CHANNEL_STUB as any;
     });
 
     const creators = [
-      makeCreator({ slug: "a" }),
-      makeCreator({ slug: "b" }),
-      makeCreator({ slug: "c" }),
-      makeCreator({ slug: "d" }),
+      makeCreator({ slug: "a", channelId: "UCA1234567890123456789a" }),
+      makeCreator({ slug: "b", channelId: "UCB1234567890123456789b" }),
+      makeCreator({ slug: "c", channelId: "UCC1234567890123456789c" }),
+      makeCreator({ slug: "d", channelId: "UCD1234567890123456789d" }),
     ];
 
     const start = Date.now();
@@ -168,11 +156,7 @@ describe("getCreatorAvatars", () => {
     expect(youtube.getChannelByHandle).not.toHaveBeenCalled();
   });
 
-  it("creator avatar resolution NEVER calls search.list", async () => {
-    vi.mocked(youtube.getChannelByHandle).mockResolvedValue(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      CHANNEL_STUB as any,
-    );
+  it("creator avatar resolution NEVER calls search.list or getChannelByHandle", async () => {
     vi.mocked(youtube.getChannelById).mockResolvedValue(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       CHANNEL_STUB as any,
@@ -180,10 +164,13 @@ describe("getCreatorAvatars", () => {
 
     const creators = [
       makeCreator({ slug: "a", channelId: "UC1234567890123456789012" }),
-      makeCreator({ slug: "b" }),
+      makeCreator({ slug: "b" }), // unverified — no API call
     ];
     await getCreatorAvatars(creators);
 
     expect(youtube.searchChannels).not.toHaveBeenCalled();
+    expect(youtube.getChannelByHandle).not.toHaveBeenCalled();
+    // Only getChannelById should have been called (for creator "a")
+    expect(youtube.getChannelById).toHaveBeenCalledTimes(1);
   });
 });
