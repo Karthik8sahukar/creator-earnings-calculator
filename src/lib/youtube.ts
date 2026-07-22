@@ -159,26 +159,7 @@ async function ytFetch<T>(
   path: string,
   params: Record<string, string | number | undefined>,
 ): Promise<T> {
-  // ─── DIAGNOSTIC: step-by-step tracing inside ytFetch ─────────────────
-  const sanitizeUrl = (u: URL) => {
-    const copy = new URL(u.toString());
-    copy.searchParams.delete("key");
-    return copy.toString();
-  };
-
-  console.info("[ytFetch] ENTER", { path, params });
-
-  let key: string;
-  try {
-    key = assertKey();
-  } catch (keyErr) {
-    console.error("[ytFetch] assertKey THREW", {
-      errorName: (keyErr as Error).name,
-      errorMessage: (keyErr as Error).message,
-    });
-    throw keyErr;
-  }
-
+  const key = assertKey();
   const url = new URL(`${youtube.apiBase}/${path}`);
   for (const [k, v] of Object.entries(params)) {
     if (v !== undefined && v !== null && v !== "") {
@@ -186,8 +167,6 @@ async function ytFetch<T>(
     }
   }
   url.searchParams.set("key", key);
-
-  console.info("[ytFetch] Request URL (no key)", { url: sanitizeUrl(url) });
 
   // Track API calls for instrumentation
   if (path === "channels") trackApiCall("youtube.channels.list");
@@ -199,26 +178,13 @@ async function ytFetch<T>(
   const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
   let res: Response;
-  console.info("[ytFetch] fetch() starting", { timeoutMs: UPSTREAM_TIMEOUT_MS });
   try {
     res = await fetch(url.toString(), {
       signal: controller.signal,
-      // Small revalidate hint for platforms that respect it. Our own cache
-      // layer is the primary guard.
       next: { revalidate: 300 },
     });
-    console.info("[ytFetch] fetch() completed", { status: res.status, ok: res.ok, statusText: res.statusText });
   } catch (err) {
-    clearTimeout(timeout);
-    const fetchErr = err as Error;
-    console.error("[ytFetch] fetch() THREW", {
-      errorName: fetchErr.name,
-      errorMessage: fetchErr.message,
-      stack: fetchErr.stack?.split("\n").slice(0, 8).join("\n"),
-      url: sanitizeUrl(url),
-    });
-    // The fetch failed at the network level. This includes timeouts.
-    if (fetchErr.name === "AbortError") {
+    if ((err as { name?: string }).name === "AbortError") {
       markUpstream("timeout");
       throw new YouTubeApiError(
         504,
@@ -236,52 +202,26 @@ async function ytFetch<T>(
     clearTimeout(timeout);
   }
 
-  console.info("[ytFetch] HTTP status", { status: res.status, ok: res.ok });
-
   if (!res.ok) {
-    console.info("[ytFetch] Response NOT OK, reading error body");
     let reason: string | undefined;
     try {
       const body = (await res.json()) as {
         error?: { errors?: { reason?: string }[] };
       };
       reason = body.error?.errors?.[0]?.reason;
-      console.info("[ytFetch] Error body parsed", { reason, bodyKeys: Object.keys(body) });
-    } catch (jsonErr) {
-      console.error("[ytFetch] Error body JSON parse failed", {
-        errorName: (jsonErr as Error).name,
-        errorMessage: (jsonErr as Error).message,
-      });
+    } catch {
+      // ignore — we already have a status code
     }
     const mapped = mapUpstreamError(res.status, reason);
     markUpstream(categoryFor(mapped.code));
-    console.error("[ytFetch] Throwing YouTubeApiError (non-ok)", {
-      mappedCode: mapped.code,
-      mappedStatus: mapped.status,
-      originalStatus: res.status,
-      reason,
-    });
     throw new YouTubeApiError(mapped.status, mapped.code, mapped.message);
   }
 
-  // Response is OK — parse JSON body
-  console.info("[ytFetch] Reading response body");
-  let rawText: string;
   try {
-    rawText = await res.text();
-    console.info("[ytFetch] Raw response body (truncated)", {
-      length: rawText.length,
-      body: rawText.slice(0, 1000),
-    });
-  } catch (textErr) {
-    const te = textErr as Error;
-    console.error("[ytFetch] res.text() THREW", {
-      errorName: te.name,
-      errorMessage: te.message,
-      stack: te.stack?.split("\n").slice(0, 8).join("\n"),
-      url: sanitizeUrl(url),
-      httpStatus: res.status,
-    });
+    const parsed = (await res.json()) as T;
+    markUpstream("success");
+    return parsed;
+  } catch {
     markUpstream("malformed_response");
     throw new YouTubeApiError(
       502,
@@ -289,37 +229,6 @@ async function ytFetch<T>(
       "The YouTube API returned a malformed response.",
     );
   }
-
-  console.info("[ytFetch] JSON.parse starting");
-  let parsed: T;
-  try {
-    parsed = JSON.parse(rawText) as T;
-    console.info("[ytFetch] JSON.parse completed", {
-      type: typeof parsed,
-      isArray: Array.isArray(parsed),
-      keys: parsed && typeof parsed === "object" ? Object.keys(parsed as Record<string, unknown>).slice(0, 10) : [],
-    });
-  } catch (parseErr) {
-    const pe = parseErr as Error;
-    console.error("[ytFetch] JSON.parse THREW", {
-      errorName: pe.name,
-      errorMessage: pe.message,
-      stack: pe.stack?.split("\n").slice(0, 5).join("\n"),
-      url: sanitizeUrl(url),
-      httpStatus: res.status,
-      rawTextStart: rawText.slice(0, 200),
-    });
-    markUpstream("malformed_response");
-    throw new YouTubeApiError(
-      502,
-      "MALFORMED_UPSTREAM",
-      "The YouTube API returned a malformed response.",
-    );
-  }
-
-  console.info("[ytFetch] Returning parsed object", { path });
-  markUpstream("success");
-  return parsed;
 }
 
 // ---------- Raw response shapes ----------
@@ -367,7 +276,7 @@ interface YtChannelItem {
 }
 
 interface YtChannelResponse {
-  items: YtChannelItem[];
+  items?: YtChannelItem[];
 }
 
 interface YtPlaylistItem {
@@ -649,67 +558,16 @@ export async function getChannelById(
       loader: () => Promise<ChannelDetails | null>,
     ): Promise<ChannelDetails | null>;
   }).getOrLoad(`channel:${channelId}`, async () => {
-    // ─── DIAGNOSTIC: trace YouTube API call ────────────────────────
-    console.info("[yt:getChannelById] ENTER", { channelId });
-    let res: YtChannelResponse;
-    try {
-      res = await ytFetch<YtChannelResponse>("channels", {
-        part: "snippet,statistics,contentDetails,brandingSettings",
-        id: channelId,
-        maxResults: 1,
-      });
-    } catch (fetchErr) {
-      console.error("[yt:getChannelById] ytFetch THREW", {
-        channelId,
-        errorName: (fetchErr as Error).name,
-        errorMessage: (fetchErr as Error).message,
-        stack: (fetchErr as Error).stack?.split("\n").slice(0, 5).join("\n"),
-      });
-      throw fetchErr;
-    }
-
-    console.info("[yt:getChannelById] ytFetch OK", {
-      channelId,
-      itemCount: res.items?.length ?? 0,
-      hasItems: Array.isArray(res.items),
-      firstItemId: res.items?.[0]?.id ?? "(none)",
-      hasSnippet: !!res.items?.[0]?.snippet,
-      hasContentDetails: !!res.items?.[0]?.contentDetails,
-      hasStatistics: !!res.items?.[0]?.statistics,
+    const res = await ytFetch<YtChannelResponse>("channels", {
+      part: "snippet,statistics,contentDetails,brandingSettings",
+      id: channelId,
+      maxResults: 1,
     });
 
-    const c = res.items[0];
-    if (!c) {
-      console.info("[yt:getChannelById] EXIT null (no items)", { channelId });
-      return null;
-    }
+    const c = res.items?.[0];
+    if (!c) return null;
 
-    try {
-      const mapped = mapChannel(c);
-      console.info("[yt:getChannelById] EXIT mapped", {
-        channelId,
-        title: mapped.title,
-        uploadsPlaylistId: mapped.uploadsPlaylistId,
-      });
-      return mapped;
-    } catch (mapErr) {
-      console.error("[yt:getChannelById] mapChannel THREW", {
-        channelId,
-        errorName: (mapErr as Error).name,
-        errorMessage: (mapErr as Error).message,
-        stack: (mapErr as Error).stack?.split("\n").slice(0, 5).join("\n"),
-        rawItem: JSON.stringify({
-          id: c.id,
-          hasSnippet: !!c.snippet,
-          snippetKeys: c.snippet ? Object.keys(c.snippet) : [],
-          hasContentDetails: !!c.contentDetails,
-          contentDetailsKeys: c.contentDetails ? Object.keys(c.contentDetails) : [],
-          hasStatistics: !!c.statistics,
-        }),
-      });
-      throw mapErr;
-    }
-    // ───────────────────────────────────────────────────────────────
+    return mapChannel(c);
   });
 }
 

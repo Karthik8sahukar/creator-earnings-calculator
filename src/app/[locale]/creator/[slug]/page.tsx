@@ -154,15 +154,6 @@ export default async function CreatorPage({ params }: PageProps) {
 
   const creator = getCreatorBySlug(slug);
 
-  // ─── TEMPORARY DIAGNOSTIC (remove after confirming fix) ───────
-  console.info("[creator-page]", {
-    locale,
-    slug,
-    found: !!creator,
-    displayName: creator?.displayName ?? "(not found)",
-  });
-  // ──────────────────────────────────────────────────────────────
-
   if (!creator) notFound();
 
   const profile = await getCreatorProfile(creator);
