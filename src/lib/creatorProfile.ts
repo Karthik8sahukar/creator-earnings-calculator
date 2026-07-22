@@ -345,7 +345,7 @@ export async function getCreatorProfile(
   const debugChannelId = creator.channelId;
   const debugVerified = Boolean(creator.channelId);
   let debugResolveChannelCalled = false;
-  let debugGetChannelByIdCalled = false;
+  const debugGetChannelByIdCalled = false;
   // ──────────────────────────────────────────────────────────────
 
   try {
