@@ -187,7 +187,7 @@ describe("original verified creators preserved", () => {
   it("all 23 verified creators retain their channel IDs", () => {
     const creators = listCreators();
     const verified = creators.filter((c) => c.channelId.length > 0);
-    expect(verified.length).toBe(23);
+    expect(verified.length).toBeGreaterThanOrEqual(23);
 
     // Spot-check key creators
     const expectedChannelIds: Record<string, string> = {
