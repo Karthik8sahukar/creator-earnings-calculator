@@ -147,3 +147,7 @@ vite.config.ts.timestamp-*
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+
+# Creator verification reports (generated, may contain API response data)
+reports/

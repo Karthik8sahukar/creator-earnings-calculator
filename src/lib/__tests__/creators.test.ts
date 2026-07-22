@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  CREATORS,
+  type Creator,
   getCreatorBySlug,
   getCreatorCountryTier,
   getCreatorNiche,
@@ -20,21 +20,23 @@ import {
  * every countryCode / nicheId must exist in the rpmData tables.
  */
 describe("creators catalog", () => {
+  const creators = listCreators();
+
   it("has at least twenty phase-1 creators", () => {
-    expect(CREATORS.length).toBeGreaterThanOrEqual(20);
+    expect(creators.length).toBeGreaterThanOrEqual(20);
   });
 
   it("has unique slugs", () => {
     const seen = new Set<string>();
-    for (const c of CREATORS) {
+    for (const c of creators) {
       expect(seen.has(c.slug), `duplicate slug ${c.slug}`).toBe(false);
       seen.add(c.slug);
     }
   });
 
   it("every relatedCreators reference resolves to a real slug", () => {
-    const validSlugs = new Set(CREATORS.map((c) => c.slug));
-    for (const c of CREATORS) {
+    const validSlugs = new Set(creators.map((c: Creator) => c.slug));
+    for (const c of creators) {
       for (const r of c.relatedCreators) {
         expect(
           validSlugs.has(r),
@@ -45,14 +47,14 @@ describe("creators catalog", () => {
   });
 
   it("every displayName is non-empty and every handle starts with @", () => {
-    for (const c of CREATORS) {
+    for (const c of creators) {
       expect(c.displayName.trim().length).toBeGreaterThan(0);
       expect(c.youtubeHandle.startsWith("@")).toBe(true);
     }
   });
 
   it("every country and category label is non-empty", () => {
-    for (const c of CREATORS) {
+    for (const c of creators) {
       expect(c.country.length).toBeGreaterThan(0);
       expect(c.category.length).toBeGreaterThan(0);
     }
@@ -72,9 +74,9 @@ describe("getCreatorBySlug", () => {
 });
 
 describe("listCreators / listCreatorCountries / listCreatorCategories", () => {
-  it("listCreators returns the full catalog in order", () => {
-    expect(listCreators().length).toBe(CREATORS.length);
-    expect(listCreators()[0].slug).toBe(CREATORS[0].slug);
+  it("listCreators returns the full catalog", () => {
+    const creators = listCreators();
+    expect(creators.length).toBeGreaterThanOrEqual(200);
   });
 
   it("listCreatorCountries returns unique, sorted labels", () => {
@@ -100,7 +102,7 @@ describe("resolveRelatedCreators", () => {
       "mrbeast", // duplicate
       "does-not-exist",
     ]);
-    expect(result.map((c) => c.slug)).toEqual(["mrbeast", "ishowspeed"]);
+    expect(result.map((c: Creator) => c.slug)).toEqual(["mrbeast", "ishowspeed"]);
   });
 
   it("returns an empty array when no slug matches", () => {
@@ -159,7 +161,7 @@ describe("resolveNicheId / resolveCountryCode", () => {
 
 describe("getCreatorCountryTier / getCreatorNiche", () => {
   it("returns real rpmData records for every catalog creator", () => {
-    for (const c of CREATORS) {
+    for (const c of listCreators()) {
       const tier = getCreatorCountryTier(c);
       const niche = getCreatorNiche(c);
       expect(tier.baseRpm).toBeGreaterThan(0);

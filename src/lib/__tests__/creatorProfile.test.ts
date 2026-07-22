@@ -95,7 +95,7 @@ describe("getCreatorProfile — happy path", () => {
     expect(profile.channel.channelId).toBe("UCTESTDIRECT");
   });
 
-  it("uses getChannelByHandle when channelId is empty", async () => {
+  it("returns not-verified fallback when channelId is empty (no API call)", async () => {
     const creator = {
       slug: "test",
       displayName: "Test",
@@ -108,16 +108,17 @@ describe("getCreatorProfile — happy path", () => {
       description: "",
       relatedCreators: [],
     };
-    vi.mocked(youtube.getChannelByHandle).mockResolvedValueOnce(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      makeChannelFixture({ channelId: "UCRESOLVED" }) as any,
-    );
-    vi.mocked(youtube.getRecentVideos).mockResolvedValueOnce([]);
 
     const profile = await getCreatorProfile(creator);
+    // No YouTube API methods should be called for unverified creators
     expect(youtube.searchChannels).not.toHaveBeenCalled();
-    expect(youtube.getChannelByHandle).toHaveBeenCalledWith("TestHandle");
-    expect(profile.channel.channelId).toBe("UCRESOLVED");
+    expect(youtube.getChannelByHandle).not.toHaveBeenCalled();
+    expect(youtube.getChannelById).not.toHaveBeenCalled();
+    expect(youtube.getRecentVideos).not.toHaveBeenCalled();
+    // Should render static profile with not-verified fallback
+    expect(profile.fallbackReason).toBe("not-verified");
+    expect(profile.channel.title).toBe("Test");
+    expect(profile.videos).toEqual([]);
   });
 });
 
