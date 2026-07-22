@@ -586,7 +586,8 @@ async function main() {
       const result = await processCreator(c, seenIds);
       results.push(result);
 
-      const icon = {
+      const iconMap: Record<ResultStatus, string> = {
+        "trusted": "🔒 trusted",
         "confirmed": "✅ confirmed",
         "corrected": "🔄 corrected",
         "revoked": "⛔ revoked",
@@ -594,7 +595,8 @@ async function main() {
         "manual-review": "🟡 review",
         "not-found": "⚪ not found",
         "api-error": "❌ error",
-      }[result.status] ?? result.status;
+      } satisfies Record<ResultStatus, string>;
+      const icon = iconMap[result.status];
 
       console.log(`${icon}${result.apiChannelId ? ` → ${result.apiChannelId}` : ""}`);
     } catch (err) {
