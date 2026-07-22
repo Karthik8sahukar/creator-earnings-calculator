@@ -159,7 +159,26 @@ async function ytFetch<T>(
   path: string,
   params: Record<string, string | number | undefined>,
 ): Promise<T> {
-  const key = assertKey();
+  // ─── DIAGNOSTIC: step-by-step tracing inside ytFetch ─────────────────
+  const sanitizeUrl = (u: URL) => {
+    const copy = new URL(u.toString());
+    copy.searchParams.delete("key");
+    return copy.toString();
+  };
+
+  console.info("[ytFetch] ENTER", { path, params });
+
+  let key: string;
+  try {
+    key = assertKey();
+  } catch (keyErr) {
+    console.error("[ytFetch] assertKey THREW", {
+      errorName: (keyErr as Error).name,
+      errorMessage: (keyErr as Error).message,
+    });
+    throw keyErr;
+  }
+
   const url = new URL(`${youtube.apiBase}/${path}`);
   for (const [k, v] of Object.entries(params)) {
     if (v !== undefined && v !== null && v !== "") {
@@ -167,6 +186,8 @@ async function ytFetch<T>(
     }
   }
   url.searchParams.set("key", key);
+
+  console.info("[ytFetch] Request URL (no key)", { url: sanitizeUrl(url) });
 
   // Track API calls for instrumentation
   if (path === "channels") trackApiCall("youtube.channels.list");
@@ -178,6 +199,7 @@ async function ytFetch<T>(
   const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
   let res: Response;
+  console.info("[ytFetch] fetch() starting", { timeoutMs: UPSTREAM_TIMEOUT_MS });
   try {
     res = await fetch(url.toString(), {
       signal: controller.signal,
@@ -185,10 +207,18 @@ async function ytFetch<T>(
       // layer is the primary guard.
       next: { revalidate: 300 },
     });
+    console.info("[ytFetch] fetch() completed", { status: res.status, ok: res.ok, statusText: res.statusText });
   } catch (err) {
+    clearTimeout(timeout);
+    const fetchErr = err as Error;
+    console.error("[ytFetch] fetch() THREW", {
+      errorName: fetchErr.name,
+      errorMessage: fetchErr.message,
+      stack: fetchErr.stack?.split("\n").slice(0, 8).join("\n"),
+      url: sanitizeUrl(url),
+    });
     // The fetch failed at the network level. This includes timeouts.
-    // Do NOT include the request URL — it contains the API key.
-    if ((err as { name?: string }).name === "AbortError") {
+    if (fetchErr.name === "AbortError") {
       markUpstream("timeout");
       throw new YouTubeApiError(
         504,
@@ -206,26 +236,52 @@ async function ytFetch<T>(
     clearTimeout(timeout);
   }
 
+  console.info("[ytFetch] HTTP status", { status: res.status, ok: res.ok });
+
   if (!res.ok) {
+    console.info("[ytFetch] Response NOT OK, reading error body");
     let reason: string | undefined;
     try {
       const body = (await res.json()) as {
         error?: { errors?: { reason?: string }[] };
       };
       reason = body.error?.errors?.[0]?.reason;
-    } catch {
-      // ignore — we already have a status code
+      console.info("[ytFetch] Error body parsed", { reason, bodyKeys: Object.keys(body) });
+    } catch (jsonErr) {
+      console.error("[ytFetch] Error body JSON parse failed", {
+        errorName: (jsonErr as Error).name,
+        errorMessage: (jsonErr as Error).message,
+      });
     }
     const mapped = mapUpstreamError(res.status, reason);
     markUpstream(categoryFor(mapped.code));
+    console.error("[ytFetch] Throwing YouTubeApiError (non-ok)", {
+      mappedCode: mapped.code,
+      mappedStatus: mapped.status,
+      originalStatus: res.status,
+      reason,
+    });
     throw new YouTubeApiError(mapped.status, mapped.code, mapped.message);
   }
 
+  // Response is OK — parse JSON body
+  console.info("[ytFetch] Reading response body");
+  let rawText: string;
   try {
-    const parsed = (await res.json()) as T;
-    markUpstream("success");
-    return parsed;
-  } catch {
+    rawText = await res.text();
+    console.info("[ytFetch] Raw response body (truncated)", {
+      length: rawText.length,
+      body: rawText.slice(0, 1000),
+    });
+  } catch (textErr) {
+    const te = textErr as Error;
+    console.error("[ytFetch] res.text() THREW", {
+      errorName: te.name,
+      errorMessage: te.message,
+      stack: te.stack?.split("\n").slice(0, 8).join("\n"),
+      url: sanitizeUrl(url),
+      httpStatus: res.status,
+    });
     markUpstream("malformed_response");
     throw new YouTubeApiError(
       502,
@@ -233,6 +289,37 @@ async function ytFetch<T>(
       "The YouTube API returned a malformed response.",
     );
   }
+
+  console.info("[ytFetch] JSON.parse starting");
+  let parsed: T;
+  try {
+    parsed = JSON.parse(rawText) as T;
+    console.info("[ytFetch] JSON.parse completed", {
+      type: typeof parsed,
+      isArray: Array.isArray(parsed),
+      keys: parsed && typeof parsed === "object" ? Object.keys(parsed as Record<string, unknown>).slice(0, 10) : [],
+    });
+  } catch (parseErr) {
+    const pe = parseErr as Error;
+    console.error("[ytFetch] JSON.parse THREW", {
+      errorName: pe.name,
+      errorMessage: pe.message,
+      stack: pe.stack?.split("\n").slice(0, 5).join("\n"),
+      url: sanitizeUrl(url),
+      httpStatus: res.status,
+      rawTextStart: rawText.slice(0, 200),
+    });
+    markUpstream("malformed_response");
+    throw new YouTubeApiError(
+      502,
+      "MALFORMED_UPSTREAM",
+      "The YouTube API returned a malformed response.",
+    );
+  }
+
+  console.info("[ytFetch] Returning parsed object", { path });
+  markUpstream("success");
+  return parsed;
 }
 
 // ---------- Raw response shapes ----------
