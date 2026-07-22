@@ -46,7 +46,7 @@ export type CreatorContentType = "long" | "shorts" | "mixed";
 
 /**
  * Social links for a creator. All optional — only populated when
- * verified.
+ * verified or publicly known.
  */
 export interface CreatorSocialLinks {
   twitter?: string;
@@ -55,6 +55,33 @@ export interface CreatorSocialLinks {
   website?: string;
   discord?: string;
   twitch?: string;
+  facebook?: string;
+  linkedin?: string;
+  threads?: string;
+  businessEmail?: string;
+}
+
+/**
+ * A featured video entry for the local dataset. Rendered on the
+ * profile page when live video data is unavailable.
+ */
+export interface CreatorFeaturedVideo {
+  /** YouTube video ID. */
+  videoId: string;
+  /** Title of the video. */
+  title: string;
+  /** Approximate view count (for display). */
+  views?: number;
+}
+
+/**
+ * A notable achievement or milestone for the creator.
+ */
+export interface CreatorAchievement {
+  /** Year the achievement occurred. */
+  year: number;
+  /** Short description of the achievement. */
+  label: string;
 }
 
 /**
@@ -137,6 +164,53 @@ export interface CreatorEntry {
    * Computed from approximate subscriber count ranges.
    */
   subscriberTier: "mega" | "large" | "mid" | "emerging";
+
+  // ─── Rich Profile Fields (optional, populated for full profiles) ───
+
+  /**
+   * Extended biography (2-5 sentences). Used on the profile page.
+   * Falls back to `description` when not provided.
+   */
+  biography?: string;
+
+  /**
+   * Year the creator started their YouTube channel.
+   */
+  yearStarted?: number;
+
+  /**
+   * Approximate subscriber count for the local dataset. Used when
+   * the YouTube API is unavailable. Null = show "—".
+   */
+  estimatedSubscribers?: number;
+
+  /**
+   * Approximate monthly views for the local dataset. Used for
+   * earnings estimation when YouTube API is unavailable.
+   */
+  estimatedMonthlyViews?: number;
+
+  /**
+   * Featured/notable videos from this creator. Displayed on the
+   * profile page as a fallback when live video data is unavailable.
+   */
+  featuredVideos?: CreatorFeaturedVideo[];
+
+  /**
+   * Notable achievements and milestones.
+   */
+  achievements?: CreatorAchievement[];
+
+  /**
+   * Tags for content categorization and search discovery.
+   * E.g. ["challenge", "philanthropy", "viral"]
+   */
+  tags?: string[];
+
+  /**
+   * The full YouTube channel URL. Derived from handle if not set.
+   */
+  youtubeUrl?: string;
 }
 
 // ─── Category & Country Metadata ────────────────────────────────────

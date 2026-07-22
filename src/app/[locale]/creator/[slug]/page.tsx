@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
+import { CreatorAchievements } from "@/components/creator/CreatorAchievements";
 import { CreatorEarnings } from "@/components/creator/CreatorEarnings";
 import { CreatorFallbackNotice } from "@/components/creator/CreatorFallbackNotice";
 import { CreatorFaqSection } from "@/components/creator/CreatorFaqSection";
+import { CreatorFeaturedVideos } from "@/components/creator/CreatorFeaturedVideos";
 import { CreatorHero } from "@/components/creator/CreatorHero";
 import { CreatorRelatedArticles } from "@/components/creator/CreatorRelatedArticles";
 import { CreatorStats } from "@/components/creator/CreatorStats";
@@ -268,6 +270,14 @@ export default async function CreatorPage({ params }: PageProps) {
 
       <CreatorStats profile={profile} />
 
+      {/* Featured videos from local dataset (shown when no live videos) */}
+      {profile.videos.length === 0 && creator.featuredVideos.length > 0 && (
+        <CreatorFeaturedVideos
+          videos={creator.featuredVideos}
+          creatorName={creator.displayName}
+        />
+      )}
+
       <CreatorVideoStrip
         titleKey="recentTitle"
         emptyKey="recentEmpty"
@@ -281,6 +291,14 @@ export default async function CreatorPage({ params }: PageProps) {
         videos={profile.topVideos}
         limit={6}
       />
+
+      {/* Achievements timeline from local dataset */}
+      {creator.achievements.length > 0 && (
+        <CreatorAchievements
+          achievements={creator.achievements}
+          creatorName={creator.displayName}
+        />
+      )}
 
       <RelatedCalculators />
 

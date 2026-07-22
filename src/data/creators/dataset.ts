@@ -11,8 +11,20 @@
  */
 
 import type { CreatorEntry } from "./schema";
+import { ENRICHMENT_DATA } from "./enrichment";
 
-export const CREATORS_DATASET: readonly CreatorEntry[] = [
+/**
+ * Merge enrichment data into base entries. Enrichment fields override
+ * base fields when present, allowing the base dataset to stay compact
+ * while enrichment provides rich profile data.
+ */
+function enrichEntry(entry: CreatorEntry): CreatorEntry {
+  const extra = ENRICHMENT_DATA[entry.id];
+  if (!extra) return entry;
+  return { ...entry, ...extra };
+}
+
+const RAW_DATASET: readonly CreatorEntry[] = [
 
   // ═══════════════════════════════════════════════════════════════
   //  UNITED STATES
@@ -277,6 +289,9 @@ export const CREATORS_DATASET: readonly CreatorEntry[] = [
   { id: "trash-taste", slug: "trash-taste", name: "Trash Taste", handle: "@TrashTaste", youtubeChannelId: null, country: "Japan", countryCode: "JP", language: "English", category: "Entertainment", niche: "entertainment", contentType: "long", description: "Anime podcast and variety show featuring three creators living in Japan.", keywords: ["Trash Taste", "anime podcast", "Japan"], avatar: null, banner: null, socialLinks: {}, verified: false, subscriberTier: "mid" },
   { id: "peter-mckinnon", slug: "peter-mckinnon", name: "Peter McKinnon", handle: "@PeterMcKinnon", youtubeChannelId: null, country: "Canada", countryCode: "CA", language: "English", category: "Entertainment", niche: "lifestyle", contentType: "long", description: "Canadian photographer and filmmaker creating cinematic tutorials and coffee content.", keywords: ["Peter McKinnon", "photography", "filmmaking"], avatar: null, banner: null, socialLinks: {}, verified: false, subscriberTier: "mid" },
 ];
+
+/** The enriched dataset — base entries merged with rich profile data. */
+export const CREATORS_DATASET: readonly CreatorEntry[] = RAW_DATASET.map(enrichEntry);
 
 // ─── Lookup Helpers ─────────────────────────────────────────────────
 

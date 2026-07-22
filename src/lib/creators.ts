@@ -13,10 +13,18 @@
 import { findCountry, findNiche } from "./rpmData";
 import { CREATORS_DATASET } from "@/data/creators/dataset";
 import { getRelatedCreators } from "@/data/creators/related";
-import type { CreatorEntry, CreatorContentType, CreatorCountryCode, CreatorNicheId } from "@/data/creators/schema";
+import type {
+  CreatorAchievement,
+  CreatorContentType,
+  CreatorCountryCode,
+  CreatorEntry,
+  CreatorFeaturedVideo,
+  CreatorNicheId,
+  CreatorSocialLinks,
+} from "@/data/creators/schema";
 
 // Re-export canonical types so existing consumers don't break.
-export type { CreatorCountryCode, CreatorNicheId, CreatorContentType };
+export type { CreatorCountryCode, CreatorNicheId, CreatorContentType, CreatorSocialLinks, CreatorFeaturedVideo, CreatorAchievement };
 
 /**
  * A single creator record. The public shape consumed by pages,
@@ -47,10 +55,32 @@ export interface Creator {
   contentType?: CreatorContentType;
   /** Short blurb rendered under the hero. */
   description: string;
+  /** Extended biography (2-5 sentences) for the profile page. */
+  biography: string;
+  /** Primary language of the channel. */
+  language: string;
+  /** Year the creator started their YouTube channel. */
+  yearStarted?: number;
+  /** Whether this creator has a verified channel ID. */
+  verified: boolean;
   /** Optional fallback avatar URL. */
   fallbackAvatarUrl?: string;
   /** Optional fallback banner URL. */
   fallbackBannerUrl?: string;
+  /** Approximate subscriber count for local display. */
+  estimatedSubscribers?: number;
+  /** Approximate monthly views for local earnings estimation. */
+  estimatedMonthlyViews?: number;
+  /** Social links (twitter, instagram, tiktok, website, etc.). */
+  socialLinks: CreatorSocialLinks;
+  /** Full YouTube channel URL. */
+  youtubeUrl: string;
+  /** Featured/notable videos from local dataset. */
+  featuredVideos: CreatorFeaturedVideo[];
+  /** Notable achievements and milestones. */
+  achievements: CreatorAchievement[];
+  /** Tags for categorization and search. */
+  tags: string[];
   /** Slugs of related creators. */
   relatedCreators: string[];
 }
@@ -61,10 +91,11 @@ export interface Creator {
 
 function entryToCreator(entry: CreatorEntry): Creator {
   const related = getRelatedCreators(entry, 4);
+  const handle = entry.handle.startsWith("@") ? entry.handle : `@${entry.handle}`;
   return {
     slug: entry.slug,
     displayName: entry.name,
-    youtubeHandle: entry.handle,
+    youtubeHandle: handle,
     channelId: entry.youtubeChannelId ?? "",
     country: entry.country,
     countryCode: entry.countryCode,
@@ -72,8 +103,19 @@ function entryToCreator(entry: CreatorEntry): Creator {
     nicheId: entry.niche,
     contentType: entry.contentType,
     description: entry.description,
+    biography: entry.biography ?? entry.description,
+    language: entry.language,
+    yearStarted: entry.yearStarted,
+    verified: entry.verified,
     fallbackAvatarUrl: entry.avatar ?? undefined,
     fallbackBannerUrl: entry.banner ?? undefined,
+    estimatedSubscribers: entry.estimatedSubscribers,
+    estimatedMonthlyViews: entry.estimatedMonthlyViews,
+    socialLinks: entry.socialLinks ?? {},
+    youtubeUrl: entry.youtubeUrl ?? `https://www.youtube.com/${handle.replace(/^@/, "@")}`,
+    featuredVideos: entry.featuredVideos ?? [],
+    achievements: entry.achievements ?? [],
+    tags: entry.tags ?? [],
     relatedCreators: related.map((r) => r.slug),
   };
 }

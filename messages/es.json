@@ -1061,6 +1061,13 @@
       "description": "Discover {name}'s estimated monthly earnings, yearly revenue, sponsorship value, RPM, CPM and YouTube statistics on {site}.",
       "notFoundTitle": "Creator not found",
       "notFoundDescription": "We do not have a profile for that creator yet."
+    },
+    "achievements": {
+      "title": "{name} Milestones"
+    },
+    "featuredVideos": {
+      "title": "{name} Notable Videos",
+      "views": "views"
     }
   },
   "creators": {

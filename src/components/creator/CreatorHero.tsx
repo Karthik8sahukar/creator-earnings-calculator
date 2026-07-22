@@ -3,13 +3,16 @@ import { useTranslations } from "next-intl";
 
 import {
   CalendarIcon,
+  CheckIcon,
   ExternalIcon,
   EyeIcon,
   FilmIcon,
   GlobeIcon,
+  LinkIcon,
   UsersIcon,
+  XLogoIcon,
 } from "@/components/icons";
-import type { Creator } from "@/lib/creators";
+import type { Creator, CreatorSocialLinks } from "@/lib/creators";
 import { formatCompact, formatDate } from "@/lib/format";
 import type { ChannelDetails } from "@/types/youtube";
 
@@ -92,6 +95,23 @@ export function CreatorHero({ creator, channel, isFallback = false }: Props) {
               className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 leading-tight"
             >
               {creator.displayName}
+              {creator.verified && (
+                <span
+                  className="ml-2 inline-flex items-center align-middle rounded-full bg-brand-100 dark:bg-brand-500/20 px-2 py-0.5 text-xs font-medium text-brand-700 dark:text-brand-300"
+                  title="Verified Creator"
+                >
+                  <CheckIcon width={12} height={12} />
+                  <span className="ml-1">Verified</span>
+                </span>
+              )}
+              {!creator.verified && (
+                <span
+                  className="ml-2 inline-flex items-center align-middle rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-500 dark:text-slate-400"
+                  title="Directory Profile"
+                >
+                  Directory
+                </span>
+              )}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
               <span className="font-medium text-slate-700 dark:text-slate-300">
@@ -102,6 +122,9 @@ export function CreatorHero({ creator, channel, isFallback = false }: Props) {
                 <GlobeIcon width={14} height={14} />
                 {creator.country}
               </span>
+              {creator.language && (
+                <span className="text-xs">{creator.language}</span>
+              )}
             </div>
           </div>
 
@@ -120,8 +143,11 @@ export function CreatorHero({ creator, channel, isFallback = false }: Props) {
         </div>
 
         <p className="mt-5 text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
-          {creator.description}
+          {creator.biography || creator.description}
         </p>
+
+        {/* Social Links */}
+        <SocialLinksBar links={creator.socialLinks} creatorName={creator.displayName} />
 
         <dl className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <Stat
@@ -199,6 +225,37 @@ function Stat({
       <dd className="mt-1 text-xl font-semibold text-slate-900 dark:text-slate-100">
         {value}
       </dd>
+    </div>
+  );
+}
+
+function SocialLinksBar({ links, creatorName }: { links: CreatorSocialLinks; creatorName: string }) {
+  const items: { href: string; label: string; icon: React.ReactNode }[] = [];
+
+  if (links.twitter) items.push({ href: links.twitter, label: `${creatorName} on X`, icon: <XLogoIcon width={16} height={16} /> });
+  if (links.instagram) items.push({ href: links.instagram, label: `${creatorName} on Instagram`, icon: <span className="text-sm">IG</span> });
+  if (links.tiktok) items.push({ href: links.tiktok, label: `${creatorName} on TikTok`, icon: <span className="text-sm">TT</span> });
+  if (links.twitch) items.push({ href: links.twitch, label: `${creatorName} on Twitch`, icon: <span className="text-sm">TV</span> });
+  if (links.discord) items.push({ href: links.discord, label: `${creatorName} Discord`, icon: <span className="text-sm">DC</span> });
+  if (links.website) items.push({ href: links.website, label: `${creatorName} website`, icon: <LinkIcon width={16} height={16} /> });
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mt-4 flex flex-wrap gap-2">
+      {items.map((item) => (
+        <a
+          key={item.href}
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={item.label}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          {item.icon}
+          <ExternalIcon width={12} height={12} className="opacity-50" />
+        </a>
+      ))}
     </div>
   );
 }

@@ -107,17 +107,21 @@ function buildPlaceholderChannel(creator: Creator): ChannelDetails {
     channelId: creator.channelId || "",
     title: creator.displayName,
     handle,
-    description: creator.description,
+    description: creator.biography || creator.description,
     thumbnail: creator.fallbackAvatarUrl ?? "",
     bannerUrl: creator.fallbackBannerUrl ?? null,
-    subscriberCount: null,
-    hiddenSubscriberCount: true,
-    viewCount: 0,
+    subscriberCount: creator.estimatedSubscribers ?? null,
+    hiddenSubscriberCount: !creator.estimatedSubscribers,
+    viewCount: creator.estimatedMonthlyViews
+      ? creator.estimatedMonthlyViews * 12
+      : 0,
     videoCount: 0,
-    publishedAt: "",
+    publishedAt: creator.yearStarted
+      ? `${creator.yearStarted}-01-01T00:00:00Z`
+      : "",
     country: creator.countryCode ?? null,
     uploadsPlaylistId: "",
-    channelUrl: `https://www.youtube.com/${handle.replace(/^@/, "@")}`,
+    channelUrl: creator.youtubeUrl || `https://www.youtube.com/${handle.replace(/^@/, "@")}`,
     customUrl: handle,
   };
 }
