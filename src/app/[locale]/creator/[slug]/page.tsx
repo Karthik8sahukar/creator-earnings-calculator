@@ -13,7 +13,6 @@ import { RelatedCalculators } from "@/components/creator/RelatedCalculators";
 import { RelatedCreators } from "@/components/creator/RelatedCreators";
 import { TransparencyBanner } from "@/components/TransparencyBanner";
 import { Link } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import {
@@ -49,25 +48,18 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Constrain the route to the catalog.
+ * Route configuration.
  *
- * `generateStaticParams()` below returns exactly (locales × known
- * slugs). Setting `dynamicParams = false` tells Next.js that ANY
- * request whose slug is not in that list must return a real HTTP
- * 404 — without invoking `generateMetadata` or the page component.
+ * `dynamicParams = true` allows any slug to be requested at runtime.
+ * The page itself calls `notFound()` for unknown slugs, ensuring 404s.
+ * This avoids relying on a build-time route manifest that may be
+ * incomplete or stale on platforms with incremental builds.
  *
- * This is the correct authority model here: creator existence is
- * defined by the local catalog (`src/lib/creators.ts`), NOT by the
- * YouTube API. Known catalog slugs still render normally even when
- * the API is unavailable (the page uses graceful fallbacks); slugs
- * outside the catalog return a real 404 with the existing
- * `not-found.tsx` boundary.
- *
- * The `notFound()` calls inside `generateMetadata` and the page
- * body are kept as belt-and-suspenders for the edge case where a
- * slug slips through (e.g. dev-mode with a stale route manifest).
+ * `generateStaticParams` remains as a performance optimization:
+ * it pre-renders known creators at build time, but correctness does
+ * not depend on it.
  */
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 interface RouteParams {
   locale: string;
@@ -79,18 +71,17 @@ interface PageProps {
 }
 
 /**
- * Static params — one per (locale × slug). Metadata + shell HTML for
- * every phase-1 creator is generated at build time; the actual body
- * still fetches at request time because of `dynamic = "force-dynamic"`.
+ * Static params — performance optimization only.
+ *
+ * Pre-renders known creator pages at build time. Returns only { slug }
+ * because the parent [locale]/layout.tsx already handles locale params.
+ * With dynamicParams = true, pages render even if the build manifest
+ * is incomplete.
  */
 export function generateStaticParams() {
-  const params: RouteParams[] = [];
-  for (const locale of routing.locales) {
-    for (const c of listCreators()) {
-      params.push({ locale, slug: c.slug });
-    }
-  }
-  return params;
+  return listCreators().map((c) => ({
+    slug: c.slug,
+  }));
 }
 
 export async function generateMetadata({
@@ -162,6 +153,16 @@ export default async function CreatorPage({ params }: PageProps) {
   setRequestLocale(locale);
 
   const creator = getCreatorBySlug(slug);
+
+  // ─── TEMPORARY DIAGNOSTIC (remove after confirming fix) ───────
+  console.info("[creator-page]", {
+    locale,
+    slug,
+    found: !!creator,
+    displayName: creator?.displayName ?? "(not found)",
+  });
+  // ──────────────────────────────────────────────────────────────
+
   if (!creator) notFound();
 
   const profile = await getCreatorProfile(creator);
