@@ -61,6 +61,7 @@ async function resolveCreatorAvatar(creator: Creator): Promise<string | null> {
     console.error("creator-avatar:resolve failed", {
       slug: creator.slug,
       code: err instanceof YouTubeApiError ? err.code : "UNEXPECTED",
+      message: err instanceof Error ? err.message : String(err),
     });
     return null;
   }

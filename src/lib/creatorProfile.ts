@@ -340,6 +340,7 @@ export async function getCreatorProfile(
     console.error("creator-profile:resolveChannel failed", {
       slug: creator.slug,
       code: err instanceof YouTubeApiError ? err.code : "UNEXPECTED",
+      message: err instanceof Error ? err.message : String(err),
     });
   }
 

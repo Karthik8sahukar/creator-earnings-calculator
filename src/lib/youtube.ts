@@ -253,7 +253,7 @@ interface YtThumbnailSet {
 
 interface YtChannelItem {
   id: string;
-  snippet: {
+  snippet?: {
     title: string;
     description: string;
     customUrl?: string;
@@ -267,7 +267,7 @@ interface YtChannelItem {
     hiddenSubscriberCount?: boolean;
     videoCount?: string;
   };
-  contentDetails: {
+  contentDetails?: {
     relatedPlaylists: {
       uploads: string;
     };
@@ -352,14 +352,14 @@ function channelUrl(channelId: string, handle: string | null): string {
 // ---------- Mappers (exported for tests) ----------
 
 export function mapChannel(c: YtChannelItem): ChannelDetails {
-  const handle = extractHandle(c.snippet.customUrl);
+  const handle = extractHandle(c.snippet?.customUrl);
   const stats = c.statistics ?? {};
   return {
     channelId: c.id,
-    title: c.snippet.title,
+    title: c.snippet?.title ?? "",
     handle,
-    description: c.snippet.description,
-    thumbnail: pickThumb(c.snippet.thumbnails),
+    description: c.snippet?.description ?? "",
+    thumbnail: pickThumb(c.snippet?.thumbnails),
     bannerUrl: c.brandingSettings?.image?.bannerExternalUrl ?? null,
     subscriberCount: stats.hiddenSubscriberCount
       ? null
@@ -367,11 +367,11 @@ export function mapChannel(c: YtChannelItem): ChannelDetails {
     hiddenSubscriberCount: Boolean(stats.hiddenSubscriberCount),
     viewCount: toNumber(stats.viewCount),
     videoCount: toNumber(stats.videoCount),
-    publishedAt: c.snippet.publishedAt,
-    country: c.snippet.country ?? null,
-    uploadsPlaylistId: c.contentDetails.relatedPlaylists.uploads,
+    publishedAt: c.snippet?.publishedAt ?? "",
+    country: c.snippet?.country ?? null,
+    uploadsPlaylistId: c.contentDetails?.relatedPlaylists?.uploads ?? "",
     channelUrl: channelUrl(c.id, handle),
-    customUrl: c.snippet.customUrl ?? null,
+    customUrl: c.snippet?.customUrl ?? null,
   };
 }
 
@@ -381,10 +381,10 @@ export function mapChannelSearchResult(
   const stats = c.statistics ?? {};
   return {
     channelId: c.id,
-    title: c.snippet.title,
-    handle: extractHandle(c.snippet.customUrl),
-    description: c.snippet.description,
-    thumbnail: pickThumb(c.snippet.thumbnails),
+    title: c.snippet?.title ?? "",
+    handle: extractHandle(c.snippet?.customUrl),
+    description: c.snippet?.description ?? "",
+    thumbnail: pickThumb(c.snippet?.thumbnails),
     subscriberCount: stats.hiddenSubscriberCount
       ? null
       : toNumber(stats.subscriberCount),
