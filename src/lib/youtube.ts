@@ -181,7 +181,7 @@ async function ytFetch<T>(
   try {
     res = await fetch(url.toString(), {
       signal: controller.signal,
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
   } catch (err) {
     if ((err as { name?: string }).name === "AbortError") {
