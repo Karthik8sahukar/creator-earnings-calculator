@@ -115,8 +115,7 @@ describe("levenshtein similarity", () => {
 });
 
 describe("verification classification", () => {
-  it("classifies exact handle + title match as verified", () => {
-    // Simulated - the logic matches handle and title
+  it("classifies exact handle + exact title as verified", () => {
     const storedHandle = "@MrBeast";
     const returnedCustomUrl = "@MrBeast";
     const storedName = "MrBeast";
@@ -131,33 +130,90 @@ describe("verification classification", () => {
 
     expect(handleMatches).toBe(true);
     expect(titleSimilar).toBe(true);
-    // Would be classified as "verified"
+    // Both match → classified as "verified"
   });
 
-  it("classifies handle match but different title as probable_match", () => {
-    const handleMatches = true;
-    const titleSimilar = levenshteinSimilarity("mrbeast gaming", "mrbeast") > 0.6;
-    // Title is similar enough — still verified
-    expect(handleMatches && titleSimilar).toBe(true);
+  it("classifies exact handle + different title as probable_match", () => {
+    // Handle matches perfectly but title is substantially different
+    const storedHandle = "@MrBeast";
+    const returnedCustomUrl = "@MrBeast";
+    const storedName = "MrBeast";
+    const returnedTitle = "MrBeast Gaming";
+
+    const handleMatches = storedHandle.toLowerCase().replace(/^@/, "") ===
+      returnedCustomUrl.toLowerCase().replace(/^@/, "");
+    const titleSimilar = levenshteinSimilarity(
+      returnedTitle.toLowerCase(),
+      storedName.toLowerCase(),
+    ) > 0.6;
+
+    // Handle matches but title doesn't meet threshold → probable_match
+    expect(handleMatches).toBe(true);
+    expect(titleSimilar).toBe(false);
+    // In the classifier: handleMatches && !titleSimilar → "probable_match"
+  });
+
+  it("classifies different handle + similar title as probable_match", () => {
+    const storedHandle = "@OldHandle";
+    const returnedCustomUrl = "@NewHandle";
+    const storedName = "MrBeast";
+    const returnedTitle = "MrBeast";
+
+    const handleMatches = storedHandle.toLowerCase().replace(/^@/, "") ===
+      returnedCustomUrl.toLowerCase().replace(/^@/, "");
+    const titleSimilar = levenshteinSimilarity(
+      returnedTitle.toLowerCase(),
+      storedName.toLowerCase(),
+    ) > 0.6;
+
+    expect(handleMatches).toBe(false);
+    expect(titleSimilar).toBe(true);
+    // In the classifier: !handleMatches && titleSimilar → "probable_match"
+  });
+
+  it("classifies missing customUrl with similar title as probable_match", () => {
+    // When API returns no customUrl, handle can't match
+    const storedHandle = "@MrBeast";
+    const returnedCustomUrl = ""; // API didn't return customUrl
+    const storedName = "MrBeast";
+    const returnedTitle = "MrBeast";
+
+    const handleMatches = storedHandle.toLowerCase().replace(/^@/, "") ===
+      returnedCustomUrl.toLowerCase().replace(/^@/, "");
+    const titleSimilar = levenshteinSimilarity(
+      returnedTitle.toLowerCase(),
+      storedName.toLowerCase(),
+    ) > 0.6;
+
+    // Handle won't match empty string, but title is similar
+    expect(handleMatches).toBe(false);
+    expect(titleSimilar).toBe(true);
+    // In the classifier: !handleMatches && titleSimilar → "probable_match"
+  });
+
+  it("classifies completely different results as mismatch", () => {
+    const storedHandle = "@SomeCreator";
+    const returnedCustomUrl = "@TotallyDifferent";
+    const storedName = "Some Creator";
+    const returnedTitle = "Totally Different Channel";
+
+    const handleMatches = storedHandle.toLowerCase().replace(/^@/, "") ===
+      returnedCustomUrl.toLowerCase().replace(/^@/, "");
+    const titleSimilar = levenshteinSimilarity(
+      returnedTitle.toLowerCase(),
+      storedName.toLowerCase(),
+    ) > 0.6;
+
+    expect(handleMatches).toBe(false);
+    expect(titleSimilar).toBe(false);
+    // In the classifier: !handleMatches && !titleSimilar → "mismatch"
   });
 
   it("detects duplicate channel IDs", () => {
     const seenIds = new Set(["UCX6OQ3DkcsbYNE6H8uQQuVA"]);
     const newId = "UCX6OQ3DkcsbYNE6H8uQQuVA";
     expect(seenIds.has(newId)).toBe(true);
-    // Would be classified as "duplicate_channel_id"
-  });
-
-  it("classifies completely different results as mismatch", () => {
-    const storedHandle = "@SomeCreator";
-    const returnedCustomUrl = "@TotallyDifferent";
-    const handleMatches = storedHandle.toLowerCase().replace(/^@/, "") ===
-      returnedCustomUrl.toLowerCase().replace(/^@/, "");
-    const titleSimilar = levenshteinSimilarity("some creator", "totally different") > 0.6;
-
-    expect(handleMatches).toBe(false);
-    expect(titleSimilar).toBe(false);
-    // Would be classified as "mismatch"
+    // Would be classified as "duplicate_channel_id" before any match check
   });
 });
 
