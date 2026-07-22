@@ -166,20 +166,10 @@ function mapErrorToReason(err: unknown): CreatorFallbackReason {
  */
 async function resolveChannel(creator: Creator): Promise<ChannelDetails | null> {
   if (creator.channelId) {
-    console.log("[DEBUG:resolveChannel]", JSON.stringify({
-      slug: creator.slug,
-      action: "getChannelById",
-      channelId: creator.channelId,
-    }));
     return getChannelById(creator.channelId);
   }
 
   // Unverified creator — do NOT call the YouTube API.
-  console.log("[DEBUG:resolveChannel]", JSON.stringify({
-    slug: creator.slug,
-    action: "skip-unverified",
-    channelId: "(empty)",
-  }));
   return null;
 }
 
@@ -340,16 +330,7 @@ export async function getCreatorProfile(
   let videos: VideoItem[] = [];
   let fallbackReason: CreatorFallbackReason | null = null;
 
-  // ─── TEMPORARY DEBUG LOGGING (remove after diagnosis) ─────────
-  const debugSlug = creator.slug;
-  const debugChannelId = creator.channelId;
-  const debugVerified = Boolean(creator.channelId);
-  let debugResolveChannelCalled = false;
-  const debugGetChannelByIdCalled = false;
-  // ──────────────────────────────────────────────────────────────
-
   try {
-    debugResolveChannelCalled = true;
     channel = await resolveChannel(creator);
     if (!channel) {
       fallbackReason = creator.channelId ? "not-found" : "not-verified";
@@ -361,18 +342,6 @@ export async function getCreatorProfile(
       code: err instanceof YouTubeApiError ? err.code : "UNEXPECTED",
     });
   }
-
-  // ─── TEMPORARY DEBUG LOG ──────────────────────────────────────
-  console.log("[DEBUG:creator-profile]", JSON.stringify({
-    slug: debugSlug,
-    channelId: debugChannelId || "(empty)",
-    hasChannelId: debugVerified,
-    resolveChannelCalled: debugResolveChannelCalled,
-    getChannelByIdCalled: debugGetChannelByIdCalled,
-    channelResolved: channel !== null,
-    fallbackReason: fallbackReason ?? "(none)",
-  }));
-  // ──────────────────────────────────────────────────────────────
 
   if (channel && channel.uploadsPlaylistId) {
     try {

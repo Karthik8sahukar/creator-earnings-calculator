@@ -12,29 +12,23 @@ import { getChannelById } from "./youtube";
  *
  *   The profile page's `getCreatorProfile()` also fetches recent
  *   videos and runs performance analysis — expensive work we don't
- *   need to render 20 avatars on `/creators`. This helper takes the
+ *   need to render 200 avatars on `/creators`. This helper takes the
  *   cheapest path that still gives us a thumbnail:
  *
  *     * `channelId` present  → `getChannelById()` (1 quota unit,
- *       cached 6h). Returns the full `ChannelDetails` — we take
+ *       cached 24h). Returns the full `ChannelDetails` — we take
  *       only `.thumbnail`.
  *
- *     * `channelId` empty     → `getChannelByHandle("handle")`,
- *       which uses channels.list(forHandle=@handle) — 1 quota unit,
- *       cached 6h. Returns the full `ChannelDetails` — we take
- *       only `.thumbnail`.
+ *     * `channelId` empty    → returns `null` immediately. No API
+ *       call is made for unverified creators. The UI renders an
+ *       initial-based placeholder.
  *
- *   NEVER uses search.list.
- *
- *   Both underlying calls share the same TtlCache used by
- *   `getCreatorProfile()` — so if a user has visited any creator's
- *   detail page recently, that creator's avatar lookup here is a
- *   free cache hit. No extra API request is issued.
+ *   NEVER uses search.list or getChannelByHandle for avatar resolution.
  *
  * Design rules:
  *
  *   1. **Never throws.** A single creator's failure must not
- *      prevent the other 19 avatars from resolving. Errors are
+ *      prevent the other avatars from resolving. Errors are
  *      logged with just the slug + error code (never the raw
  *      YouTube error message, which may carry internal details).
  *
