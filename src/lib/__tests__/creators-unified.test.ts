@@ -182,3 +182,37 @@ describe("unverified creator profile — no YouTube API calls", () => {
     expect(profile.earnings.monthlyViews).toBe(0);
   });
 });
+
+describe("original verified creators preserved", () => {
+  it("all 23 verified creators retain their channel IDs", () => {
+    const creators = listCreators();
+    const verified = creators.filter((c) => c.channelId.length > 0);
+    expect(verified.length).toBe(23);
+
+    // Spot-check key creators
+    const expectedChannelIds: Record<string, string> = {
+      mrbeast: "UCX6OQ3DkcsbYNE6H8uQQuVA",
+      markiplier: "UC7_YxT-KID8kRbqZo7MyscQ",
+      pewdiepie: "UC-lHJZR3Gqxm24_Vd_AJ5Yw",
+      carryminati: "UCj22tfcQrWMFIGCeyKP9hQg",
+      ksi: "UCGSfMkBdr4YjBKGRhKKbEgQ",
+    };
+
+    for (const [slug, expectedId] of Object.entries(expectedChannelIds)) {
+      const c = getCreatorBySlug(slug);
+      expect(c).toBeDefined();
+      expect(c!.channelId).toBe(expectedId);
+    }
+  });
+
+  it("verified creators have non-null channel metadata", () => {
+    const creators = listCreators();
+    const verified = creators.filter((c) => c.channelId.length > 0);
+    for (const c of verified) {
+      expect(c.displayName).toBeTruthy();
+      expect(c.youtubeHandle.startsWith("@")).toBe(true);
+      expect(c.country).toBeTruthy();
+      expect(c.category).toBeTruthy();
+    }
+  });
+});
