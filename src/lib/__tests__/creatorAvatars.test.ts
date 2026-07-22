@@ -1,7 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { YouTubeApiError } from "../errors";
-
 // Mock the YouTube service so no real API calls are ever issued.
 vi.mock("../youtube", () => ({
   getChannelById: vi.fn(),

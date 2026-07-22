@@ -10,7 +10,7 @@
  * Everything else (this module, sitemap, routes) picks it up automatically.
  */
 
-import { COUNTRIES, NICHES, findCountry, findNiche } from "./rpmData";
+import { findCountry, findNiche } from "./rpmData";
 import { CREATORS_DATASET } from "@/data/creators/dataset";
 import { getRelatedCreators } from "@/data/creators/related";
 import type { CreatorEntry, CreatorContentType, CreatorCountryCode, CreatorNicheId } from "@/data/creators/schema";

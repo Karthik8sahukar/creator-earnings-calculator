@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 
 import { CREATORS_DATASET } from "@/data/creators";
 import {
-  LEADERBOARDS,
   getLeaderboardBySlug,
   listLeaderboardSlugs,
 } from "@/data/creators/leaderboards";

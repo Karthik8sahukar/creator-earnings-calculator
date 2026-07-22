@@ -3,7 +3,6 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import {
-  CATEGORIES,
   getCategoryBySlug,
   listCategorySlugs,
   listCreatorsByCategory,
