@@ -15,10 +15,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "static.about" });
+  const isEnglish = locale === routing.defaultLocale;
   return {
     title: t("title"),
     description: t("description"),
     alternates: buildAlternates({ locale, pathSuffix: "/about" }),
+    ...(isEnglish ? {} : { robots: { index: false, follow: true } }),
   };
 }
 

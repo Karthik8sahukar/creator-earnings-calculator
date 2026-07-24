@@ -36,11 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes = [
     "",
-    "/methodology",
-    "/disclaimer",
-    "/privacy",
-    "/terms",
-    "/about",
     "/youtube-rpm-calculator",
     "/youtube-cpm-calculator",
     "/youtube-shorts-calculator",
@@ -59,6 +54,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/random-name-picker",
     "/blog",
     "/creators",
+  ];
+
+  // Pages with untranslated body content — only English canonical is indexed.
+  const englishOnlyRoutes = [
+    "/methodology",
+    "/disclaimer",
+    "/privacy",
+    "/terms",
+    "/about",
   ];
 
   const blogCategoryRoutes = BLOG_CATEGORIES.map((c) => `/blog/category/${c.slug}`);
@@ -98,6 +102,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   for (const path of blogCategoryRoutes) {
     entries.push(...perLocaleWithAlternates(path, 0.5, "weekly"));
+  }
+
+  // English-only static pages (non-English versions are noindex placeholders).
+  for (const path of englishOnlyRoutes) {
+    const url = `${base}/${routing.defaultLocale}${path}`;
+    entries.push({
+      url,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    });
   }
 
   // Creator profile pages — one per (locale × slug) with full
