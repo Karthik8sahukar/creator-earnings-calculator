@@ -13,22 +13,80 @@ import {
   TrendingUpIcon,
 } from "./icons";
 
+// ─── Categorized link definitions ───────────────────────────────────
+
+export interface CalculatorLink {
+  href:
+    | "/#find-channel"
+    | "/youtube-rpm-calculator"
+    | "/youtube-cpm-calculator"
+    | "/youtube-shorts-calculator"
+    | "/youtube-sponsorship-calculator"
+    | "/instagram-money-calculator"
+    | "/youtube-engagement-calculator"
+    | "/youtube-affiliate-calculator"
+    | "/youtube-membership-calculator"
+    | "/youtube-merch-calculator"
+    | "/youtube-channel-valuation-calculator"
+    | "/youtube-adsense-calculator"
+    | "/twitch-bits-calculator"
+    | "/yes-no-picker-wheel"
+    | "/random-team-generator";
+  labelKey: string;
+  descriptionKey: string;
+  Icon: (props: { width?: number; height?: number }) => React.ReactElement;
+}
+
+export interface CalculatorCategory {
+  headingKey: string;
+  links: CalculatorLink[];
+}
+
+export const CALCULATOR_CATEGORIES: CalculatorCategory[] = [
+  {
+    headingKey: "calculatorsMenu.headings.creatorAnalytics",
+    links: [
+      { href: "/#find-channel", labelKey: "calculatorsMenu.money.label", descriptionKey: "calculatorsMenu.money.description", Icon: DollarIcon },
+      { href: "/youtube-rpm-calculator", labelKey: "calculatorsMenu.rpm.label", descriptionKey: "calculatorsMenu.rpm.description", Icon: TrendingUpIcon },
+      { href: "/youtube-cpm-calculator", labelKey: "calculatorsMenu.cpm.label", descriptionKey: "calculatorsMenu.cpm.description", Icon: ChartIcon },
+      { href: "/youtube-shorts-calculator", labelKey: "calculatorsMenu.shorts.label", descriptionKey: "calculatorsMenu.shorts.description", Icon: FilmIcon },
+      { href: "/youtube-sponsorship-calculator", labelKey: "calculatorsMenu.sponsorship.label", descriptionKey: "calculatorsMenu.sponsorship.description", Icon: ShareIcon },
+      { href: "/youtube-engagement-calculator", labelKey: "calculatorsMenu.engagement.label", descriptionKey: "calculatorsMenu.engagement.description", Icon: TrendingUpIcon },
+      { href: "/youtube-adsense-calculator", labelKey: "calculatorsMenu.adsense.label", descriptionKey: "calculatorsMenu.adsense.description", Icon: DollarIcon },
+      { href: "/instagram-money-calculator", labelKey: "calculatorsMenu.instagram.label", descriptionKey: "calculatorsMenu.instagram.description", Icon: ShareIcon },
+    ],
+  },
+  {
+    headingKey: "calculatorsMenu.headings.streaming",
+    links: [
+      { href: "/twitch-bits-calculator", labelKey: "calculatorsMenu.twitchBits.label", descriptionKey: "calculatorsMenu.twitchBits.description", Icon: DollarIcon },
+    ],
+  },
+  {
+    headingKey: "calculatorsMenu.headings.utilities",
+    links: [
+      { href: "/yes-no-picker-wheel", labelKey: "calculatorsMenu.yesNoPicker.label", descriptionKey: "calculatorsMenu.yesNoPicker.description", Icon: ChartIcon },
+      { href: "/random-team-generator", labelKey: "calculatorsMenu.teamGenerator.label", descriptionKey: "calculatorsMenu.teamGenerator.description", Icon: ShareIcon },
+    ],
+  },
+];
+
+/** Flat list for backward compat (used by MobileNav). */
+export const CALCULATOR_LINKS: CalculatorLink[] = CALCULATOR_CATEGORIES.flatMap(
+  (cat) => cat.links,
+);
+
+// ─── Component ──────────────────────────────────────────────────────
+
 /**
- * Calculators dropdown for the desktop header.
- *
- * All five items resolve to real routes:
- *   - Money Calculator ⇒ homepage (`/#find-channel`) so it scrolls
- *     to the search box on the home page.
- *   - RPM / CPM / Shorts / Sponsorship ⇒ existing calculator routes.
- *
- * Labels are translated per locale. Links use `@/i18n/navigation` so
- * the active locale prefix is applied automatically.
+ * Calculators dropdown for the desktop header — categorized.
  *
  * A11y:
  *   - `aria-haspopup="menu"`, `aria-expanded`, `aria-controls`.
  *   - ArrowDown from the trigger focuses the first item.
  *   - ArrowUp/ArrowDown roves focus. Escape closes and restores focus.
  *   - Outside click closes the menu.
+ *   - Category headings are not focusable (decoration only).
  */
 export function CalculatorsMenu({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
@@ -95,7 +153,6 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
       e.preventDefault();
       focusItem(items.length - 1);
     } else if (e.key === "Tab") {
-      // Let Tab move naturally, but close the menu on the way out.
       setOpen(false);
     }
   };
@@ -129,135 +186,48 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
           onKeyDown={onMenuKey}
           className="absolute left-0 mt-2 w-80 max-h-[70vh] rounded-xl bg-white shadow-pop border border-slate-200 dark:bg-slate-900 dark:border-slate-800 z-50 overflow-y-auto animate-fade-in"
         >
-          <ul className="p-1.5">
-            {CALCULATOR_LINKS.map(({ href, labelKey, descriptionKey, Icon }) => (
-              <li key={href} role="none">
-                <Link
-                  href={href}
-                  role="menuitem"
-                  tabIndex={-1}
-                  onClick={() => setOpen(false)}
-                  className="flex items-start gap-3 rounded-lg p-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:bg-slate-50 dark:focus-visible:bg-slate-800"
+          <div className="p-1.5">
+            {CALCULATOR_CATEGORIES.map((category, catIdx) => (
+              <div key={category.headingKey}>
+                {catIdx > 0 && (
+                  <div className="my-1.5 border-t border-slate-100 dark:border-slate-800" />
+                )}
+                <p
+                  className="px-2.5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500"
+                  aria-hidden="true"
                 >
-                  <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-200">
-                    <Icon width={18} height={18} />
-                  </span>
-                  <span className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      {t(labelKey)}
-                    </span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                      {t(descriptionKey)}
-                    </span>
-                  </span>
-                </Link>
-              </li>
+                  {t(category.headingKey)}
+                </p>
+                <ul>
+                  {category.links.map(({ href, labelKey, descriptionKey, Icon }) => (
+                    <li key={href} role="none">
+                      <Link
+                        href={href}
+                        role="menuitem"
+                        tabIndex={-1}
+                        onClick={() => setOpen(false)}
+                        className="flex items-start gap-3 rounded-lg p-2.5 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:bg-slate-50 dark:focus-visible:bg-slate-800"
+                      >
+                        <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-200">
+                          <Icon width={16} height={16} />
+                        </span>
+                        <span className="flex flex-col">
+                          <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                            {t(labelKey)}
+                          </span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {t(descriptionKey)}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
   );
 }
-
-/**
- * Menu items. Labels are message-key references (resolved at render
- * time) — the array itself is a pure data structure that can be
- * imported and reused by `MobileNav` without duplication.
- */
-export interface CalculatorLink {
-  href:
-    | "/#find-channel"
-    | "/youtube-rpm-calculator"
-    | "/youtube-cpm-calculator"
-    | "/youtube-shorts-calculator"
-    | "/youtube-sponsorship-calculator"
-    | "/instagram-money-calculator"
-    | "/youtube-engagement-calculator"
-    | "/youtube-affiliate-calculator"
-    | "/youtube-membership-calculator"
-    | "/youtube-merch-calculator"
-    | "/youtube-channel-valuation-calculator"
-    | "/youtube-adsense-calculator"
-    | "/twitch-bits-calculator"
-    | "/yes-no-picker-wheel"
-    | "/random-team-generator";
-  labelKey: string;
-  descriptionKey: string;
-  Icon: (props: { width?: number; height?: number }) => React.ReactElement;
-}
-
-export const CALCULATOR_LINKS: CalculatorLink[] = [
-  {
-    href: "/#find-channel",
-    labelKey: "calculatorsMenu.money.label",
-    descriptionKey: "calculatorsMenu.money.description",
-    Icon: DollarIcon,
-  },
-  {
-    href: "/instagram-money-calculator",
-    labelKey: "calculatorsMenu.instagram.label",
-    descriptionKey: "calculatorsMenu.instagram.description",
-    Icon: ShareIcon,
-  },
-  {
-    href: "/youtube-rpm-calculator",
-    labelKey: "calculatorsMenu.rpm.label",
-    descriptionKey: "calculatorsMenu.rpm.description",
-    Icon: TrendingUpIcon,
-  },
-  {
-    href: "/youtube-cpm-calculator",
-    labelKey: "calculatorsMenu.cpm.label",
-    descriptionKey: "calculatorsMenu.cpm.description",
-    Icon: ChartIcon,
-  },
-  {
-    href: "/youtube-shorts-calculator",
-    labelKey: "calculatorsMenu.shorts.label",
-    descriptionKey: "calculatorsMenu.shorts.description",
-    Icon: FilmIcon,
-  },
-  {
-    href: "/youtube-sponsorship-calculator",
-    labelKey: "calculatorsMenu.sponsorship.label",
-    descriptionKey: "calculatorsMenu.sponsorship.description",
-    Icon: ShareIcon,
-  },
-  {
-    href: "/youtube-engagement-calculator",
-    labelKey: "calculatorsMenu.engagement.label",
-    descriptionKey: "calculatorsMenu.engagement.description",
-    Icon: TrendingUpIcon,
-  },
-  {
-    href: "/youtube-adsense-calculator",
-    labelKey: "calculatorsMenu.adsense.label",
-    descriptionKey: "calculatorsMenu.adsense.description",
-    Icon: DollarIcon,
-  },
-  {
-    href: "/youtube-channel-valuation-calculator",
-    labelKey: "calculatorsMenu.valuation.label",
-    descriptionKey: "calculatorsMenu.valuation.description",
-    Icon: ChartIcon,
-  },
-  {
-    href: "/twitch-bits-calculator",
-    labelKey: "calculatorsMenu.twitchBits.label",
-    descriptionKey: "calculatorsMenu.twitchBits.description",
-    Icon: DollarIcon,
-  },
-  {
-    href: "/yes-no-picker-wheel",
-    labelKey: "calculatorsMenu.yesNoPicker.label",
-    descriptionKey: "calculatorsMenu.yesNoPicker.description",
-    Icon: ChartIcon,
-  },
-  {
-    href: "/random-team-generator",
-    labelKey: "calculatorsMenu.teamGenerator.label",
-    descriptionKey: "calculatorsMenu.teamGenerator.description",
-    Icon: ShareIcon,
-  },
-];

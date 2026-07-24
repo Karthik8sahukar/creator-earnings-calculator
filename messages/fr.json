@@ -143,6 +143,19 @@
       "subtitle": "Practical guides on YouTube monetization, growth, and the creator economy.",
       "viewAll": "View all articles",
       "readMore": "Read article"
+    },
+    "platformHeadline": "Creator Analytics Platform",
+    "platformSubtitle": "Analyze creators across YouTube, Instagram, Twitch and more. Estimate revenue, calculate engagement, and discover insights with free, transparent tools.",
+    "ctaSearch": "Search Creator",
+    "ctaTools": "Browse Tools",
+    "featuredToolLabel": "Featured Tool",
+    "badges": {
+      "youtube": "YouTube",
+      "instagram": "Instagram",
+      "twitch": "Twitch",
+      "creatorEconomy": "Creator Economy",
+      "revenue": "Revenue",
+      "analytics": "Analytics"
     }
   },
   "search": {
@@ -549,6 +562,11 @@
     "teamGenerator": {
       "label": "Random Team Generator",
       "description": "Split a list of names into random teams."
+    },
+    "headings": {
+      "creatorAnalytics": "Creator Analytics",
+      "streaming": "Streaming",
+      "utilities": "Utilities"
     }
   },
   "popularCalculators": {
@@ -1208,5 +1226,60 @@
     "eyebrow": "Créateurs",
     "title": "Créateurs populaires",
     "viewAll": "Voir tous les créateurs"
+  },
+  "featuredTools": {
+    "title": "Explore Creator Tools",
+    "subtitle": "Free calculators, estimators, and utilities for creators and marketers across every platform.",
+    "categories": {
+      "analytics": "Analytics",
+      "streaming": "Streaming",
+      "utilities": "Utilities"
+    },
+    "cards": {
+      "money": {
+        "title": "YouTube Money Calculator",
+        "description": "Estimate a channel's total monthly revenue from views, RPM, and ad performance."
+      },
+      "rpm": {
+        "title": "RPM Calculator",
+        "description": "Calculate revenue per 1,000 monetized views."
+      },
+      "cpm": {
+        "title": "CPM Calculator",
+        "description": "What advertisers pay per 1,000 ad impressions."
+      },
+      "shorts": {
+        "title": "Shorts Calculator",
+        "description": "Estimate Creator Pool payouts from Shorts views."
+      },
+      "sponsorship": {
+        "title": "Sponsorship Calculator",
+        "description": "Estimate brand deal rates from engagement and reach."
+      },
+      "engagement": {
+        "title": "Engagement Calculator",
+        "description": "Calculate engagement rate from views and interactions."
+      },
+      "adsense": {
+        "title": "AdSense Calculator",
+        "description": "Estimate AdSense revenue from RPM and monthly views."
+      },
+      "instagram": {
+        "title": "Instagram Calculator",
+        "description": "Estimate Instagram creator earnings across all streams."
+      },
+      "twitch": {
+        "title": "Twitch Bits Calculator",
+        "description": "Convert Twitch Bits to USD and see package pricing."
+      },
+      "yesNo": {
+        "title": "Yes/No Picker Wheel",
+        "description": "Spin the wheel for a random yes or no decision."
+      },
+      "teams": {
+        "title": "Random Team Generator",
+        "description": "Split a list of names into balanced random teams."
+      }
+    }
   }
 }
