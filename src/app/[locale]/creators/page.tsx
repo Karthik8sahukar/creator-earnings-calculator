@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { CreatorsIndexClient } from "@/components/creator/CreatorsIndexClient";
+import { CreatorsDirectoryClient } from "@/components/creator/CreatorsDirectoryClient";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
@@ -10,29 +10,31 @@ import {
   listCreatorCountries,
   listCreators,
 } from "@/lib/creators";
+import {
+  filterCreators,
+  sortCreators,
+  paginateCreators,
+  type CreatorFilters,
+  type CreatorSortField,
+} from "@/lib/creatorDirectory";
 import { buildAlternates } from "@/lib/i18nMetadata";
 import {
   buildBreadcrumbListLd,
   buildItemListLd,
   serializeJsonLd,
 } from "@/lib/jsonLd";
-
-// The directory page fetches every creator's avatar from the
-// YouTube Data API on render. Even though `getCreatorAvatars()`
-// reuses the process-local TtlCache, the very first render after a
-// cold cache still needs the API key to be present — so we opt out
-// of build-time prerendering and force the Node runtime. In steady
-// state this is cheap: each avatar lookup is served from the
-// TtlCache (45m for search entries, 6h for channel entries), and
-// the entire batch completes in a few milliseconds once warm.
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+import type { CreatorCountryCode } from "@/data/creators/schema";
 
 /**
- * `/[locale]/creators` — the search + filter index of every creator
- * in the catalog. Statically generated per locale because the catalog
- * itself is data-driven from `src/lib/creators.ts`.
+ * `/[locale]/creators` — Enhanced creator directory with:
+ *   - URL-based search, filters, sort, and pagination
+ *   - Server-side filtering for SEO
+ *   - 24 creators per page
+ *   - Shareable URLs like /creators?country=IN&category=Gaming&sort=name&page=2
  */
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -40,17 +42,34 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
+  searchParams: searchParamsPromise,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const searchParams = await searchParamsPromise;
   const t = await getTranslations({ locale, namespace: "creators.meta" });
+
+  // Build descriptive title from active filters
+  const country = typeof searchParams.country === "string" ? searchParams.country : "";
+  const category = typeof searchParams.category === "string" ? searchParams.category : "";
+
+  let title = t("title");
+  if (country && category) {
+    title = `${category} YouTube Creators in ${country} — Earnings & Stats`;
+  } else if (country) {
+    title = `YouTube Creators in ${country} — Earnings & Revenue`;
+  } else if (category) {
+    title = `${category} YouTube Creators — Earnings & Revenue`;
+  }
+
   return {
-    title: t("title"),
+    title,
     description: t("description"),
     alternates: buildAlternates({ locale, pathSuffix: "/creators" }),
     openGraph: {
-      title: t("title"),
+      title,
       description: t("description"),
       url: `${publicConfig.siteUrl}/${locale}/creators`,
       siteName: publicConfig.siteName,
@@ -58,37 +77,92 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: t("title"),
+      title,
       description: t("description"),
     },
   };
 }
 
+// Map country names to codes for filtering
+const COUNTRY_NAME_TO_CODE: Record<string, CreatorCountryCode> = {
+  "United States": "US",
+  "United Kingdom": "GB",
+  "Canada": "CA",
+  "Australia": "AU",
+  "Germany": "DE",
+  "France": "FR",
+  "Netherlands": "NL",
+  "Sweden": "SE",
+  "Japan": "JP",
+  "South Korea": "KR",
+  "India": "IN",
+  "Brazil": "BR",
+  "Mexico": "MX",
+  "Spain": "ES",
+  "Italy": "IT",
+  "Indonesia": "ID",
+  "Philippines": "PH",
+  "South Africa": "ZA",
+  "United Arab Emirates": "AE",
+};
+
 export default async function CreatorsIndexPage({
   params,
+  searchParams: searchParamsPromise,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
+  const searchParams = await searchParamsPromise;
   setRequestLocale(locale);
 
   const t = await getTranslations({ locale, namespace: "creators" });
-  const tCommon = await getTranslations({
-    locale,
-    namespace: "common.breadcrumbs",
-  });
+  const tCommon = await getTranslations({ locale, namespace: "common.breadcrumbs" });
 
-  const creators = listCreators();
+  // ── Parse URL params ──────────────────────────────────────────
+  const search = typeof searchParams.q === "string" ? searchParams.q : "";
+  const countryParam = typeof searchParams.country === "string" ? searchParams.country : "all";
+  const categoryParam = typeof searchParams.category === "string" ? searchParams.category : "all";
+  const verifiedParam = typeof searchParams.verified === "string" ? searchParams.verified : "all";
+  const sortParam = typeof searchParams.sort === "string" ? searchParams.sort : "subscribers";
+  const pageParam = typeof searchParams.page === "string" ? parseInt(searchParams.page, 10) : 1;
+  const perPage = 24;
+
+  // ── Build filter object ───────────────────────────────────────
+  const filters: CreatorFilters = {};
+  if (search) filters.search = search;
+  if (countryParam !== "all") {
+    // Could be a country name or code
+    const code = COUNTRY_NAME_TO_CODE[countryParam];
+    if (code) filters.country = code;
+    else filters.search = (filters.search ?? "") + " " + countryParam;
+  }
+  if (categoryParam !== "all") filters.category = categoryParam;
+  if (verifiedParam === "true") filters.verified = true;
+
+  // ── Execute query ─────────────────────────────────────────────
+  const filtered = filterCreators(filters);
+  const sortField = (["name", "country", "category", "subscriberTier", "newest"].includes(sortParam)
+    ? sortParam === "subscribers" ? "subscriberTier" : sortParam
+    : "subscriberTier") as CreatorSortField;
+  const sorted = sortCreators(filtered, sortField, "asc");
+  const paginated = paginateCreators(sorted, { page: pageParam, perPage });
+
+  // ── Convert to Creator interface for cards ────────────────────
+  const allCreators = listCreators();
   const countries = listCreatorCountries();
   const categories = listCreatorCategories();
 
-  // Fetch every avatar in parallel, reusing the existing TtlCache
-  // via the youtube service. Failures fall through to `null`, which
-  // the card renders as an initial-based placeholder — the page
-  // never blocks on a single flaky lookup.
-  const avatars = await getCreatorAvatars(creators);
+  // Map CreatorEntry[] to Creator[] by slug lookup
+  const creatorsForCards = paginated.creators
+    .map((entry) => allCreators.find((c) => c.slug === entry.slug))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
-  // JSON-LD: BreadcrumbList + ItemList of creator profiles.
+  // Fetch avatars for the current page only
+  const avatars = await getCreatorAvatars(creatorsForCards);
+
+  // ── JSON-LD ───────────────────────────────────────────────────
   const breadcrumbLd = buildBreadcrumbListLd([
     { name: tCommon("home"), url: `${publicConfig.siteUrl}/${locale}` },
     {
@@ -97,7 +171,7 @@ export default async function CreatorsIndexPage({
     },
   ]);
   const itemListLd = buildItemListLd(
-    creators.map((c) => ({
+    creatorsForCards.map((c) => ({
       name: c.displayName,
       url: `${publicConfig.siteUrl}/${locale}/creator/${c.slug}`,
       description: c.description,
@@ -122,13 +196,27 @@ export default async function CreatorsIndexPage({
         <p className="text-slate-600 dark:text-slate-400 max-w-2xl">
           {t("subtitle")}
         </p>
+        <p className="text-sm font-medium text-brand-700 dark:text-brand-300">
+          {paginated.total} {t("creatorsCount") ?? "creators"}
+        </p>
       </header>
 
-      <CreatorsIndexClient
-        creators={creators}
-        countries={countries}
-        categories={categories}
+      <CreatorsDirectoryClient
+        creators={creatorsForCards}
+        countries={countries as string[]}
+        categories={categories as string[]}
         avatars={avatars}
+        currentFilters={{
+          search,
+          country: countryParam,
+          category: categoryParam,
+          verified: verifiedParam,
+          sort: sortParam,
+          page: paginated.page,
+          perPage,
+        }}
+        totalResults={paginated.total}
+        totalPages={paginated.totalPages}
       />
     </div>
   );

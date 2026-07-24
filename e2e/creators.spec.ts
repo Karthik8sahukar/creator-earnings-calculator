@@ -17,36 +17,78 @@ import { expect, test } from "@playwright/test";
  */
 
 test.describe("Creators directory", () => {
-  test("index page lists creators and supports search + filters", async ({
-    page,
-  }) => {
+  test("index page loads and displays creator cards", async ({ page }) => {
     await page.goto("/en/creators");
     await expect(
       page.getByRole("heading", { level: 1, name: /YouTube Creators/i }),
     ).toBeVisible();
 
-    // Grid renders — at least MrBeast should be present since we
-    // curate them into `CREATORS`.
+    // Grid renders — at least MrBeast and CarryMinati should be present.
     await expect(page.getByTestId("creator-card-mrbeast")).toBeVisible();
     await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
+  });
 
-    // Search filters the grid.
+  test("search filters the creator grid", async ({ page }) => {
+    await page.goto("/en/creators");
+
+    // Search for a specific creator.
     await page.getByTestId("creators-search").fill("carryminati");
+    // Wait for the search to take effect (debounced URL navigation).
+    await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
+    await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
+  });
+
+  test("country filter shows only creators from that country", async ({
+    page,
+  }) => {
+    // Visit with a clean slate — no search state.
+    await page.goto("/en/creators");
+
+    // Apply country = India via the filter select.
+    await page.getByTestId("creators-filter-country").selectOption("India");
+
+    // Wait for an India creator to appear — confirms navigation completed.
+    await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
+    // TechBurner is an India creator (subscriberTier: mid, verified: true).
+    await expect(page.getByTestId("creator-card-techburner")).toBeVisible();
+    // A non-India creator should NOT be visible.
+    await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
+  });
+
+  test("clear filters restores the full grid", async ({ page }) => {
+    // Start with a filter active.
+    await page.goto("/en/creators?country=India");
     await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
     await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
 
-    // Clear search + filter by country = India.
+    // Clear all filters.
+    await page.getByTestId("creators-clear-filters").click();
+
+    // Full grid restores — MrBeast returns.
+    await expect(page.getByTestId("creator-card-mrbeast")).toBeVisible();
+  });
+
+  test("search then filter independently without interference", async ({
+    page,
+  }) => {
+    await page.goto("/en/creators");
+
+    // First: search for TechBurner specifically.
+    await page.getByTestId("creators-search").fill("Tech Burner");
+    await expect(page.getByTestId("creator-card-techburner")).toBeVisible();
+
+    // Clear search by emptying the input and pressing Enter for
+    // immediate sync (avoids debounce timing).
     await page.getByTestId("creators-search").fill("");
+    await page.getByTestId("creators-search").press("Enter");
+    // Wait for full grid to reload.
+    await expect(page.getByTestId("creator-card-mrbeast")).toBeVisible();
+
+    // Now apply India filter on the clean slate.
     await page.getByTestId("creators-filter-country").selectOption("India");
-    // A handful of India creators should be visible.
     await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
     await expect(page.getByTestId("creator-card-techburner")).toBeVisible();
-    // A global-only creator should NOT be visible.
     await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
-
-    // Clear filters restores the full grid.
-    await page.getByTestId("creators-clear-filters").click();
-    await expect(page.getByTestId("creator-card-mrbeast")).toBeVisible();
   });
 
   test("directory emits BreadcrumbList + ItemList JSON-LD", async ({

@@ -1,7 +1,10 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 
+import { useFormatMoney } from "@/components/currency";
 import type { CreatorProfile } from "@/lib/creatorProfile";
-import { formatCompact, formatCurrency } from "@/lib/format";
+import { formatCompact } from "@/lib/format";
 
 interface Props {
   profile: CreatorProfile;
@@ -10,24 +13,18 @@ interface Props {
 /**
  * The estimated-earnings card on the creator profile page.
  *
- * We reuse the exact same math as the interactive `EarningsCalculator`
- * component — the numbers here are precomputed on the server by
- * `getCreatorProfile()`, which calls `calculateEarnings()` from
- * `@/lib/earnings`. This component never runs a calculation of its
- * own; it just presents the numbers.
- *
- * When the underlying monthly-views figure is 0 (the YouTube API
- * failed) we surface a placeholder note instead of "0 USD" numbers,
- * which would look like a promise of zero rather than a data gap.
+ * Uses the global CurrencyContext to format all monetary values in
+ * the user's selected currency. Amounts from the profile are in USD;
+ * conversion happens via the `useFormatMoney` hook.
  */
 export function CreatorEarnings({ profile }: Props) {
   const t = useTranslations("creator.earnings");
+  const { formatMoney } = useFormatMoney();
   const { earnings } = profile;
-  const currency = earnings.currency;
   const hasData = earnings.monthlyViews > 0;
 
   const fmt = (n: number, opts: { compact?: boolean } = { compact: true }) =>
-    formatCurrency(n, currency, opts);
+    formatMoney(n, opts);
 
   return (
     <section aria-labelledby="creator-earnings-title" className="card p-6 sm:p-8">

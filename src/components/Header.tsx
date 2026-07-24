@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
 import { CalculatorsMenu } from "./CalculatorsMenu";
+import { CurrencySelector } from "./currency";
 import { LanguageSelector } from "./LanguageSelector";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
@@ -66,6 +67,13 @@ export function Header() {
           </Link>
 
           <Link
+            href="/top-creators"
+            className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+          >
+            {t("nav.rankings") ?? "Rankings"}
+          </Link>
+
+          <Link
             href="/blog"
             className="rounded-md px-2 py-1 hover:text-slate-900 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
           >
@@ -88,6 +96,7 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           <div className="hidden md:flex items-center gap-1">
+            <CurrencySelector />
             <LanguageSelector />
             <ThemeToggle />
           </div>
