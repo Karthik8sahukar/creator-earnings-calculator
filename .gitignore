@@ -155,3 +155,4 @@ reports/
 # Pipeline generated data (rebuild with scripts)
 data/pipeline/*.json
 !data/pipeline/.gitkeep
+!data/pipeline/sample-import.json
