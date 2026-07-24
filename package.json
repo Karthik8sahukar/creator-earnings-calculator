@@ -14,7 +14,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "creators:verify": "npx tsx scripts/verify-creators.ts"
+    "creators:verify": "npx tsx scripts/verify-creators.ts",
+    "pipeline:import": "npx tsx scripts/import-creators.ts",
+    "pipeline:verify": "npx tsx scripts/verify-creators-v2.ts",
+    "pipeline:enrich": "npx tsx scripts/enrich-creators-v2.ts",
+    "pipeline:search-index": "npx tsx scripts/build-search-index.ts",
+    "pipeline:validate": "npx tsx scripts/validate-creators.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.10",

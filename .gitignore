@@ -151,3 +151,7 @@ vite.config.ts.timestamp-*
 
 # Creator verification reports (generated, may contain API response data)
 reports/
+
+# Pipeline generated data (rebuild with scripts)
+data/pipeline/*.json
+!data/pipeline/.gitkeep
