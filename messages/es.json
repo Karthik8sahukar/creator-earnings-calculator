@@ -42,7 +42,8 @@
     "instagramCalculator": "Instagram Calculator",
     "instagramCalculatorAria": "Instagram Money Calculator",
     "creators": "Creadores",
-    "creatorsAria": "Explorar perfiles de creadores de YouTube"
+    "creatorsAria": "Explorar perfiles de creadores de YouTube",
+    "rankings": "Rankings"
   },
   "languageSelector": {
     "trigger": "Idioma",
@@ -75,7 +76,9 @@
     "blog": "Blog",
     "estimatesBlurb": "Los ingresos que se muestran aquí son estimaciones calculadas de forma independiente.",
     "instagramCalculator": "Instagram Money Calculator",
-    "creators": "Creadores"
+    "creators": "Creadores",
+    "engagementCalculator": "Engagement Calculator",
+    "adsenseCalculator": "AdSense Calculator"
   },
   "home": {
     "chip": "Con datos de la YouTube Data API v3",
@@ -86,6 +89,57 @@
       "poweredBy": "Con la YouTube Data API",
       "free": "Gratis para siempre",
       "noLogin": "Sin registro"
+    },
+    "trending": {
+      "eyebrow": "Trending",
+      "title": "Trending creators",
+      "viewAll": "View all"
+    },
+    "featured": {
+      "eyebrow": "Featured",
+      "title": "Featured creators",
+      "subtitle": "Hand-picked creators from around the world representing diverse niches and countries.",
+      "viewAll": "View all creators"
+    },
+    "topEarning": {
+      "eyebrow": "Highest RPM",
+      "title": "Top earning creators",
+      "subtitle": "Ranked by estimated RPM based on country and niche.",
+      "viewAll": "View all"
+    },
+    "byCountry": {
+      "eyebrow": "By Country",
+      "title": "Top creators by country",
+      "creators": "creators",
+      "rpm": "Base RPM",
+      "shortsRpm": "Shorts RPM",
+      "explore": "Explore country"
+    },
+    "byCategory": {
+      "eyebrow": "By Category",
+      "title": "Top creators by category",
+      "creators": "creators",
+      "rpmMultiplier": "RPM multiplier",
+      "avgRpm": "US RPM",
+      "explore": "Explore category"
+    },
+    "stats": {
+      "eyebrow": "Platform data",
+      "title": "Platform statistics",
+      "subtitle": "The data powering the Creator Intelligence Platform.",
+      "totalCreators": "Creator profiles",
+      "verifiedCreators": "API-verified channels",
+      "countriesCovered": "Creator countries",
+      "categories": "Content categories",
+      "nichesTracked": "Niches with RPM data",
+      "rpmCountries": "Countries with RPM data"
+    },
+    "latestBlogs": {
+      "eyebrow": "Blog",
+      "title": "Latest articles",
+      "subtitle": "Practical guides on YouTube monetization, growth, and the creator economy.",
+      "viewAll": "View all articles",
+      "readMore": "Read article"
     }
   },
   "search": {
@@ -468,6 +522,18 @@
     "instagram": {
       "label": "Instagram Money Calculator",
       "description": "Estimate Instagram creator earnings."
+    },
+    "engagement": {
+      "label": "Engagement Calculator",
+      "description": "Calculate engagement rate from views and interactions."
+    },
+    "adsense": {
+      "label": "AdSense Calculator",
+      "description": "Estimate AdSense revenue from RPM and views."
+    },
+    "valuation": {
+      "label": "Channel Valuation",
+      "description": "Estimate the market value of a YouTube channel."
     }
   },
   "popularCalculators": {
@@ -1061,6 +1127,31 @@
       "description": "Discover {name}'s estimated monthly earnings, yearly revenue, sponsorship value, RPM, CPM and YouTube statistics on {site}.",
       "notFoundTitle": "Creator not found",
       "notFoundDescription": "We do not have a profile for that creator yet."
+    },
+    "analytics": {
+      "title": "Historical Analytics",
+      "empty": "Historical data is still being collected. Growth charts will appear once enough snapshots have been captured.",
+      "error": "Could not load historical analytics right now. Please try again later.",
+      "lastUpdated": "Last updated: {date}",
+      "range": "Range",
+      "rangeAll": "All",
+      "insufficientData": "Insufficient data points for this time range. Collecting more snapshots.",
+      "subGrowth30d": "Subscriber growth (30d)",
+      "viewGrowth30d": "View growth (30d)",
+      "earningsChange30d": "Earnings change (30d)",
+      "dailySubGain": "Avg. daily sub gain",
+      "period": "Period",
+      "subChange": "Subscribers",
+      "viewChange": "Views",
+      "uploads": "Uploads",
+      "earningsChange": "Earnings",
+      "metrics": {
+        "subscribers": "Subscribers",
+        "totalViews": "Views",
+        "monthlyEarnings": "Earnings",
+        "videoCount": "Videos"
+      },
+      "disclaimer": "Growth data is derived from periodic snapshots. Values represent estimated changes between capture points and may not reflect real-time fluctuations."
     }
   },
   "creators": {
@@ -1084,6 +1175,18 @@
       "title": "Directorio de creadores de YouTube — Ingresos, ganancias y estadísticas",
       "description": "Explora creadores de YouTube con estimaciones independientes de ingresos mensuales, valor de patrocinios, RPM, CPM y estadísticas del canal.",
       "breadcrumb": "Creadores"
+    },
+    "creatorsCount": "creators",
+    "filterVerified": "Verified",
+    "filterVerifiedOnly": "Verified only",
+    "filterSort": "Sort by",
+    "pageInfo": "Page {page} of {total}",
+    "sortOptions": {
+      "subscribers": "Subscribers",
+      "name": "Alphabetical",
+      "country": "Country",
+      "category": "Category",
+      "newest": "Newest"
     }
   },
   "popularCreators": {
