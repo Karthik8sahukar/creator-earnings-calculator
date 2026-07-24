@@ -31,7 +31,12 @@ export interface CalculatorLink {
     | "/youtube-adsense-calculator"
     | "/twitch-bits-calculator"
     | "/yes-no-picker-wheel"
-    | "/random-team-generator";
+    | "/random-team-generator"
+    | "/spin-the-wheel"
+    | "/coin-flip"
+    | "/dice-roller"
+    | "/random-number-generator"
+    | "/random-name-picker";
   labelKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -69,9 +74,19 @@ export const CALCULATOR_CATEGORIES: CalculatorCategory[] = [
       { href: "/random-team-generator", labelKey: "calculatorsMenu.teamGenerator.label", descriptionKey: "calculatorsMenu.teamGenerator.description", Icon: ShareIcon },
     ],
   },
+  {
+    headingKey: "calculatorsMenu.headings.decisionTools",
+    links: [
+      { href: "/spin-the-wheel", labelKey: "calculatorsMenu.spinWheel.label", descriptionKey: "calculatorsMenu.spinWheel.description", Icon: ChartIcon },
+      { href: "/coin-flip", labelKey: "calculatorsMenu.coinFlip.label", descriptionKey: "calculatorsMenu.coinFlip.description", Icon: DollarIcon },
+      { href: "/dice-roller", labelKey: "calculatorsMenu.diceRoller.label", descriptionKey: "calculatorsMenu.diceRoller.description", Icon: FilmIcon },
+      { href: "/random-number-generator", labelKey: "calculatorsMenu.randomNumber.label", descriptionKey: "calculatorsMenu.randomNumber.description", Icon: TrendingUpIcon },
+      { href: "/random-name-picker", labelKey: "calculatorsMenu.namePicker.label", descriptionKey: "calculatorsMenu.namePicker.description", Icon: ShareIcon },
+    ],
+  },
 ];
 
-/** Flat list for backward compat (used by MobileNav). */
+/** Flat list for backward compat. */
 export const CALCULATOR_LINKS: CalculatorLink[] = CALCULATOR_CATEGORIES.flatMap(
   (cat) => cat.links,
 );

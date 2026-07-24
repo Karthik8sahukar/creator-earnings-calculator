@@ -81,7 +81,12 @@
     "notFinancialAdvice": "Estimates only. Not financial advice.",
     "blog": "Blog",
     "creators": "Creators",
-    "estimatesBlurb": "Revenue figures on this site are independently calculated estimates."
+    "estimatesBlurb": "Revenue figures on this site are independently calculated estimates.",
+    "spinWheel": "Spin the Wheel",
+    "coinFlip": "Coin Flip",
+    "diceRoller": "Dice Roller",
+    "randomNumber": "Random Number Generator",
+    "namePicker": "Random Name Picker"
   },
   "search": {
     "srLabel": "Search channel",
@@ -753,7 +758,28 @@
     "headings": {
       "creatorAnalytics": "Creator Analytics",
       "streaming": "Streaming",
-      "utilities": "Utilities"
+      "utilities": "Utilities",
+      "decisionTools": "Decision Tools"
+    },
+    "spinWheel": {
+      "label": "Spin the Wheel",
+      "description": "Customizable random spinner."
+    },
+    "coinFlip": {
+      "label": "Coin Flip",
+      "description": "Heads or tails instantly."
+    },
+    "diceRoller": {
+      "label": "Dice Roller",
+      "description": "Roll any dice online."
+    },
+    "randomNumber": {
+      "label": "Random Number Generator",
+      "description": "Numbers in any range."
+    },
+    "namePicker": {
+      "label": "Random Name Picker",
+      "description": "Pick names from a list."
     }
   },
   "popularCalculators": {
@@ -1280,6 +1306,41 @@
       "description": "Discover {name}'s estimated monthly earnings, yearly revenue, sponsorship value, RPM, CPM and YouTube statistics on {site}.",
       "notFoundTitle": "Creator not found",
       "notFoundDescription": "We do not have a profile for that creator yet."
+    }
+  },
+  "decisionTools": {
+    "eyebrow": "Decision Tools",
+    "title": "Make Decisions Instantly",
+    "subtitle": "Free randomness tools for quick decisions, games, and group activities. No login, no tracking, works offline.",
+    "cards": {
+      "spinWheel": {
+        "title": "Spin the Wheel",
+        "description": "Add your options and spin for a random pick."
+      },
+      "coinFlip": {
+        "title": "Coin Flip",
+        "description": "Quick heads or tails with multi-flip support."
+      },
+      "diceRoller": {
+        "title": "Dice Roller",
+        "description": "Roll d4 through d100 with totals and history."
+      },
+      "randomNumber": {
+        "title": "Random Number Generator",
+        "description": "Generate numbers in any range you choose."
+      },
+      "namePicker": {
+        "title": "Random Name Picker",
+        "description": "Pick one or more names from your list."
+      },
+      "yesNo": {
+        "title": "Yes/No Picker Wheel",
+        "description": "Spin for a weighted yes or no answer."
+      },
+      "teamGenerator": {
+        "title": "Random Team Generator",
+        "description": "Split names into balanced random groups."
+      }
     }
   }
 }

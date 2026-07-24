@@ -81,7 +81,12 @@
     "adsenseCalculator": "AdSense Calculator",
     "twitchBitsCalculator": "Twitch Bits Calculator",
     "yesNoPickerWheel": "Yes/No Picker Wheel",
-    "teamGenerator": "Random Team Generator"
+    "teamGenerator": "Random Team Generator",
+    "spinWheel": "Spin the Wheel",
+    "coinFlip": "Coin Flip",
+    "diceRoller": "Dice Roller",
+    "randomNumber": "Random Number Generator",
+    "namePicker": "Random Name Picker"
   },
   "home": {
     "chip": "Basierend auf der YouTube Data API v3",
@@ -566,7 +571,28 @@
     "headings": {
       "creatorAnalytics": "Creator Analytics",
       "streaming": "Streaming",
-      "utilities": "Utilities"
+      "utilities": "Utilities",
+      "decisionTools": "Decision Tools"
+    },
+    "spinWheel": {
+      "label": "Spin the Wheel",
+      "description": "Customizable random spinner."
+    },
+    "coinFlip": {
+      "label": "Coin Flip",
+      "description": "Heads or tails instantly."
+    },
+    "diceRoller": {
+      "label": "Dice Roller",
+      "description": "Roll any dice online."
+    },
+    "randomNumber": {
+      "label": "Random Number Generator",
+      "description": "Numbers in any range."
+    },
+    "namePicker": {
+      "label": "Random Name Picker",
+      "description": "Pick names from a list."
     }
   },
   "popularCalculators": {
@@ -1279,6 +1305,41 @@
       "teams": {
         "title": "Random Team Generator",
         "description": "Split a list of names into balanced random teams."
+      }
+    }
+  },
+  "decisionTools": {
+    "eyebrow": "Decision Tools",
+    "title": "Make Decisions Instantly",
+    "subtitle": "Free randomness tools for quick decisions, games, and group activities. No login, no tracking, works offline.",
+    "cards": {
+      "spinWheel": {
+        "title": "Spin the Wheel",
+        "description": "Add your options and spin for a random pick."
+      },
+      "coinFlip": {
+        "title": "Coin Flip",
+        "description": "Quick heads or tails with multi-flip support."
+      },
+      "diceRoller": {
+        "title": "Dice Roller",
+        "description": "Roll d4 through d100 with totals and history."
+      },
+      "randomNumber": {
+        "title": "Random Number Generator",
+        "description": "Generate numbers in any range you choose."
+      },
+      "namePicker": {
+        "title": "Random Name Picker",
+        "description": "Pick one or more names from your list."
+      },
+      "yesNo": {
+        "title": "Yes/No Picker Wheel",
+        "description": "Spin for a weighted yes or no answer."
+      },
+      "teamGenerator": {
+        "title": "Random Team Generator",
+        "description": "Split names into balanced random groups."
       }
     }
   }

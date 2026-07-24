@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
+import { DecisionTools } from "@/components/home/DecisionTools";
 import { Faq } from "@/components/home/Faq";
 import { FeaturedCreators } from "@/components/home/FeaturedCreators";
 import { FeaturedTools } from "@/components/home/FeaturedTools";
@@ -77,6 +78,7 @@ export default async function HomePage({
       </Hero>
 
       <FeaturedTools />
+      <DecisionTools />
       <TrendingCreators />
       <FeaturedCreators />
       <TopEarningCreators />
