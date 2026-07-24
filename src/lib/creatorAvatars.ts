@@ -58,9 +58,14 @@ async function resolveCreatorAvatar(creator: Creator): Promise<string | null> {
     // Return null so the UI renders its initial-based placeholder.
     return null;
   } catch (err) {
+    const code = err instanceof YouTubeApiError
+      ? err.code
+      : err instanceof TypeError
+        ? "MALFORMED_RESPONSE"
+        : "UNEXPECTED";
     console.error("creator-avatar:resolve failed", {
       slug: creator.slug,
-      code: err instanceof YouTubeApiError ? err.code : "UNEXPECTED",
+      code,
     });
     return null;
   }

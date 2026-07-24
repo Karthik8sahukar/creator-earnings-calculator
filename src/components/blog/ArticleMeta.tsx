@@ -11,6 +11,7 @@ import type { BlogPost } from "@/lib/blog";
  */
 export function ArticleMeta({ post }: { post: BlogPost }) {
   const t = useTranslations("blog");
+  const tRoot = useTranslations();
   const category = findCategory(post.categoryId);
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
@@ -20,7 +21,7 @@ export function ArticleMeta({ post }: { post: BlogPost }) {
           href={`/blog/category/${category.slug}` as any}
           className="inline-flex items-center rounded-full bg-brand-50 text-brand-700 px-2.5 py-1 text-xs font-medium hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-200 dark:hover:bg-brand-500/20"
         >
-          {t(category.labelKey)}
+          {tRoot(category.labelKey)}
         </Link>
       )}
       <span className="text-slate-700 dark:text-slate-300 font-medium">

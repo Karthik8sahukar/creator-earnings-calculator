@@ -452,7 +452,7 @@ export async function getChannelByHandle(
       forHandle: normalizedHandle,
       maxResults: 1,
     });
-    const c = res.items[0];
+    const c = res.items?.[0];
     if (!c) return null;
     return mapChannel(c);
   });
@@ -567,7 +567,7 @@ export async function getChannelById(
       id: channelId,
       maxResults: 1,
     });
-    const c = res.items[0];
+    const c = res.items?.[0];
     if (!c) return null;
     return mapChannel(c);
   });

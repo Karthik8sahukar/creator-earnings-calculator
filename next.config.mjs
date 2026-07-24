@@ -46,15 +46,13 @@ const nextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
-      // API routes should never be cached by shared caches — they're
-      // already Cache-Control-controlled by each route, but this is a
-      // defense-in-depth default.
+      // API routes get security headers. Cache-Control is managed by
+      // each route handler individually (analytics uses s-maxage,
+      // search uses private max-age, health uses no-store, and
+      // force-dynamic routes get no-cache from Next.js automatically).
       {
         source: "/api/:path*",
-        headers: [
-          ...securityHeaders,
-          { key: "Cache-Control", value: "no-store" },
-        ],
+        headers: securityHeaders,
       },
     ];
   },

@@ -6,7 +6,26 @@ import { COUNTRIES, NICHES } from "@/lib/rpmData";
 
 /**
  * Platform statistics section on the homepage.
- * Shows key metrics about the platform's data coverage.
+ *
+ * Every metric is computed at render time from the canonical data
+ * structures — NOTHING is hardcoded. When creators are added to
+ * `src/data/creators/dataset.ts` or RPM tiers are added to
+ * `src/lib/rpmData.ts`, these numbers update automatically.
+ *
+ * Data contracts:
+ *
+ *   "Creator profiles"      = CREATORS_DATASET.length
+ *   "API-verified channels" = creators where verified === true
+ *                             (means youtubeChannelId is confirmed
+ *                             via the YouTube Data API)
+ *   "Creator countries"     = unique countryCode values present in
+ *                             the creator dataset (NOT the same as
+ *                             RPM country tiers)
+ *   "Content categories"    = unique category labels in the dataset
+ *   "Niches with RPM data"  = NICHES array length (the RPM engine's
+ *                             niche multiplier table)
+ *   "Countries with RPM data" = COUNTRIES array length (the RPM
+ *                             engine's country tier table)
  */
 export async function PlatformStats() {
   const t = await getTranslations("home.stats");

@@ -127,6 +127,15 @@ export interface CreatorEntry {
   socialLinks: CreatorSocialLinks;
 
   /**
+   * Alternative names, spellings, and former channel names.
+   * Used by the search index for fuzzy matching. Optional — defaults
+   * to empty array when not provided.
+   *
+   * Examples: ["Felix Kjellberg", "pewds"] for PewDiePie.
+   */
+  aliases?: string[];
+
+  /**
    * Whether this creator's channelId has been verified via the
    * YouTube API. Unverified entries may need manual confirmation.
    */
@@ -137,6 +146,39 @@ export interface CreatorEntry {
    * Computed from approximate subscriber count ranges.
    */
   subscriberTier: "mega" | "large" | "mid" | "emerging";
+
+  /**
+   * Extensible metadata bag for pipeline-generated enrichment data.
+   * Not consumed by the UI directly — used by scripts and reports.
+   * Optional — omitted for manually-added creators.
+   */
+  metadata?: CreatorMetadata;
+}
+
+/**
+ * Pipeline metadata attached during import/enrich/verify steps.
+ * Allows the pipeline to track provenance without polluting the
+ * core fields that the UI reads.
+ */
+export interface CreatorMetadata {
+  /** ISO timestamp when this record was first imported. */
+  importedAt?: string;
+  /** ISO timestamp of the last enrichment pass. */
+  enrichedAt?: string;
+  /** ISO timestamp of the last verification pass. */
+  verifiedAt?: string;
+  /** Source of the import (e.g. "manual", "csv", "api-discovery"). */
+  source?: string;
+  /** Confidence score from the last verification (0–1). */
+  verificationConfidence?: number;
+  /** Subscriber count snapshot at last enrichment (for tier computation). */
+  subscriberCount?: number;
+  /** Total view count snapshot at last enrichment. */
+  viewCount?: number;
+  /** Video count snapshot at last enrichment. */
+  videoCount?: number;
+  /** Channel join date from YouTube API. */
+  joinedAt?: string;
 }
 
 // ─── Category & Country Metadata ────────────────────────────────────

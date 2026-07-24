@@ -1007,9 +1007,9 @@
       "eyebrow": "Platform data",
       "title": "Platform statistics",
       "subtitle": "The data powering the Creator Intelligence Platform.",
-      "totalCreators": "Creators tracked",
-      "verifiedCreators": "Verified creators",
-      "countriesCovered": "Countries covered",
+      "totalCreators": "Creator profiles",
+      "verifiedCreators": "API-verified channels",
+      "countriesCovered": "Creator countries",
       "categories": "Content categories",
       "nichesTracked": "Niches with RPM data",
       "rpmCountries": "Countries with RPM data"
@@ -1135,6 +1135,31 @@
     },
     "faq": {
       "title": "Frequently asked questions"
+    },
+    "analytics": {
+      "title": "Historical Analytics",
+      "empty": "Historical data is still being collected. Growth charts will appear once enough snapshots have been captured.",
+      "error": "Could not load historical analytics right now. Please try again later.",
+      "lastUpdated": "Last updated: {date}",
+      "range": "Range",
+      "rangeAll": "All",
+      "insufficientData": "Insufficient data points for this time range. Collecting more snapshots.",
+      "subGrowth30d": "Subscriber growth (30d)",
+      "viewGrowth30d": "View growth (30d)",
+      "earningsChange30d": "Earnings change (30d)",
+      "dailySubGain": "Avg. daily sub gain",
+      "period": "Period",
+      "subChange": "Subscribers",
+      "viewChange": "Views",
+      "uploads": "Uploads",
+      "earningsChange": "Earnings",
+      "metrics": {
+        "subscribers": "Subscribers",
+        "totalViews": "Views",
+        "monthlyEarnings": "Earnings",
+        "videoCount": "Videos"
+      },
+      "disclaimer": "Growth data is derived from periodic snapshots. Values represent estimated changes between capture points and may not reflect real-time fluctuations."
     },
     "fallback": {
       "aria": "Data availability notice",

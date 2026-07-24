@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
 import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+//import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
