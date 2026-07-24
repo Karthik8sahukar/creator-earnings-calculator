@@ -3,12 +3,16 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ChartIcon, DollarIcon, FilmIcon, ShareIcon, TrendingUpIcon } from "../icons";
 
+// ─── Decision Tools (no creator analytics here) ─────────────────────
+
 interface Tool {
   href: string;
   titleKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
 }
+
+const BADGE_DECISION = "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300";
 
 const TOOLS: readonly Tool[] = [
   { href: "/spin-the-wheel", titleKey: "decisionTools.cards.spinWheel.title", descriptionKey: "decisionTools.cards.spinWheel.description", Icon: ChartIcon },
@@ -22,45 +26,51 @@ const TOOLS: readonly Tool[] = [
 
 /**
  * Decision Tools section for the homepage.
- * Showcases all randomness/decision-making utilities in a responsive grid.
+ * Only randomness/decision utilities — no creator analytics.
  */
 export function DecisionTools() {
   const t = useTranslations();
 
   return (
     <section id="decision-tools" aria-labelledby="decision-tools-title" className="scroll-mt-20">
-      <div className="mb-8 text-center sm:text-left">
-        <p className="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">
-          {t("decisionTools.eyebrow")}
-        </p>
+      <div className="mb-10 text-center sm:text-left">
         <h2
           id="decision-tools-title"
           className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50"
         >
           {t("decisionTools.title")}
         </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-300 max-w-2xl">
+        <p className="mt-2 text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
           {t("decisionTools.subtitle")}
         </p>
       </div>
 
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {TOOLS.map(({ href, titleKey, descriptionKey, Icon }) => (
           <li key={href}>
             <Link
               href={href as never}
-              className="group card flex h-full flex-col gap-3 p-5 transition duration-200 hover:-translate-y-1 hover:shadow-pop focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+              className="group card flex h-full flex-col gap-4 p-5 transition duration-200 hover:-translate-y-1 hover:shadow-pop focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
             >
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent-500/15 to-brand-500/15 text-accent-700 dark:text-accent-200">
-                <Icon width={20} height={20} />
-              </span>
-              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                {t(titleKey)}
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
-                {t(descriptionKey)}
-              </p>
-              <span className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 dark:text-brand-300">
+              <div className="flex items-start justify-between">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/15 to-accent-500/15 text-purple-700 dark:text-purple-200">
+                  <Icon width={18} height={18} />
+                </span>
+                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${BADGE_DECISION}`}>
+                  {t("decisionTools.badge")}
+                </span>
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                  {t(titleKey)}
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  {t(descriptionKey)}
+                </p>
+              </div>
+
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 dark:text-purple-300">
                 Open
                 <span aria-hidden className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
               </span>
@@ -68,6 +78,17 @@ export function DecisionTools() {
           </li>
         ))}
       </ul>
+
+      {/* View All Tools link */}
+      <div className="mt-8 text-center">
+        <Link
+          href={"/tools" as never}
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+        >
+          View All Tools
+          <span aria-hidden>&rarr;</span>
+        </Link>
+      </div>
     </section>
   );
 }

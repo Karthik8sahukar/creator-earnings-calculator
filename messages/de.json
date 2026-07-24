@@ -1254,8 +1254,12 @@
     "viewAll": "Alle Creator ansehen"
   },
   "featuredTools": {
-    "title": "Explore Creator Tools",
-    "subtitle": "Free calculators, estimators, and utilities for creators and marketers across every platform.",
+    "title": "Explore Creator Analytics",
+    "subtitle": "Analytics, calculators and revenue tools for creators across multiple platforms.",
+    "badges": {
+      "analytics": "Creator Analytics",
+      "streaming": "Streaming"
+    },
     "categories": {
       "analytics": "Analytics",
       "streaming": "Streaming",
@@ -1264,39 +1268,39 @@
     "cards": {
       "money": {
         "title": "YouTube Money Calculator",
-        "description": "Estimate a channel's total monthly revenue from views, RPM, and ad performance."
+        "description": "Estimate a channel's total monthly revenue from views, RPM, and ad performance across long-form and Shorts."
       },
       "rpm": {
         "title": "RPM Calculator",
-        "description": "Calculate revenue per 1,000 monetized views."
+        "description": "Calculate revenue per 1,000 monetized views — the key metric for understanding creator earnings."
       },
       "cpm": {
         "title": "CPM Calculator",
-        "description": "What advertisers pay per 1,000 ad impressions."
+        "description": "See what advertisers pay per 1,000 ad impressions. Essential for pricing benchmarks."
       },
       "shorts": {
         "title": "Shorts Calculator",
-        "description": "Estimate Creator Pool payouts from Shorts views."
+        "description": "Estimate Creator Pool payouts from YouTube Shorts views based on audience country and niche."
       },
       "sponsorship": {
         "title": "Sponsorship Calculator",
-        "description": "Estimate brand deal rates from engagement and reach."
+        "description": "Estimate brand deal rates based on subscribers, engagement, niche, and deliverable type."
       },
       "engagement": {
         "title": "Engagement Calculator",
-        "description": "Calculate engagement rate from views and interactions."
+        "description": "Calculate engagement rate from views, likes, comments and shares to benchmark performance."
       },
       "adsense": {
         "title": "AdSense Calculator",
-        "description": "Estimate AdSense revenue from RPM and monthly views."
+        "description": "Estimate AdSense revenue from your RPM and monthly view count with daily and yearly projections."
       },
       "instagram": {
         "title": "Instagram Calculator",
-        "description": "Estimate Instagram creator earnings across all streams."
+        "description": "Estimate Instagram creator earnings from sponsored posts, reels, stories, affiliate income and subscriptions."
       },
       "twitch": {
         "title": "Twitch Bits Calculator",
-        "description": "Convert Twitch Bits to USD and see package pricing."
+        "description": "Convert Twitch Bits to USD and see package pricing. Understand streamer payout vs viewer cost."
       },
       "yesNo": {
         "title": "Yes/No Picker Wheel",
@@ -1309,37 +1313,38 @@
     }
   },
   "decisionTools": {
-    "eyebrow": "Decision Tools",
-    "title": "Make Decisions Instantly",
-    "subtitle": "Free randomness tools for quick decisions, games, and group activities. No login, no tracking, works offline.",
+    "eyebrow": "Interactive Tools",
+    "title": "Decision Tools",
+    "subtitle": "Free interactive tools for games, classrooms, meetings and quick decisions. No login, no tracking.",
+    "badge": "Decision Tool",
     "cards": {
       "spinWheel": {
         "title": "Spin the Wheel",
-        "description": "Add your options and spin for a random pick."
+        "description": "Create a customizable spinning wheel with unlimited options."
       },
       "coinFlip": {
         "title": "Coin Flip",
-        "description": "Quick heads or tails with multi-flip support."
+        "description": "Flip a virtual coin for quick and unbiased decisions."
       },
       "diceRoller": {
         "title": "Dice Roller",
-        "description": "Roll d4 through d100 with totals and history."
+        "description": "Roll one or more virtual dice for games, classrooms and tabletop RPGs."
       },
       "randomNumber": {
         "title": "Random Number Generator",
-        "description": "Generate numbers in any range you choose."
+        "description": "Generate random numbers instantly within any custom range."
       },
       "namePicker": {
         "title": "Random Name Picker",
-        "description": "Pick one or more names from your list."
+        "description": "Pick a random winner from a list of names."
       },
       "yesNo": {
-        "title": "Yes/No Picker Wheel",
-        "description": "Spin for a weighted yes or no answer."
+        "title": "Yes / No Picker Wheel",
+        "description": "Spin a wheel to get a random Yes or No answer."
       },
       "teamGenerator": {
         "title": "Random Team Generator",
-        "description": "Split names into balanced random groups."
+        "description": "Split names into balanced random teams instantly."
       }
     }
   }
