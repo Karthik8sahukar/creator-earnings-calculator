@@ -55,7 +55,7 @@ export function FeaturedTools() {
   const t = useTranslations();
 
   return (
-    <section id="tools" aria-labelledby="featured-tools-title" className="scroll-mt-20">
+    <section id="creator-tools" aria-labelledby="featured-tools-title" className="scroll-mt-20">
       <div className="mb-10 text-center sm:text-left">
         <h2
           id="featured-tools-title"

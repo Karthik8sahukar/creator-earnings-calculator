@@ -9,7 +9,6 @@ import { FeaturedCreators } from "@/components/home/FeaturedCreators";
 import { FeaturedTools } from "@/components/home/FeaturedTools";
 import { Hero } from "@/components/home/Hero";
 import { LatestBlogs } from "@/components/home/LatestBlogs";
-import { PlatformStats } from "@/components/home/PlatformStats";
 import { PopularCreators } from "@/components/home/PopularCreators";
 import { TopByCategory } from "@/components/home/TopByCategory";
 import { TopByCountry } from "@/components/home/TopByCountry";
@@ -78,15 +77,14 @@ export default async function HomePage({
       </Hero>
 
       <FeaturedTools />
+      <DecisionTools />
       <TrendingCreators />
       <FeaturedCreators />
       <TopEarningCreators />
       <TopByCountry />
       <TopByCategory />
-      <DecisionTools />
       <PopularCreators />
       <LatestBlogs />
-      <PlatformStats />
       <WhyBeHumler />
       <Faq />
     </div>
