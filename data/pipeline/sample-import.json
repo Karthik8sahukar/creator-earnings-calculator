@@ -2,9 +2,7 @@
   {
     "name": "Technoblade",
     "handle": "@Technoblade",
-    "slug": "technoblade",
     "aliases": ["Techno", "Blood God"],
-    "youtubeChannelId": "UCelMeixAOTs2OQAAi9wU8sQ",
     "country": "United States",
     "countryCode": "US",
     "language": "English",
@@ -19,7 +17,6 @@
   {
     "name": "SSundee",
     "handle": "@SSundee",
-    "slug": "ssundee",
     "aliases": ["Ian Marcus Stapleton"],
     "country": "United States",
     "countryCode": "US",
@@ -35,7 +32,6 @@
   {
     "name": "LazarBeam",
     "handle": "@LazarBeam",
-    "slug": "lazarbeam",
     "aliases": ["Lannan Eacott", "Lazarlazar"],
     "country": "Australia",
     "countryCode": "AU",
@@ -51,7 +47,6 @@
   {
     "name": "PrestonPlayz",
     "handle": "@PrestonPlayz",
-    "slug": "prestonplayz",
     "aliases": ["Preston Arsement", "TBNRfrags"],
     "country": "United States",
     "countryCode": "US",
@@ -67,7 +62,6 @@
   {
     "name": "Aphmau",
     "handle": "@Aphmau",
-    "slug": "aphmau",
     "aliases": ["Jessica Bravura"],
     "country": "United States",
     "countryCode": "US",
@@ -83,9 +77,7 @@
   {
     "name": "CaptainSparklez",
     "handle": "@CaptainSparklez",
-    "slug": "captainsparklez",
-    "aliases": ["Jordan Maron", "CaptainSparklez"],
-    "youtubeChannelId": "UCkvdRMRMbQik2hQxNVYXqPQ",
+    "aliases": ["Jordan Maron"],
     "country": "United States",
     "countryCode": "US",
     "language": "English",
@@ -100,9 +92,7 @@
   {
     "name": "TheOdd1sOut",
     "handle": "@theodd1sout",
-    "slug": "theodd1sout",
     "aliases": ["James Rallison", "Odd1sOut"],
-    "youtubeChannelId": "UCo8bcnLyZH8tBIH9V1mLgqQ",
     "country": "United States",
     "countryCode": "US",
     "language": "English",
@@ -117,9 +107,7 @@
   {
     "name": "Jaiden Animations",
     "handle": "@JaidenAnimations",
-    "slug": "jaiden-animations",
     "aliases": ["Jaiden Dittfach"],
-    "youtubeChannelId": "UCGwu0nbY2wSkW8N-cghnLpA",
     "country": "United States",
     "countryCode": "US",
     "language": "English",
@@ -134,7 +122,6 @@
   {
     "name": "Jelly",
     "handle": "@Jelly",
-    "slug": "jelly",
     "aliases": ["Jelle Van Vucht"],
     "country": "Netherlands",
     "countryCode": "NL",
@@ -150,7 +137,6 @@
   {
     "name": "Slogoman",
     "handle": "@Slogoman",
-    "slug": "slogoman",
     "aliases": ["Josh Temple"],
     "country": "United Kingdom",
     "countryCode": "GB",
@@ -166,7 +152,6 @@
   {
     "name": "Crainer",
     "handle": "@Crainer",
-    "slug": "crainer",
     "aliases": ["Benjamin Vestergaard Dreyer"],
     "country": "Denmark",
     "countryCode": "OTHER",
@@ -182,9 +167,7 @@
   {
     "name": "Domics",
     "handle": "@Domics",
-    "slug": "domics",
     "aliases": ["Dominic Panganiban"],
-    "youtubeChannelId": "UCn1XB-jYNMpSbp1hPfrVnIw",
     "country": "Canada",
     "countryCode": "CA",
     "language": "English",
@@ -199,7 +182,6 @@
   {
     "name": "illymation",
     "handle": "@illymation",
-    "slug": "illymation",
     "aliases": ["Illy"],
     "country": "United States",
     "countryCode": "US",
@@ -215,7 +197,6 @@
   {
     "name": "Corpse Husband",
     "handle": "@CorpseHusband",
-    "slug": "corpse-husband",
     "aliases": ["Corpse", "CORPSE"],
     "country": "United States",
     "countryCode": "US",
@@ -231,7 +212,6 @@
   {
     "name": "Ph1LzA",
     "handle": "@Ph1LzA",
-    "slug": "philza",
     "aliases": ["Philza Minecraft", "Phil Watson"],
     "country": "United Kingdom",
     "countryCode": "GB",
@@ -247,9 +227,7 @@
   {
     "name": "Stampylonghead",
     "handle": "@stampylonghead",
-    "slug": "stampylonghead",
     "aliases": ["Stampy Cat", "Joseph Garrett"],
-    "youtubeChannelId": "UCj5i58mCkAREDqFWlhaQbOw",
     "country": "United Kingdom",
     "countryCode": "GB",
     "language": "English",
@@ -264,7 +242,6 @@
   {
     "name": "PopularMMOs",
     "handle": "@PopularMMOs",
-    "slug": "popularmmos",
     "aliases": ["Pat", "Patrick Brown"],
     "country": "United States",
     "countryCode": "US",
@@ -280,7 +257,6 @@
   {
     "name": "Muselk",
     "handle": "@Muselk",
-    "slug": "muselk",
     "aliases": ["Elliott Watkins"],
     "country": "Australia",
     "countryCode": "AU",
@@ -296,7 +272,6 @@
   {
     "name": "Fresh",
     "handle": "@Fresh",
-    "slug": "fresh",
     "aliases": ["Mrfreshasian", "Harley Fresh"],
     "country": "Australia",
     "countryCode": "AU",
@@ -312,7 +287,6 @@
   {
     "name": "Thinknoodles",
     "handle": "@Thinknoodles",
-    "slug": "thinknoodles",
     "aliases": ["Justin Watkins"],
     "country": "United States",
     "countryCode": "US",
