@@ -12,6 +12,7 @@ import {
   getComparisonData,
   buildComparisonFaq,
   getPopularComparisons,
+  type ComparisonCreatorData,
 } from "@/lib/comparison";
 import { buildAlternates } from "@/lib/i18nMetadata";
 import {
@@ -247,7 +248,7 @@ function ComparisonCard({
   creator,
   avatarUrl,
 }: {
-  creator: ReturnType<typeof getComparisonData> extends { creator1: infer T } ? T : never;
+  creator: ComparisonCreatorData;
   avatarUrl: string | null;
 }) {
   return (
