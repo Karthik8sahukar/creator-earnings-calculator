@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { LanguageSelector } from "./LanguageSelector";
 import { Link } from "@/i18n/navigation";
@@ -160,8 +161,8 @@ export function MobileNav({ className = "" }: { className?: string }) {
         <MenuIcon width={22} height={22} />
       </button>
 
-      {/* Full-screen drawer */}
-      {open && (
+      {/* Full-screen drawer — rendered via portal to escape header's backdrop-filter containing block */}
+      {open && createPortal(
         <div
           className="fixed inset-0 z-[70]"
           role="dialog"
@@ -237,7 +238,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes slideInRight {
