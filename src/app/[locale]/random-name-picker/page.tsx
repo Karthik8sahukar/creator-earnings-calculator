@@ -7,11 +7,6 @@ import { routing } from "@/i18n/routing";
 import { RandomNameClient } from "./RandomNameClient";
 
 const PATH = "/random-name-picker";
-const RELATED = [
-  { href: "/random-team-generator", title: "Random Team Generator", description: "Split names into balanced teams." },
-  { href: "/spin-the-wheel", title: "Spin the Wheel", description: "Visual random selection." },
-  { href: "/random-number-generator", title: "Random Number Generator", description: "Pick random numbers." },
-];
 const FAQ = [
   { q: "How does the name picker work?", a: "Paste your list of names, set how many to pick, and click Pick. The tool uses a Fisher-Yates shuffle to ensure unbiased random selection." },
   { q: "Can I pick multiple names?", a: "Yes. Set the count to pick 2, 3, 5, or any number up to your total list size. Selected names are unique (no repeats)." },
@@ -41,7 +36,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
   return (
     <>
-      <DecisionLayout eyebrow="Decision Tool" title="Random Name Picker" intro="Paste a list of names and randomly pick one or more winners. Uses an unbiased shuffle algorithm — every name has an equal chance." breadcrumbs={[{ label: "Random Name Picker", href: PATH }]} faq={FAQ} relatedTools={RELATED}>
+      <DecisionLayout eyebrow="Decision Tool" title="Random Name Picker" intro="Paste a list of names and randomly pick one or more winners. Uses an unbiased shuffle algorithm — every name has an equal chance." breadcrumbs={[{ label: "Random Name Picker", href: PATH }]} faq={FAQ} currentToolPath={PATH}>
         <RandomNameClient />
       </DecisionLayout>
       <ToolSEO locale={locale} pathSuffix={PATH} toolName="Random Name Picker" toolDescription="Randomly select names from a list using unbiased Fisher-Yates algorithm." faq={FAQ} breadcrumbName="Random Name Picker" />

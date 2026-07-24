@@ -7,11 +7,6 @@ import { routing } from "@/i18n/routing";
 import { RandomNumberClient } from "./RandomNumberClient";
 
 const PATH = "/random-number-generator";
-const RELATED = [
-  { href: "/dice-roller", title: "Dice Roller", description: "Roll standard RPG dice." },
-  { href: "/coin-flip", title: "Coin Flip", description: "Quick 50/50 decision." },
-  { href: "/spin-the-wheel", title: "Spin the Wheel", description: "Visual random picker." },
-];
 const FAQ = [
   { q: "What range can I use?", a: "Any integer range. Set minimum and maximum to any whole numbers (negative numbers supported)." },
   { q: "Can I generate multiple numbers?", a: "Yes, up to 100 numbers at once. Each is independently random within your range." },
@@ -40,7 +35,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
   return (
     <>
-      <DecisionLayout eyebrow="Decision Tool" title="Random Number Generator" intro="Generate random numbers within any range. Set your minimum, maximum, and how many numbers you need. Instant results with full history." breadcrumbs={[{ label: "Random Number Generator", href: PATH }]} faq={FAQ} relatedTools={RELATED}>
+      <DecisionLayout eyebrow="Decision Tool" title="Random Number Generator" intro="Generate random numbers within any range. Set your minimum, maximum, and how many numbers you need. Instant results with full history." breadcrumbs={[{ label: "Random Number Generator", href: PATH }]} faq={FAQ} currentToolPath={PATH}>
         <RandomNumberClient />
       </DecisionLayout>
       <ToolSEO locale={locale} pathSuffix={PATH} toolName="Random Number Generator" toolDescription="Generate random integers within any range with multi-number support." faq={FAQ} breadcrumbName="Random Number Generator" />

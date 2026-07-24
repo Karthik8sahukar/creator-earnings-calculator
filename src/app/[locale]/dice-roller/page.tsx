@@ -7,11 +7,6 @@ import { routing } from "@/i18n/routing";
 import { DiceRollerClient } from "./DiceRollerClient";
 
 const PATH = "/dice-roller";
-const RELATED = [
-  { href: "/coin-flip", title: "Coin Flip", description: "Heads or tails." },
-  { href: "/random-number-generator", title: "Random Number Generator", description: "Any range." },
-  { href: "/spin-the-wheel", title: "Spin the Wheel", description: "Multi-option picker." },
-];
 const FAQ = [
   { q: "What dice types are supported?", a: "Any die from d2 to d100. Presets include d4, d6, d8, d10, d12, d20." },
   { q: "Can I roll multiple dice?", a: "Yes, up to 10 dice at once. The total is shown automatically." },
@@ -40,7 +35,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
   return (
     <>
-      <DecisionLayout eyebrow="Decision Tool" title="Dice Roller" intro="Roll any type of die from d4 to d100. Support for multiple dice, preset configurations, running totals, and complete roll history." breadcrumbs={[{ label: "Dice Roller", href: PATH }]} faq={FAQ} relatedTools={RELATED}>
+      <DecisionLayout eyebrow="Decision Tool" title="Dice Roller" intro="Roll any type of die from d4 to d100. Support for multiple dice, preset configurations, running totals, and complete roll history." breadcrumbs={[{ label: "Dice Roller", href: PATH }]} faq={FAQ} currentToolPath={PATH}>
         <DiceRollerClient />
       </DecisionLayout>
       <ToolSEO locale={locale} pathSuffix={PATH} toolName="Dice Roller" toolDescription="Virtual dice roller supporting d4 through d100 with multi-roll and history." faq={FAQ} breadcrumbName="Dice Roller" />

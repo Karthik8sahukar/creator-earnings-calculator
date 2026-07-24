@@ -7,12 +7,6 @@ import { routing } from "@/i18n/routing";
 import { CoinFlipClient } from "./CoinFlipClient";
 
 const PATH = "/coin-flip";
-const RELATED = [
-  { href: "/spin-the-wheel", title: "Spin the Wheel", description: "Multi-option random picker." },
-  { href: "/yes-no-picker-wheel", title: "Yes/No Picker Wheel", description: "Binary decision spinner." },
-  { href: "/dice-roller", title: "Dice Roller", description: "Roll standard or custom dice." },
-  { href: "/random-number-generator", title: "Random Number Generator", description: "Generate numbers in any range." },
-];
 const FAQ = [
   { q: "Is the coin flip fair?", a: "Yes. Each flip uses Math.random() with an exact 50/50 probability for Heads and Tails. No weighting is applied." },
   { q: "Can I flip multiple coins at once?", a: "Yes. Set the number of flips (1-100) and click Flip. All results are shown together with a Heads/Tails count." },
@@ -39,7 +33,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
   return (
     <>
-      <DecisionLayout eyebrow="Decision Tool" title="Coin Flip" intro="Flip a virtual coin for a quick Heads or Tails decision. Support for multiple simultaneous flips with running statistics." breadcrumbs={[{ label: "Coin Flip", href: PATH }]} faq={FAQ} relatedTools={RELATED}>
+      <DecisionLayout eyebrow="Decision Tool" title="Coin Flip" intro="Flip a virtual coin for a quick Heads or Tails decision. Support for multiple simultaneous flips with running statistics." breadcrumbs={[{ label: "Coin Flip", href: PATH }]} faq={FAQ} currentToolPath={PATH}>
         <CoinFlipClient />
       </DecisionLayout>
       <ToolSEO locale={locale} pathSuffix={PATH} toolName="Coin Flip" toolDescription="Virtual coin flip with multi-flip support and history tracking." faq={FAQ} breadcrumbName="Coin Flip" />

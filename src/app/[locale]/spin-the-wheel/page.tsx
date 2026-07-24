@@ -7,12 +7,6 @@ import { routing } from "@/i18n/routing";
 import { SpinWheelClient } from "./SpinWheelClient";
 
 const PATH = "/spin-the-wheel";
-const RELATED = [
-  { href: "/yes-no-picker-wheel", title: "Yes/No Picker Wheel", description: "Binary decision spinner." },
-  { href: "/coin-flip", title: "Coin Flip", description: "Heads or tails instantly." },
-  { href: "/random-name-picker", title: "Random Name Picker", description: "Pick a name from a list." },
-  { href: "/dice-roller", title: "Dice Roller", description: "Roll 1-10 dice." },
-];
 const FAQ = [
   { q: "How does Spin the Wheel work?", a: "Enter your options (one per line), click Spin, and the wheel randomly selects one. The algorithm is unbiased — each option has an equal chance." },
   { q: "Can I customize the options?", a: "Yes. Edit the text area with your own items, one per line. The wheel updates instantly. Minimum 2 options required." },
@@ -40,7 +34,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
   return (
     <>
-      <DecisionLayout eyebrow="Decision Tool" title="Spin the Wheel" intro="Add your options, spin the wheel, and let randomness decide. Customize segments, track history, and use keyboard shortcuts." breadcrumbs={[{ label: "Spin the Wheel", href: PATH }]} faq={FAQ} relatedTools={RELATED}>
+      <DecisionLayout eyebrow="Decision Tool" title="Spin the Wheel" intro="Add your options, spin the wheel, and let randomness decide. Customize segments, track history, and use keyboard shortcuts." breadcrumbs={[{ label: "Spin the Wheel", href: PATH }]} faq={FAQ} currentToolPath={PATH}>
         <SpinWheelClient />
       </DecisionLayout>
       <ToolSEO locale={locale} pathSuffix={PATH} toolName="Spin the Wheel" toolDescription="Customizable spinning wheel for random selection." faq={FAQ} breadcrumbName="Spin the Wheel" />

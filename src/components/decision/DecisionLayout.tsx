@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { DecisionRelatedTools } from "./DecisionRelatedTools";
 
 interface BreadcrumbItem {
   label: string;
@@ -18,13 +19,19 @@ interface Props {
   children: React.ReactNode;
   faq?: FaqItem[];
   breadcrumbs?: BreadcrumbItem[];
-  relatedTools?: { href: string; title: string; description: string }[];
+  /** The path of the current tool (e.g. "/spin-the-wheel") for related tools exclusion. */
+  currentToolPath: string;
 }
 
 /**
  * Shared layout for all Decision Tools pages.
- * Provides: breadcrumbs, hero header, children slot, FAQ section, related tools.
- * Similar to SimpleCalcLayout but tailored for decision tools with related-tools support.
+ *
+ * Section order:
+ *   1. Breadcrumbs
+ *   2. Hero header (eyebrow + H1 + intro)
+ *   3. Children (the interactive tool)
+ *   4. Related Decision Tools (automatic, excludes current)
+ *   5. FAQ
  */
 export function DecisionLayout({
   eyebrow,
@@ -33,11 +40,11 @@ export function DecisionLayout({
   children,
   faq,
   breadcrumbs,
-  relatedTools,
+  currentToolPath,
 }: Props) {
   const t = useTranslations();
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto max-w-4xl space-y-10">
       {breadcrumbs && (
         <nav
           aria-label={t("channelPage.breadcrumbAria")}
@@ -76,6 +83,8 @@ export function DecisionLayout({
 
       {children}
 
+      <DecisionRelatedTools currentTool={currentToolPath} />
+
       {faq && faq.length > 0 && (
         <section aria-labelledby="faq-title" className="card p-6 sm:p-8 space-y-4">
           <h2 id="faq-title" className="text-xl font-semibold text-slate-900 dark:text-slate-100">
@@ -89,27 +98,6 @@ export function DecisionLayout({
               </div>
             ))}
           </dl>
-        </section>
-      )}
-
-      {relatedTools && relatedTools.length > 0 && (
-        <section className="card p-6 sm:p-8 space-y-3">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Related Decision Tools
-          </h2>
-          <ul className="grid gap-2 sm:grid-cols-2 text-sm">
-            {relatedTools.map((tool) => (
-              <li key={tool.href}>
-                <Link
-                  href={tool.href as never}
-                  className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline"
-                >
-                  {tool.title}
-                </Link>
-                <span className="text-slate-500 dark:text-slate-400"> — {tool.description}</span>
-              </li>
-            ))}
-          </ul>
         </section>
       )}
     </div>
