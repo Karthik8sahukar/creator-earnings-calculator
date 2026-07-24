@@ -43,6 +43,7 @@ const OTHER_TOOLS: readonly Tool[] = [
   { href: "/youtube-adsense-calculator", titleKey: "featuredTools.cards.adsense.title", descriptionKey: "featuredTools.cards.adsense.description", badgeKey: "featuredTools.badges.analytics", badgeColor: BADGE_ANALYTICS, Icon: DollarIcon },
   { href: "/instagram-money-calculator", titleKey: "featuredTools.cards.instagram.title", descriptionKey: "featuredTools.cards.instagram.description", badgeKey: "featuredTools.badges.analytics", badgeColor: BADGE_ANALYTICS, Icon: ShareIcon },
   { href: "/twitch-bits-calculator", titleKey: "featuredTools.cards.twitch.title", descriptionKey: "featuredTools.cards.twitch.description", badgeKey: "featuredTools.badges.streaming", badgeColor: BADGE_STREAMING, Icon: DollarIcon },
+  { href: "/website-revenue-estimator", titleKey: "featuredTools.cards.websiteRevenue.title", descriptionKey: "featuredTools.cards.websiteRevenue.description", badgeKey: "featuredTools.badges.analytics", badgeColor: BADGE_ANALYTICS, Icon: ChartIcon },
 ];
 
 /**

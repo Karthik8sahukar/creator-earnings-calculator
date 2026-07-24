@@ -111,6 +111,14 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/website-revenue-estimator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("websiteRevenue") ?? "Website Revenue Estimator"}
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/twitch-bits-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >

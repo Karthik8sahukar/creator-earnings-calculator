@@ -29,6 +29,7 @@ export interface CalculatorLink {
     | "/youtube-merch-calculator"
     | "/youtube-channel-valuation-calculator"
     | "/youtube-adsense-calculator"
+    | "/website-revenue-estimator"
     | "/twitch-bits-calculator"
     | "/yes-no-picker-wheel"
     | "/random-team-generator"
@@ -59,6 +60,7 @@ export const CALCULATOR_CATEGORIES: CalculatorCategory[] = [
       { href: "/youtube-engagement-calculator", labelKey: "calculatorsMenu.engagement.label", descriptionKey: "calculatorsMenu.engagement.description", Icon: TrendingUpIcon },
       { href: "/youtube-adsense-calculator", labelKey: "calculatorsMenu.adsense.label", descriptionKey: "calculatorsMenu.adsense.description", Icon: DollarIcon },
       { href: "/instagram-money-calculator", labelKey: "calculatorsMenu.instagram.label", descriptionKey: "calculatorsMenu.instagram.description", Icon: ShareIcon },
+      { href: "/website-revenue-estimator", labelKey: "calculatorsMenu.websiteRevenue.label", descriptionKey: "calculatorsMenu.websiteRevenue.description", Icon: ChartIcon },
     ],
   },
   {

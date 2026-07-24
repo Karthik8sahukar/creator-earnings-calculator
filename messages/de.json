@@ -86,7 +86,8 @@
     "coinFlip": "Coin Flip",
     "diceRoller": "Dice Roller",
     "randomNumber": "Random Number Generator",
-    "namePicker": "Random Name Picker"
+    "namePicker": "Random Name Picker",
+    "websiteRevenue": "Website Revenue Estimator"
   },
   "home": {
     "chip": "Basierend auf der YouTube Data API v3",
@@ -593,6 +594,10 @@
     "namePicker": {
       "label": "Random Name Picker",
       "description": "Pick names from a list."
+    },
+    "websiteRevenue": {
+      "label": "Website Revenue Estimator",
+      "description": "Estimate any website's monthly earnings."
     }
   },
   "popularCalculators": {
@@ -1309,6 +1314,10 @@
       "teams": {
         "title": "Random Team Generator",
         "description": "Split a list of names into balanced random teams."
+      },
+      "websiteRevenue": {
+        "title": "Website Revenue Estimator",
+        "description": "Estimate any website's monthly revenue, RPM, valuation, and monetization breakdown."
       }
     }
   },
