@@ -181,7 +181,7 @@ export default async function LocaleLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-dvh font-sans antialiased bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
+      <body className="min-h-dvh font-sans antialiased bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors overflow-x-hidden">
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:text-slate-900 focus:px-3 focus:py-1 focus:rounded dark:focus:bg-slate-900 dark:focus:text-slate-50"

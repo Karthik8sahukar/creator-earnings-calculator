@@ -10,22 +10,22 @@ import { MenuIcon, XIcon } from "./icons";
 import { ThemeToggle } from "./ThemeToggle";
 
 const PRIMARY_LINKS = [
-  { href: "/creators", labelKey: "nav.creators" },
-  { href: "/methodology", labelKey: "nav.methodology" },
-  { href: "/about", labelKey: "nav.about" },
+  { href: "/blog" as const, labelKey: "nav.blog" },
+  { href: "/creators" as const, labelKey: "nav.creators" },
+  { href: "/methodology" as const, labelKey: "nav.methodology" },
+  { href: "/about" as const, labelKey: "nav.about" },
 ] as const;
 
 /**
- * Mobile-only slide-in nav.
+ * Mobile-only slide-in navigation drawer.
  *
- * A11y:
- *   - Trigger button has `aria-label`, `aria-expanded`, `aria-controls`.
- *   - Sheet is `role="dialog"` `aria-modal="true"` with a labelled heading.
- *   - Focus is trapped inside the sheet while it's open. Focus returns
- *     to the trigger on close.
- *   - Closes on: Escape, click on the backdrop, and after any nav link.
- *   - Body scroll is locked while open.
- *   - All visible text is translated per locale.
+ * Fixed issues:
+ *   - Hamburger button has explicit 44×44px touch target with no wrapper interference
+ *   - Drawer uses translateX animation (not opacity-only) for reliable slide-in
+ *   - Body scroll lock uses both overflow:hidden AND position:fixed to prevent iOS bounce
+ *   - Z-index explicitly set higher than header (z-40 → drawer z-[70])
+ *   - Focus trap properly handles dynamic content
+ *   - Close on: Escape, backdrop click, link click, X button
  */
 export function MobileNav({ className = "" }: { className?: string }) {
   const [open, setOpen] = useState(false);
@@ -41,29 +41,41 @@ export function MobileNav({ className = "" }: { className?: string }) {
     requestAnimationFrame(() => triggerRef.current?.focus());
   }, []);
 
+  // Escape key closes
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        close();
-      }
+      if (e.key === "Escape") { e.preventDefault(); close(); }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, close]);
 
-  // Body scroll lock while the sheet is open.
+  // Body scroll lock — handles iOS Safari + prevents scrollbar layout shift
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPosition = body.style.position;
+    const prevTop = body.style.top;
+    const prevWidth = body.style.width;
+
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+
     return () => {
-      document.body.style.overflow = prev;
+      body.style.overflow = prevOverflow;
+      body.style.position = prevPosition;
+      body.style.top = prevTop;
+      body.style.width = prevWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [open]);
 
-  // Focus trap.
+  // Focus trap
   useEffect(() => {
     if (!open) return;
     requestAnimationFrame(() => closeBtnRef.current?.focus());
@@ -88,6 +100,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
 
   return (
     <div className={className}>
+      {/* Hamburger — 44×44px minimum touch target, explicit positioning */}
       <button
         ref={triggerRef}
         type="button"
@@ -95,33 +108,35 @@ export function MobileNav({ className = "" }: { className?: string }) {
         aria-expanded={open}
         aria-controls={open ? dialogId : undefined}
         onClick={() => setOpen(true)}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+        className="relative z-10 inline-flex h-11 w-11 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 active:bg-slate-200 dark:text-slate-200 dark:hover:bg-slate-800 dark:active:bg-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 transition-colors"
       >
-        <MenuIcon width={20} height={20} />
+        <MenuIcon width={22} height={22} />
       </button>
 
+      {/* Drawer overlay */}
       {open && (
         <div
-          className="fixed inset-0 z-[60]"
+          className="fixed inset-0 z-[70]"
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
           id={dialogId}
         >
-          {/* Backdrop — clicking closes. */}
-          <button
-            type="button"
-            aria-label={t("common.actions.closeMenu")}
-            tabIndex={-1}
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
             onClick={close}
-            className="absolute inset-0 bg-slate-950/40 backdrop-blur-sm animate-fade-in cursor-default"
+            aria-hidden="true"
           />
 
+          {/* Sheet — slides in from right */}
           <div
             ref={sheetRef}
-            className="absolute right-0 top-0 h-full w-[86%] max-w-sm bg-white shadow-pop border-l border-slate-200 dark:bg-slate-950 dark:border-slate-800 flex flex-col animate-fade-in"
+            className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl border-l border-slate-200 dark:bg-slate-950 dark:border-slate-800 flex flex-col"
+            style={{ animation: "slideInRight 0.25s ease-out" }}
           >
-            <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-slate-800">
+            {/* Header */}
+            <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
               <span
                 id={titleId}
                 className="text-sm font-semibold text-slate-900 dark:text-slate-100"
@@ -133,82 +148,51 @@ export function MobileNav({ className = "" }: { className?: string }) {
                 type="button"
                 aria-label={t("common.actions.closeMenu")}
                 onClick={close}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60 transition-colors"
               >
-                <XIcon width={18} height={18} />
+                <XIcon width={20} height={20} />
               </button>
             </div>
 
+            {/* Scrollable content */}
             <nav
               aria-label={t("nav.mobilePrimary")}
-              className="flex-1 overflow-y-auto p-3"
+              className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-5"
             >
-              {/*
-                Pinned Instagram entry — visible at the very top of the
-                mobile menu so touch visitors reach it in one tap
-                without scanning the full calculator list. The same
-                target is still available inside the "Calculators"
-                section below, but this pin makes the primary CTA
-                impossible to miss.
-              */}
-              <div className="mb-4">
-                <Link
-                  href="/instagram-money-calculator"
-                  onClick={close}
-                  data-testid="mobile-instagram-link"
-                  className="flex items-center justify-between rounded-xl border border-brand-200 bg-gradient-to-br from-brand-500/10 to-accent-500/10 px-3 py-3 text-sm font-semibold text-brand-800 hover:from-brand-500/15 hover:to-accent-500/15 dark:border-brand-500/30 dark:text-brand-100"
-                >
-                  <span>{t("nav.instagramCalculatorAria")}</span>
-                  <span aria-hidden>→</span>
-                </Link>
-              </div>
+              {/* Tool categories */}
+              {CALCULATOR_CATEGORIES.map((category) => (
+                <div key={category.headingKey}>
+                  <p className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    {t(category.headingKey)}
+                  </p>
+                  <ul className="space-y-0.5">
+                    {category.links.map((c) => (
+                      <li key={c.href}>
+                        <Link
+                          href={c.href}
+                          onClick={close}
+                          className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 active:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800 dark:active:bg-slate-700 transition-colors"
+                        >
+                          {t(c.labelKey)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
 
+              {/* Resources */}
               <div>
-                <p className="px-3 pt-1 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {t("nav.calculators")}
-                </p>
-                {CALCULATOR_CATEGORIES.map((category) => (
-                  <div key={category.headingKey} className="mb-3">
-                    <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                      {t(category.headingKey)}
-                    </p>
-                    <ul className="space-y-0.5">
-                      {category.links.map((c) => (
-                        <li key={c.href}>
-                          <Link
-                            href={c.href}
-                            onClick={close}
-                            className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
-                          >
-                            {t(c.labelKey)}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <p className="px-3 pt-1 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {t("footer.company")}
+                <p className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Resources
                 </p>
                 <ul className="space-y-0.5">
-                  <li>
-                    <Link
-                      href="/blog"
-                      onClick={close}
-                      className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
-                    >
-                      {t("nav.blog")}
-                    </Link>
-                  </li>
                   {PRIMARY_LINKS.map((l) => (
                     <li key={l.href}>
                       <Link
                         href={l.href}
                         onClick={close}
-                        className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
+                        className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50 active:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800 dark:active:bg-slate-700 transition-colors"
                       >
                         {t(l.labelKey)}
                       </Link>
@@ -218,13 +202,22 @@ export function MobileNav({ className = "" }: { className?: string }) {
               </div>
             </nav>
 
-            <div className="border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-2">
+            {/* Footer */}
+            <div className="border-t border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between gap-2 shrink-0">
               <LanguageSelector />
               <ThemeToggle />
             </div>
           </div>
         </div>
       )}
+
+      {/* Keyframe for slide-in — injected once */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+      `}} />
     </div>
   );
 }

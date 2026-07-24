@@ -12,8 +12,8 @@ export function Hero({ children }: { children: ReactNode }) {
   const t = useTranslations();
 
   return (
-    <section aria-labelledby="hero-title" className="pt-6 sm:pt-10">
-      <div className="max-w-4xl mx-auto text-center space-y-5">
+    <section aria-labelledby="hero-title" className="pt-6 sm:pt-10 overflow-hidden">
+      <div className="max-w-4xl mx-auto text-center space-y-5 px-1">
         {/* SEO H1 — preserved for search engines */}
         <h1 id="hero-title" className="sr-only">
           {t("home.title")}
@@ -74,7 +74,7 @@ export function Hero({ children }: { children: ReactNode }) {
         </div>
 
         {/* Trust metrics */}
-        <div className="flex flex-wrap justify-center gap-6 pt-3 text-sm text-slate-600 dark:text-slate-400">
+        <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 pt-3 text-sm text-slate-600 dark:text-slate-400">
           <span className="flex items-center gap-1.5">
             <span className="text-lg font-bold text-slate-900 dark:text-slate-100">20+</span>
             Creator Tools
