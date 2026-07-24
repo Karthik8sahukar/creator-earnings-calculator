@@ -8,79 +8,75 @@
  *   - DATABASE_URL environment variable (Neon connection string)
  *   - creator_snapshots table created via migration
  *
- * Features:
- *   - Parameterized queries only (no SQL interpolation)
- *   - Duplicate insert safety via ON CONFLICT
- *   - Deterministic ordering (captured_at ASC)
- *   - Connection pooling via Neon's HTTP driver
- *   - Compatible with Vercel serverless runtime
- *   - No connection leaks (stateless HTTP queries)
+ * Typing strategy:
+ *   The Neon `neon()` function returns queries typed as
+ *   `Record<string, any>[]`. Rather than using type assertions
+ *   (which bypass safety), we use validated mapper functions that
+ *   extract and convert each field explicitly. This guarantees
+ *   runtime type safety even if the database schema drifts.
+ *
+ * @neondatabase/serverless version: ^0.10.0
  */
 
-import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
-import type { CreatorSnapshot, SnapshotQuery, SnapshotSource, DataQuality } from "./types";
+import { neon } from "@neondatabase/serverless";
+import type { CreatorSnapshot, SnapshotSource, DataQuality, SnapshotQuery } from "./types";
 import { dateToBucketKey, rangeToStartDate, type AnalyticsStorage } from "./storage";
 
-// ─── Row Types ──────────────────────────────────────────────────────
+// ─── Row Mapper Functions ───────────────────────────────────────────
+//
+// Each mapper takes a raw `Record<string, unknown>` row from the
+// Neon driver and produces a correctly-typed domain object.
+// No `as any` assertions — every field is accessed via bracket
+// notation and converted explicitly. The only narrowing is from
+// `string` to known string-literal unions via validated helper functions.
 
-/** Row returned by INSERT ... RETURNING id */
-interface InsertedRow {
-  id: string;
+const VALID_SOURCES: ReadonlySet<string> = new Set(["youtube-api", "manual", "fixture", "enrichment"]);
+const VALID_QUALITIES: ReadonlySet<string> = new Set(["high", "medium", "low", "stale"]);
+
+function toSource(value: unknown): SnapshotSource {
+  const s = String(value ?? "youtube-api");
+  return VALID_SOURCES.has(s) ? (s as SnapshotSource) : "youtube-api";
 }
 
-/** Row returned by SELECT * FROM creator_snapshots */
-interface SnapshotRow {
-  id: string;
-  creator_slug: string;
-  captured_at: string;
-  time_bucket: string;
-  subscribers: number | null;
-  total_views: string; // bigint comes back as string from pg
-  video_count: number;
-  estimated_daily_earnings_usd: string; // numeric comes as string
-  estimated_monthly_earnings_usd: string;
-  estimated_yearly_earnings_usd: string;
-  estimated_rpm_usd: string;
-  estimated_cpm_usd: string;
-  source: string;
-  data_quality: string;
-  created_at: string;
+function toDataQuality(value: unknown): DataQuality {
+  const s = String(value ?? "high");
+  return VALID_QUALITIES.has(s) ? (s as DataQuality) : "high";
 }
 
-/** Row returned by SELECT 1 ... (existence check) */
-interface ExistsRow {
-  "?column?": number;
-}
-
-/** Row returned by SELECT DISTINCT creator_slug */
-interface SlugRow {
-  creator_slug: string;
-}
-
-// ─── Row → Domain mapping ───────────────────────────────────────────
-
-function rowToSnapshot(row: SnapshotRow): CreatorSnapshot {
+function mapSnapshotRow(row: Record<string, unknown>): CreatorSnapshot {
   return {
-    id: row.id,
-    creatorSlug: row.creator_slug,
-    capturedAt: row.captured_at,
-    subscribers: row.subscribers,
-    totalViews: Number(row.total_views),
-    videoCount: row.video_count,
-    estimatedDailyEarningsUsd: Number(row.estimated_daily_earnings_usd),
-    estimatedMonthlyEarningsUsd: Number(row.estimated_monthly_earnings_usd),
-    estimatedYearlyEarningsUsd: Number(row.estimated_yearly_earnings_usd),
-    estimatedRpmUsd: Number(row.estimated_rpm_usd),
-    estimatedCpmUsd: Number(row.estimated_cpm_usd),
-    source: row.source as SnapshotSource,
-    dataQuality: row.data_quality as DataQuality,
+    id: String(row["id"] ?? ""),
+    creatorSlug: String(row["creator_slug"] ?? ""),
+    capturedAt: String(row["captured_at"] ?? ""),
+    subscribers: row["subscribers"] === null || row["subscribers"] === undefined ? null : Number(row["subscribers"]),
+    totalViews: Number(row["total_views"] ?? 0),
+    videoCount: Number(row["video_count"] ?? 0),
+    estimatedDailyEarningsUsd: Number(row["estimated_daily_earnings_usd"] ?? 0),
+    estimatedMonthlyEarningsUsd: Number(row["estimated_monthly_earnings_usd"] ?? 0),
+    estimatedYearlyEarningsUsd: Number(row["estimated_yearly_earnings_usd"] ?? 0),
+    estimatedRpmUsd: Number(row["estimated_rpm_usd"] ?? 0),
+    estimatedCpmUsd: Number(row["estimated_cpm_usd"] ?? 0),
+    source: toSource(row["source"]),
+    dataQuality: toDataQuality(row["data_quality"]),
   };
+}
+
+function hasInsertedId(row: Record<string, unknown>): boolean {
+  return typeof row["id"] === "string" && row["id"].length > 0;
+}
+
+function extractSlug(row: Record<string, unknown>): string {
+  return String(row["creator_slug"] ?? "");
+}
+
+function hasExistenceRow(rows: Array<Record<string, unknown>>): boolean {
+  return rows.length > 0;
 }
 
 // ─── Adapter ────────────────────────────────────────────────────────
 
 export class PostgresAnalyticsStorage implements AnalyticsStorage {
-  private sql: NeonQueryFunction<false, false>;
+  private sql: ReturnType<typeof neon>;
 
   constructor(databaseUrl: string) {
     this.sql = neon(databaseUrl);
@@ -90,9 +86,8 @@ export class PostgresAnalyticsStorage implements AnalyticsStorage {
     const timeBucket = dateToBucketKey(new Date(snapshot.capturedAt));
 
     // INSERT with ON CONFLICT — safely handles duplicates.
-    // RETURNING id gives us a row array: if insert succeeded it has
-    // one element; if ON CONFLICT triggered, the array is empty.
-    const rows: InsertedRow[] = await this.sql(
+    // RETURNING id: if insert succeeded, one row; if conflict, zero rows.
+    const rows = await this.sql(
       `INSERT INTO creator_snapshots (
         id, creator_slug, captured_at, time_bucket,
         subscribers, total_views, video_count,
@@ -122,38 +117,36 @@ export class PostgresAnalyticsStorage implements AnalyticsStorage {
       ],
     );
 
-    return rows.length > 0;
+    // rows is Record<string, any>[]. Check if any row was returned.
+    return Array.isArray(rows) && rows.length > 0 && hasInsertedId(rows[0]);
   }
 
   async getSnapshots(query: SnapshotQuery): Promise<CreatorSnapshot[]> {
     const startDate = rangeToStartDate(query.range ?? "all").toISOString();
 
-    let rows: SnapshotRow[];
+    const rows = query.limit
+      ? await this.sql(
+          `SELECT * FROM creator_snapshots
+           WHERE creator_slug = $1
+             AND captured_at >= $2
+           ORDER BY captured_at ASC
+           LIMIT $3`,
+          [query.creatorSlug, startDate, query.limit],
+        )
+      : await this.sql(
+          `SELECT * FROM creator_snapshots
+           WHERE creator_slug = $1
+             AND captured_at >= $2
+           ORDER BY captured_at ASC`,
+          [query.creatorSlug, startDate],
+        );
 
-    if (query.limit) {
-      rows = await this.sql(
-        `SELECT * FROM creator_snapshots
-         WHERE creator_slug = $1
-           AND captured_at >= $2
-         ORDER BY captured_at ASC
-         LIMIT $3`,
-        [query.creatorSlug, startDate, query.limit],
-      );
-    } else {
-      rows = await this.sql(
-        `SELECT * FROM creator_snapshots
-         WHERE creator_slug = $1
-           AND captured_at >= $2
-         ORDER BY captured_at ASC`,
-        [query.creatorSlug, startDate],
-      );
-    }
-
-    return rows.map(rowToSnapshot);
+    if (!Array.isArray(rows)) return [];
+    return rows.map(mapSnapshotRow);
   }
 
   async getLatestSnapshot(creatorSlug: string): Promise<CreatorSnapshot | null> {
-    const rows: SnapshotRow[] = await this.sql(
+    const rows = await this.sql(
       `SELECT * FROM creator_snapshots
        WHERE creator_slug = $1
        ORDER BY captured_at DESC
@@ -161,12 +154,12 @@ export class PostgresAnalyticsStorage implements AnalyticsStorage {
       [creatorSlug],
     );
 
-    if (rows.length === 0) return null;
-    return rowToSnapshot(rows[0]);
+    if (!Array.isArray(rows) || rows.length === 0) return null;
+    return mapSnapshotRow(rows[0]);
   }
 
   async hasSnapshotInBucket(creatorSlug: string, bucketKey: string): Promise<boolean> {
-    const rows: ExistsRow[] = await this.sql(
+    const rows = await this.sql(
       `SELECT 1 FROM creator_snapshots
        WHERE creator_slug = $1
          AND time_bucket = $2
@@ -174,15 +167,16 @@ export class PostgresAnalyticsStorage implements AnalyticsStorage {
       [creatorSlug, bucketKey],
     );
 
-    return rows.length > 0;
+    return Array.isArray(rows) && hasExistenceRow(rows);
   }
 
   async getTrackedCreatorSlugs(): Promise<string[]> {
-    const rows: SlugRow[] = await this.sql(
+    const rows = await this.sql(
       `SELECT DISTINCT creator_slug FROM creator_snapshots
        ORDER BY creator_slug ASC`,
     );
 
-    return rows.map((r) => r.creator_slug);
+    if (!Array.isArray(rows)) return [];
+    return rows.map(extractSlug);
   }
 }
