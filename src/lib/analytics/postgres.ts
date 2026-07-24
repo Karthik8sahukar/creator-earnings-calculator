@@ -2,25 +2,30 @@
  * PostgreSQL Analytics Storage Adapter (Drizzle ORM)
  *
  * Production-grade storage using Drizzle ORM with Neon HTTP driver.
- * All queries are fully typed — no manual row mapping, no type
- * assertions, no Record<string, any> handling.
+ * All queries are fully typed via the Drizzle schema — no manual
+ * row mapping, no type assertions, no Record<string, any> handling.
  *
- * Drizzle provides:
- *   - Type-safe insert/select/where via schema inference
- *   - Parameterized queries (SQL injection safe)
- *   - Correct TypeScript types for every column
- *   - No connection leaks (Neon HTTP is stateless)
+ * The pgEnum columns (source, dataQuality) are inferred by Drizzle
+ * as their exact string literal unions, matching the domain types
+ * in types.ts without any narrowing casts.
  */
 
-import { eq, gte, asc, desc, sql } from "drizzle-orm";
+import { asc, desc, sql } from "drizzle-orm";
 import { getDb } from "./db";
-import { creatorSnapshots } from "./schema.db";
-import type { CreatorSnapshot, SnapshotQuery, SnapshotSource, DataQuality } from "./types";
+import { creatorSnapshots, type CreatorSnapshotSelect } from "./schema.db";
+import type { CreatorSnapshot, SnapshotQuery } from "./types";
 import { dateToBucketKey, rangeToStartDate, type AnalyticsStorage } from "./storage";
 
-// ─── Row ↔ Domain conversion ────────────────────────────────────────
+// ─── Row → Domain ───────────────────────────────────────────────────
+//
+// The Drizzle schema uses pgEnum for source and dataQuality, so the
+// inferred select type already has the correct literal union —
+// no `as` assertion needed.
+//
+// NUMERIC columns are returned as strings by PostgreSQL; we convert
+// to numbers for the domain model.
 
-function rowToDomain(row: typeof creatorSnapshots.$inferSelect): CreatorSnapshot {
+function rowToDomain(row: CreatorSnapshotSelect): CreatorSnapshot {
   return {
     id: row.id,
     creatorSlug: row.creatorSlug,
@@ -33,8 +38,8 @@ function rowToDomain(row: typeof creatorSnapshots.$inferSelect): CreatorSnapshot
     estimatedYearlyEarningsUsd: Number(row.estimatedYearlyEarningsUsd),
     estimatedRpmUsd: Number(row.estimatedRpmUsd),
     estimatedCpmUsd: Number(row.estimatedCpmUsd),
-    source: row.source as SnapshotSource,
-    dataQuality: row.dataQuality as DataQuality,
+    source: row.source,
+    dataQuality: row.dataQuality,
   };
 }
 
@@ -96,7 +101,7 @@ export class PostgresAnalyticsStorage implements AnalyticsStorage {
     const rows = await db
       .select()
       .from(creatorSnapshots)
-      .where(eq(creatorSnapshots.creatorSlug, creatorSlug))
+      .where(sql`${creatorSnapshots.creatorSlug} = ${creatorSlug}`)
       .orderBy(desc(creatorSnapshots.capturedAt))
       .limit(1);
 

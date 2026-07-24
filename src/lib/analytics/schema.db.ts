@@ -4,12 +4,13 @@
  * This file defines the database schema in TypeScript. Drizzle uses
  * this to:
  *   1. Generate fully-typed queries (no manual row mapping)
- *   2. Generate SQL migrations via drizzle-kit
- *   3. Provide $inferSelect / $inferInsert types
+ *   2. Provide $inferSelect / $inferInsert types
+ *   3. Enforce valid values for source and data_quality via pgEnum
  */
 
 import {
   pgTable,
+  pgEnum,
   text,
   integer,
   bigint,
@@ -18,6 +19,24 @@ import {
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
+
+// ─── Enums ──────────────────────────────────────────────────────────
+
+export const snapshotSourceEnum = pgEnum("snapshot_source", [
+  "youtube-api",
+  "manual",
+  "fixture",
+  "enrichment",
+]);
+
+export const dataQualityEnum = pgEnum("data_quality_level", [
+  "high",
+  "medium",
+  "low",
+  "stale",
+]);
+
+// ─── Table ──────────────────────────────────────────────────────────
 
 export const creatorSnapshots = pgTable(
   "creator_snapshots",
@@ -32,16 +51,16 @@ export const creatorSnapshots = pgTable(
     totalViews: bigint("total_views", { mode: "number" }).notNull().default(0),
     videoCount: integer("video_count").notNull().default(0),
 
-    // Estimated earnings (USD)
+    // Estimated earnings (USD) — NUMERIC for precision
     estimatedDailyEarningsUsd: numeric("estimated_daily_earnings_usd", { precision: 12, scale: 2 }).notNull().default("0"),
     estimatedMonthlyEarningsUsd: numeric("estimated_monthly_earnings_usd", { precision: 12, scale: 2 }).notNull().default("0"),
     estimatedYearlyEarningsUsd: numeric("estimated_yearly_earnings_usd", { precision: 14, scale: 2 }).notNull().default("0"),
     estimatedRpmUsd: numeric("estimated_rpm_usd", { precision: 8, scale: 4 }).notNull().default("0"),
     estimatedCpmUsd: numeric("estimated_cpm_usd", { precision: 8, scale: 4 }).notNull().default("0"),
 
-    // Metadata
-    source: text("source").notNull().default("youtube-api"),
-    dataQuality: text("data_quality").notNull().default("high"),
+    // Metadata — pgEnum enforces valid values at DB level
+    source: snapshotSourceEnum("source").notNull().default("youtube-api"),
+    dataQuality: dataQualityEnum("data_quality").notNull().default("high"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow().notNull(),
   },
   (table) => [
