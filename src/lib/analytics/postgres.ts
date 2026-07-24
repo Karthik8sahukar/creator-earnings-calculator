@@ -17,21 +17,27 @@
  *   - No connection leaks (stateless HTTP queries)
  */
 
-import { neon } from "@neondatabase/serverless";
+import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 import type { CreatorSnapshot, SnapshotQuery, SnapshotSource, DataQuality } from "./types";
-import { dateToBucketKey, rangeToStartDate } from "./storage";
+import { dateToBucketKey, rangeToStartDate, type AnalyticsStorage } from "./storage";
 
-// ─── Types ──────────────────────────────────────────────────────────
+// ─── Row Types ──────────────────────────────────────────────────────
 
+/** Row returned by INSERT ... RETURNING id */
+interface InsertedRow {
+  id: string;
+}
+
+/** Row returned by SELECT * FROM creator_snapshots */
 interface SnapshotRow {
   id: string;
   creator_slug: string;
   captured_at: string;
   time_bucket: string;
   subscribers: number | null;
-  total_views: string; // bigint comes back as string
+  total_views: string; // bigint comes back as string from pg
   video_count: number;
-  estimated_daily_earnings_usd: string;
+  estimated_daily_earnings_usd: string; // numeric comes as string
   estimated_monthly_earnings_usd: string;
   estimated_yearly_earnings_usd: string;
   estimated_rpm_usd: string;
@@ -41,7 +47,17 @@ interface SnapshotRow {
   created_at: string;
 }
 
-// ─── Row ↔ Domain mapping ───────────────────────────────────────────
+/** Row returned by SELECT 1 ... (existence check) */
+interface ExistsRow {
+  "?column?": number;
+}
+
+/** Row returned by SELECT DISTINCT creator_slug */
+interface SlugRow {
+  creator_slug: string;
+}
+
+// ─── Row → Domain mapping ───────────────────────────────────────────
 
 function rowToSnapshot(row: SnapshotRow): CreatorSnapshot {
   return {
@@ -63,10 +79,8 @@ function rowToSnapshot(row: SnapshotRow): CreatorSnapshot {
 
 // ─── Adapter ────────────────────────────────────────────────────────
 
-import type { AnalyticsStorage } from "./storage";
-
 export class PostgresAnalyticsStorage implements AnalyticsStorage {
-  private sql: ReturnType<typeof neon>;
+  private sql: NeonQueryFunction<false, false>;
 
   constructor(databaseUrl: string) {
     this.sql = neon(databaseUrl);
@@ -75,37 +89,40 @@ export class PostgresAnalyticsStorage implements AnalyticsStorage {
   async saveSnapshot(snapshot: CreatorSnapshot): Promise<boolean> {
     const timeBucket = dateToBucketKey(new Date(snapshot.capturedAt));
 
-    // INSERT with ON CONFLICT — safely handles duplicates
-    const result = await this.sql`
-      INSERT INTO creator_snapshots (
+    // INSERT with ON CONFLICT — safely handles duplicates.
+    // RETURNING id gives us a row array: if insert succeeded it has
+    // one element; if ON CONFLICT triggered, the array is empty.
+    const rows: InsertedRow[] = await this.sql(
+      `INSERT INTO creator_snapshots (
         id, creator_slug, captured_at, time_bucket,
         subscribers, total_views, video_count,
         estimated_daily_earnings_usd, estimated_monthly_earnings_usd,
         estimated_yearly_earnings_usd, estimated_rpm_usd, estimated_cpm_usd,
         source, data_quality
       ) VALUES (
-        ${snapshot.id},
-        ${snapshot.creatorSlug},
-        ${snapshot.capturedAt},
-        ${timeBucket},
-        ${snapshot.subscribers},
-        ${snapshot.totalViews},
-        ${snapshot.videoCount},
-        ${snapshot.estimatedDailyEarningsUsd},
-        ${snapshot.estimatedMonthlyEarningsUsd},
-        ${snapshot.estimatedYearlyEarningsUsd},
-        ${snapshot.estimatedRpmUsd},
-        ${snapshot.estimatedCpmUsd},
-        ${snapshot.source},
-        ${snapshot.dataQuality}
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
       )
       ON CONFLICT (creator_slug, time_bucket) DO NOTHING
-      RETURNING id
-    `;
+      RETURNING id`,
+      [
+        snapshot.id,
+        snapshot.creatorSlug,
+        snapshot.capturedAt,
+        timeBucket,
+        snapshot.subscribers,
+        snapshot.totalViews,
+        snapshot.videoCount,
+        snapshot.estimatedDailyEarningsUsd,
+        snapshot.estimatedMonthlyEarningsUsd,
+        snapshot.estimatedYearlyEarningsUsd,
+        snapshot.estimatedRpmUsd,
+        snapshot.estimatedCpmUsd,
+        snapshot.source,
+        snapshot.dataQuality,
+      ],
+    );
 
-    // If RETURNING gives us a row, the insert succeeded.
-    // If ON CONFLICT triggered, no row is returned → duplicate.
-    return result.length > 0;
+    return rows.length > 0;
   }
 
   async getSnapshots(query: SnapshotQuery): Promise<CreatorSnapshot[]> {
@@ -114,53 +131,57 @@ export class PostgresAnalyticsStorage implements AnalyticsStorage {
     let rows: SnapshotRow[];
 
     if (query.limit) {
-      rows = await this.sql`
-        SELECT * FROM creator_snapshots
-        WHERE creator_slug = ${query.creatorSlug}
-          AND captured_at >= ${startDate}
-        ORDER BY captured_at ASC
-        LIMIT ${query.limit}
-      ` as SnapshotRow[];
+      rows = await this.sql(
+        `SELECT * FROM creator_snapshots
+         WHERE creator_slug = $1
+           AND captured_at >= $2
+         ORDER BY captured_at ASC
+         LIMIT $3`,
+        [query.creatorSlug, startDate, query.limit],
+      );
     } else {
-      rows = await this.sql`
-        SELECT * FROM creator_snapshots
-        WHERE creator_slug = ${query.creatorSlug}
-          AND captured_at >= ${startDate}
-        ORDER BY captured_at ASC
-      ` as SnapshotRow[];
+      rows = await this.sql(
+        `SELECT * FROM creator_snapshots
+         WHERE creator_slug = $1
+           AND captured_at >= $2
+         ORDER BY captured_at ASC`,
+        [query.creatorSlug, startDate],
+      );
     }
 
     return rows.map(rowToSnapshot);
   }
 
   async getLatestSnapshot(creatorSlug: string): Promise<CreatorSnapshot | null> {
-    const rows = await this.sql`
-      SELECT * FROM creator_snapshots
-      WHERE creator_slug = ${creatorSlug}
-      ORDER BY captured_at DESC
-      LIMIT 1
-    ` as SnapshotRow[];
+    const rows: SnapshotRow[] = await this.sql(
+      `SELECT * FROM creator_snapshots
+       WHERE creator_slug = $1
+       ORDER BY captured_at DESC
+       LIMIT 1`,
+      [creatorSlug],
+    );
 
     if (rows.length === 0) return null;
     return rowToSnapshot(rows[0]);
   }
 
   async hasSnapshotInBucket(creatorSlug: string, bucketKey: string): Promise<boolean> {
-    const rows = await this.sql`
-      SELECT 1 FROM creator_snapshots
-      WHERE creator_slug = ${creatorSlug}
-        AND time_bucket = ${bucketKey}
-      LIMIT 1
-    `;
+    const rows: ExistsRow[] = await this.sql(
+      `SELECT 1 FROM creator_snapshots
+       WHERE creator_slug = $1
+         AND time_bucket = $2
+       LIMIT 1`,
+      [creatorSlug, bucketKey],
+    );
 
     return rows.length > 0;
   }
 
   async getTrackedCreatorSlugs(): Promise<string[]> {
-    const rows = await this.sql`
-      SELECT DISTINCT creator_slug FROM creator_snapshots
-      ORDER BY creator_slug ASC
-    ` as Array<{ creator_slug: string }>;
+    const rows: SlugRow[] = await this.sql(
+      `SELECT DISTINCT creator_slug FROM creator_snapshots
+       ORDER BY creator_slug ASC`,
+    );
 
     return rows.map((r) => r.creator_slug);
   }

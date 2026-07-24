@@ -8,7 +8,7 @@
 
 import { CREATORS_DATASET } from "@/data/creators/dataset";
 import type { CreatorEntry, CreatorCountryCode } from "@/data/creators/schema";
-import { COUNTRIES, NICHES, findCountry } from "./rpmData";
+import { NICHES, findCountry } from "./rpmData";
 
 // ─── Country page metadata ──────────────────────────────────────────
 
