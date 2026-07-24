@@ -240,8 +240,8 @@ export function getAnalyticsStorage(): AnalyticsStorage {
   const databaseUrl = process.env.DATABASE_URL;
 
   if (databaseUrl) {
-    // Production or development with DATABASE_URL → PostgreSQL
-    _instance = new PostgresAnalyticsStorage(databaseUrl);
+    // Production or development with DATABASE_URL → PostgreSQL via Drizzle
+    _instance = new PostgresAnalyticsStorage();
     return _instance;
   }
 

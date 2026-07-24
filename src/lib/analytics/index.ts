@@ -38,6 +38,9 @@ export {
 
 export { PostgresAnalyticsStorage } from "./postgres";
 
+export { getDb, type AnalyticsDb } from "./db";
+export { creatorSnapshots, type CreatorSnapshotSelect, type CreatorSnapshotInsert } from "./schema.db";
+
 export { getCreatorAnalytics } from "./service";
 
 export {

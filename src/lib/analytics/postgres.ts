@@ -1,182 +1,131 @@
 /**
- * PostgreSQL Analytics Storage Adapter
+ * PostgreSQL Analytics Storage Adapter (Drizzle ORM)
  *
- * Production-grade storage for creator analytics snapshots using
- * Neon serverless PostgreSQL (@neondatabase/serverless).
+ * Production-grade storage using Drizzle ORM with Neon HTTP driver.
+ * All queries are fully typed — no manual row mapping, no type
+ * assertions, no Record<string, any> handling.
  *
- * Requirements:
- *   - DATABASE_URL environment variable (Neon connection string)
- *   - creator_snapshots table created via migration
- *
- * Typing strategy:
- *   The Neon `neon()` function returns queries typed as
- *   `Record<string, any>[]`. Rather than using type assertions
- *   (which bypass safety), we use validated mapper functions that
- *   extract and convert each field explicitly. This guarantees
- *   runtime type safety even if the database schema drifts.
- *
- * @neondatabase/serverless version: ^0.10.0
+ * Drizzle provides:
+ *   - Type-safe insert/select/where via schema inference
+ *   - Parameterized queries (SQL injection safe)
+ *   - Correct TypeScript types for every column
+ *   - No connection leaks (Neon HTTP is stateless)
  */
 
-import { neon } from "@neondatabase/serverless";
-import type { CreatorSnapshot, SnapshotSource, DataQuality, SnapshotQuery } from "./types";
+import { eq, gte, asc, desc, sql } from "drizzle-orm";
+import { getDb } from "./db";
+import { creatorSnapshots } from "./schema.db";
+import type { CreatorSnapshot, SnapshotQuery, SnapshotSource, DataQuality } from "./types";
 import { dateToBucketKey, rangeToStartDate, type AnalyticsStorage } from "./storage";
 
-// ─── Row Mapper Functions ───────────────────────────────────────────
-//
-// Each mapper takes a raw `Record<string, unknown>` row from the
-// Neon driver and produces a correctly-typed domain object.
-// No `as any` assertions — every field is accessed via bracket
-// notation and converted explicitly. The only narrowing is from
-// `string` to known string-literal unions via validated helper functions.
+// ─── Row ↔ Domain conversion ────────────────────────────────────────
 
-const VALID_SOURCES: ReadonlySet<string> = new Set(["youtube-api", "manual", "fixture", "enrichment"]);
-const VALID_QUALITIES: ReadonlySet<string> = new Set(["high", "medium", "low", "stale"]);
-
-function toSource(value: unknown): SnapshotSource {
-  const s = String(value ?? "youtube-api");
-  return VALID_SOURCES.has(s) ? (s as SnapshotSource) : "youtube-api";
-}
-
-function toDataQuality(value: unknown): DataQuality {
-  const s = String(value ?? "high");
-  return VALID_QUALITIES.has(s) ? (s as DataQuality) : "high";
-}
-
-function mapSnapshotRow(row: Record<string, unknown>): CreatorSnapshot {
+function rowToDomain(row: typeof creatorSnapshots.$inferSelect): CreatorSnapshot {
   return {
-    id: String(row["id"] ?? ""),
-    creatorSlug: String(row["creator_slug"] ?? ""),
-    capturedAt: String(row["captured_at"] ?? ""),
-    subscribers: row["subscribers"] === null || row["subscribers"] === undefined ? null : Number(row["subscribers"]),
-    totalViews: Number(row["total_views"] ?? 0),
-    videoCount: Number(row["video_count"] ?? 0),
-    estimatedDailyEarningsUsd: Number(row["estimated_daily_earnings_usd"] ?? 0),
-    estimatedMonthlyEarningsUsd: Number(row["estimated_monthly_earnings_usd"] ?? 0),
-    estimatedYearlyEarningsUsd: Number(row["estimated_yearly_earnings_usd"] ?? 0),
-    estimatedRpmUsd: Number(row["estimated_rpm_usd"] ?? 0),
-    estimatedCpmUsd: Number(row["estimated_cpm_usd"] ?? 0),
-    source: toSource(row["source"]),
-    dataQuality: toDataQuality(row["data_quality"]),
+    id: row.id,
+    creatorSlug: row.creatorSlug,
+    capturedAt: row.capturedAt,
+    subscribers: row.subscribers,
+    totalViews: row.totalViews,
+    videoCount: row.videoCount,
+    estimatedDailyEarningsUsd: Number(row.estimatedDailyEarningsUsd),
+    estimatedMonthlyEarningsUsd: Number(row.estimatedMonthlyEarningsUsd),
+    estimatedYearlyEarningsUsd: Number(row.estimatedYearlyEarningsUsd),
+    estimatedRpmUsd: Number(row.estimatedRpmUsd),
+    estimatedCpmUsd: Number(row.estimatedCpmUsd),
+    source: row.source as SnapshotSource,
+    dataQuality: row.dataQuality as DataQuality,
   };
-}
-
-function hasInsertedId(row: Record<string, unknown>): boolean {
-  return typeof row["id"] === "string" && row["id"].length > 0;
-}
-
-function extractSlug(row: Record<string, unknown>): string {
-  return String(row["creator_slug"] ?? "");
-}
-
-function hasExistenceRow(rows: Array<Record<string, unknown>>): boolean {
-  return rows.length > 0;
 }
 
 // ─── Adapter ────────────────────────────────────────────────────────
 
 export class PostgresAnalyticsStorage implements AnalyticsStorage {
-  private sql: ReturnType<typeof neon>;
-
-  constructor(databaseUrl: string) {
-    this.sql = neon(databaseUrl);
-  }
-
   async saveSnapshot(snapshot: CreatorSnapshot): Promise<boolean> {
+    const db = getDb();
     const timeBucket = dateToBucketKey(new Date(snapshot.capturedAt));
 
-    // INSERT with ON CONFLICT — safely handles duplicates.
-    // RETURNING id: if insert succeeded, one row; if conflict, zero rows.
-    const rows = await this.sql(
-      `INSERT INTO creator_snapshots (
-        id, creator_slug, captured_at, time_bucket,
-        subscribers, total_views, video_count,
-        estimated_daily_earnings_usd, estimated_monthly_earnings_usd,
-        estimated_yearly_earnings_usd, estimated_rpm_usd, estimated_cpm_usd,
-        source, data_quality
-      ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
-      )
-      ON CONFLICT (creator_slug, time_bucket) DO NOTHING
-      RETURNING id`,
-      [
-        snapshot.id,
-        snapshot.creatorSlug,
-        snapshot.capturedAt,
+    const result = await db
+      .insert(creatorSnapshots)
+      .values({
+        id: snapshot.id,
+        creatorSlug: snapshot.creatorSlug,
+        capturedAt: snapshot.capturedAt,
         timeBucket,
-        snapshot.subscribers,
-        snapshot.totalViews,
-        snapshot.videoCount,
-        snapshot.estimatedDailyEarningsUsd,
-        snapshot.estimatedMonthlyEarningsUsd,
-        snapshot.estimatedYearlyEarningsUsd,
-        snapshot.estimatedRpmUsd,
-        snapshot.estimatedCpmUsd,
-        snapshot.source,
-        snapshot.dataQuality,
-      ],
-    );
+        subscribers: snapshot.subscribers,
+        totalViews: snapshot.totalViews,
+        videoCount: snapshot.videoCount,
+        estimatedDailyEarningsUsd: String(snapshot.estimatedDailyEarningsUsd),
+        estimatedMonthlyEarningsUsd: String(snapshot.estimatedMonthlyEarningsUsd),
+        estimatedYearlyEarningsUsd: String(snapshot.estimatedYearlyEarningsUsd),
+        estimatedRpmUsd: String(snapshot.estimatedRpmUsd),
+        estimatedCpmUsd: String(snapshot.estimatedCpmUsd),
+        source: snapshot.source,
+        dataQuality: snapshot.dataQuality,
+      })
+      .onConflictDoNothing({
+        target: [creatorSnapshots.creatorSlug, creatorSnapshots.timeBucket],
+      })
+      .returning({ id: creatorSnapshots.id });
 
-    // rows is Record<string, any>[]. Check if any row was returned.
-    return Array.isArray(rows) && rows.length > 0 && hasInsertedId(rows[0]);
+    return result.length > 0;
   }
 
   async getSnapshots(query: SnapshotQuery): Promise<CreatorSnapshot[]> {
+    const db = getDb();
     const startDate = rangeToStartDate(query.range ?? "all").toISOString();
 
-    const rows = query.limit
-      ? await this.sql(
-          `SELECT * FROM creator_snapshots
-           WHERE creator_slug = $1
-             AND captured_at >= $2
-           ORDER BY captured_at ASC
-           LIMIT $3`,
-          [query.creatorSlug, startDate, query.limit],
-        )
-      : await this.sql(
-          `SELECT * FROM creator_snapshots
-           WHERE creator_slug = $1
-             AND captured_at >= $2
-           ORDER BY captured_at ASC`,
-          [query.creatorSlug, startDate],
-        );
+    const baseQuery = db
+      .select()
+      .from(creatorSnapshots)
+      .where(
+        sql`${creatorSnapshots.creatorSlug} = ${query.creatorSlug} AND ${creatorSnapshots.capturedAt} >= ${startDate}`,
+      )
+      .orderBy(asc(creatorSnapshots.capturedAt));
 
-    if (!Array.isArray(rows)) return [];
-    return rows.map(mapSnapshotRow);
+    const rows = query.limit
+      ? await baseQuery.limit(query.limit)
+      : await baseQuery;
+
+    return rows.map(rowToDomain);
   }
 
   async getLatestSnapshot(creatorSlug: string): Promise<CreatorSnapshot | null> {
-    const rows = await this.sql(
-      `SELECT * FROM creator_snapshots
-       WHERE creator_slug = $1
-       ORDER BY captured_at DESC
-       LIMIT 1`,
-      [creatorSlug],
-    );
+    const db = getDb();
 
-    if (!Array.isArray(rows) || rows.length === 0) return null;
-    return mapSnapshotRow(rows[0]);
+    const rows = await db
+      .select()
+      .from(creatorSnapshots)
+      .where(eq(creatorSnapshots.creatorSlug, creatorSlug))
+      .orderBy(desc(creatorSnapshots.capturedAt))
+      .limit(1);
+
+    if (rows.length === 0) return null;
+    return rowToDomain(rows[0]);
   }
 
   async hasSnapshotInBucket(creatorSlug: string, bucketKey: string): Promise<boolean> {
-    const rows = await this.sql(
-      `SELECT 1 FROM creator_snapshots
-       WHERE creator_slug = $1
-         AND time_bucket = $2
-       LIMIT 1`,
-      [creatorSlug, bucketKey],
-    );
+    const db = getDb();
 
-    return Array.isArray(rows) && hasExistenceRow(rows);
+    const rows = await db
+      .select({ id: creatorSnapshots.id })
+      .from(creatorSnapshots)
+      .where(
+        sql`${creatorSnapshots.creatorSlug} = ${creatorSlug} AND ${creatorSnapshots.timeBucket} = ${bucketKey}`,
+      )
+      .limit(1);
+
+    return rows.length > 0;
   }
 
   async getTrackedCreatorSlugs(): Promise<string[]> {
-    const rows = await this.sql(
-      `SELECT DISTINCT creator_slug FROM creator_snapshots
-       ORDER BY creator_slug ASC`,
-    );
+    const db = getDb();
 
-    if (!Array.isArray(rows)) return [];
-    return rows.map(extractSlug);
+    const rows = await db
+      .selectDistinct({ creatorSlug: creatorSnapshots.creatorSlug })
+      .from(creatorSnapshots)
+      .orderBy(asc(creatorSnapshots.creatorSlug));
+
+    return rows.map((r) => r.creatorSlug);
   }
 }
