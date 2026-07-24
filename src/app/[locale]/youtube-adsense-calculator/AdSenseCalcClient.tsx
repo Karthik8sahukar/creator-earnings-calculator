@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { calculateAdSenseRevenue } from "@/lib/calculators";
-import { formatCurrency } from "@/lib/format";
+import { useFormatMoney } from "@/components/currency";
 
 export function AdSenseCalcClient() {
   const [monthlyViews, setMonthlyViews] = useState<number>(500000);
   const [rpm, setRpm] = useState<number>(4);
   const [monetizedPct, setMonetizedPct] = useState<number>(90);
+  const { formatMoney } = useFormatMoney();
 
   const result = useMemo(
     () => calculateAdSenseRevenue({ monthlyViews, rpm, monetizedPercentage: monetizedPct }),
@@ -35,10 +36,10 @@ export function AdSenseCalcClient() {
 
       {/* Results */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <ResultCard label="Daily" value={result.valid ? formatCurrency(result.dailyRevenue, "USD") : "—"} />
-        <ResultCard label="Weekly" value={result.valid ? formatCurrency(result.weeklyRevenue, "USD") : "—"} />
-        <ResultCard label="Monthly" value={result.valid ? formatCurrency(result.monthlyRevenue, "USD") : "—"} highlight />
-        <ResultCard label="Yearly" value={result.valid ? formatCurrency(result.yearlyRevenue, "USD") : "—"} />
+        <ResultCard label="Daily" value={result.valid ? formatMoney(result.dailyRevenue) : "—"} />
+        <ResultCard label="Weekly" value={result.valid ? formatMoney(result.weeklyRevenue) : "—"} />
+        <ResultCard label="Monthly" value={result.valid ? formatMoney(result.monthlyRevenue) : "—"} highlight />
+        <ResultCard label="Yearly" value={result.valid ? formatMoney(result.yearlyRevenue) : "—"} />
       </div>
 
       {!result.valid && result.reason && (
@@ -52,7 +53,7 @@ export function AdSenseCalcClient() {
           <>
             <br />
             <span>
-              ({monthlyViews.toLocaleString()} ÷ 1,000) × ${rpm} × ({monetizedPct}% ÷ 90%) = {formatCurrency(result.monthlyRevenue, "USD")}
+              ({monthlyViews.toLocaleString()} ÷ 1,000) × ${rpm} × ({monetizedPct}% ÷ 90%) = {formatMoney(result.monthlyRevenue)}
             </span>
           </>
         )}

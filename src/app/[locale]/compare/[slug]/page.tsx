@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
+import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
@@ -169,20 +170,20 @@ export default async function ComparisonPage({
               <CompRow label="Verified" v1={c1.creator.verified ? "Yes ✓" : "No"} v2={c2.creator.verified ? "Yes ✓" : "No"} />
               <CompRow
                 label="Estimated RPM"
-                v1={`$${c1.rpmExpected.toFixed(2)}`}
-                v2={`$${c2.rpmExpected.toFixed(2)}`}
+                v1={<Money amount={c1.rpmExpected} />}
+                v2={<Money amount={c2.rpmExpected} />}
                 highlight={c1.rpmExpected > c2.rpmExpected ? "v1" : c2.rpmExpected > c1.rpmExpected ? "v2" : undefined}
               />
               <CompRow
                 label="Estimated CPM"
-                v1={`$${c1.cpmExpected.toFixed(2)}`}
-                v2={`$${c2.cpmExpected.toFixed(2)}`}
+                v1={<Money amount={c1.cpmExpected} />}
+                v2={<Money amount={c2.cpmExpected} />}
                 highlight={c1.cpmExpected > c2.cpmExpected ? "v1" : c2.cpmExpected > c1.cpmExpected ? "v2" : undefined}
               />
               <CompRow
                 label="Shorts RPM"
-                v1={`$${c1.shortsRpmExpected.toFixed(4)}`}
-                v2={`$${c2.shortsRpmExpected.toFixed(4)}`}
+                v1={<Money amount={c1.shortsRpmExpected} />}
+                v2={<Money amount={c2.shortsRpmExpected} />}
                 highlight={c1.shortsRpmExpected > c2.shortsRpmExpected ? "v1" : c2.shortsRpmExpected > c1.shortsRpmExpected ? "v2" : undefined}
               />
               <CompRow label="Language" v1={c1.creator.language} v2={c2.creator.language} />
@@ -272,8 +273,8 @@ function ComparisonCard({
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <MiniStat label="RPM" value={`$${creator.rpmExpected.toFixed(2)}`} />
-        <MiniStat label="CPM" value={`$${creator.cpmExpected.toFixed(2)}`} />
+        <MiniStat label="RPM" value={<Money amount={creator.rpmExpected} />} />
+        <MiniStat label="CPM" value={<Money amount={creator.cpmExpected} />} />
         <MiniStat label="Country" value={creator.creator.country} />
         <MiniStat label="Category" value={creator.creator.category} />
       </div>
@@ -281,7 +282,7 @@ function ComparisonCard({
   );
 }
 
-function MiniStat({ label, value }: { label: string; value: string }) {
+function MiniStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-lg bg-slate-50 dark:bg-slate-800 p-2">
       <p className="text-[10px] uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
@@ -297,8 +298,8 @@ function CompRow({
   highlight,
 }: {
   label: string;
-  v1: string;
-  v2: string;
+  v1: React.ReactNode;
+  v2: React.ReactNode;
   highlight?: "v1" | "v2";
 }) {
   return (

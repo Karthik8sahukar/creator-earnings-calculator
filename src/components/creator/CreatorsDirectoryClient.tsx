@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useCallback, useId, useTransition } from "react";
+import { useCallback, useEffect, useId, useRef, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import { CreatorCard } from "./CreatorCard";
@@ -64,10 +64,43 @@ export function CreatorsDirectoryClient({
   const searchId = useId();
   const [isPending, startTransition] = useTransition();
 
+  // Ref to the search input so updateParams can read its live value
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  // Ref for debounce timer cleanup
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
   // ── URL param sync ────────────────────────────────────────────
+  //
+  // When any filter fires, we always read the LIVE search input value
+  // (not the stale URL param) so the pushed URL reflects what the user
+  // sees in the input. This prevents the race condition where a
+  // debounced search update fires after a filter change.
   const updateParams = useCallback(
     (updates: Record<string, string | null>) => {
+      // Cancel any pending debounced search — we'll include the input
+      // value directly in this navigation.
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+      }
+
       const params = new URLSearchParams(searchParams.toString());
+
+      // Always sync the live search input value into params so no stale
+      // `q` param can persist from a prior navigation.
+      const liveSearchValue = searchInputRef.current?.value ?? "";
+      if (liveSearchValue) {
+        params.set("q", liveSearchValue);
+      } else {
+        params.delete("q");
+      }
 
       for (const [key, value] of Object.entries(updates)) {
         if (value === null || value === "" || value === "all" || value === "1") {
@@ -90,9 +123,29 @@ export function CreatorsDirectoryClient({
   );
 
   const clearAll = () => {
+    // Also clear the search input visually
+    if (searchInputRef.current) {
+      searchInputRef.current.value = "";
+    }
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
     startTransition(() => {
       router.push(pathname, { scroll: false });
     });
+  };
+
+  const handleSearchChange = (value: string) => {
+    // Clear any existing debounce timer
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    // Debounce search URL sync by 300ms
+    debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
+      updateParams({ q: value || null });
+    }, 300);
   };
 
   const hasActiveFilters =
@@ -117,18 +170,13 @@ export function CreatorsDirectoryClient({
           />
           <input
             id={searchId}
+            ref={searchInputRef}
             type="search"
             defaultValue={currentFilters.search}
-            onChange={(e) => {
-              const val = e.target.value;
-              // Debounce: only sync to URL after 300ms
-              const timeout = setTimeout(() => {
-                updateParams({ q: val || null });
-              }, 300);
-              return () => clearTimeout(timeout);
-            }}
+            onChange={(e) => handleSearchChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                // Immediate navigation on Enter — no debounce
                 updateParams({ q: (e.target as HTMLInputElement).value || null });
               }
             }}
@@ -141,7 +189,12 @@ export function CreatorsDirectoryClient({
             <button
               type="button"
               aria-label={t("clearSearchAria")}
-              onClick={() => updateParams({ q: null })}
+              onClick={() => {
+                if (searchInputRef.current) {
+                  searchInputRef.current.value = "";
+                }
+                updateParams({ q: null });
+              }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             >
               <XIcon width={16} height={16} />

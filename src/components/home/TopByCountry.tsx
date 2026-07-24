@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { GlobeIcon } from "../icons";
 import { getCountryStats } from "@/lib/creatorDirectory";
@@ -56,7 +57,7 @@ export async function TopByCountry() {
                     {t("rpm")}
                   </p>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                    ${countryTier.baseRpm.toFixed(2)}
+                    <Money amount={countryTier.baseRpm} />
                   </p>
                 </div>
                 <div>
@@ -64,7 +65,7 @@ export async function TopByCountry() {
                     {t("shortsRpm")}
                   </p>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                    ${countryTier.shortsRpm.toFixed(3)}
+                    <Money amount={countryTier.shortsRpm} />
                   </p>
                 </div>
               </div>

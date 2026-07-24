@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
 import { CalculatorsMenu } from "./CalculatorsMenu";
+import { CurrencySelector } from "./currency";
 import { LanguageSelector } from "./LanguageSelector";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
@@ -95,6 +96,7 @@ export function Header() {
 
         <div className="flex items-center gap-1">
           <div className="hidden md:flex items-center gap-1">
+            <CurrencySelector />
             <LanguageSelector />
             <ThemeToggle />
           </div>

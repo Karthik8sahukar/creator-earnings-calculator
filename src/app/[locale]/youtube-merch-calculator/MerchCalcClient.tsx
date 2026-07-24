@@ -2,13 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { calculateMerchRevenue } from "@/lib/calculators";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { useFormatMoney } from "@/components/currency";
+import { formatNumber } from "@/lib/format";
 
 export function MerchCalcClient() {
   const [monthlyViews, setMonthlyViews] = useState<number>(500000);
   const [conversionRate, setConversionRate] = useState<number>(1);
   const [aov, setAov] = useState<number>(35);
   const [profitMargin, setProfitMargin] = useState<number>(40);
+  const { formatMoney } = useFormatMoney();
 
   const result = useMemo(
     () => calculateMerchRevenue({ monthlyViews, conversionRate, averageOrderValue: aov, profitMargin }),
@@ -39,9 +41,9 @@ export function MerchCalcClient() {
 
       {/* Results */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <ResultCard label="Monthly revenue" value={result.valid ? formatCurrency(result.monthlyRevenue, "USD") : "—"} />
-        <ResultCard label="Monthly profit" value={result.valid ? formatCurrency(result.monthlyProfit, "USD") : "—"} highlight />
-        <ResultCard label="Yearly profit" value={result.valid ? formatCurrency(result.yearlyProfit, "USD") : "—"} />
+        <ResultCard label="Monthly revenue" value={result.valid ? formatMoney(result.monthlyRevenue) : "—"} />
+        <ResultCard label="Monthly profit" value={result.valid ? formatMoney(result.monthlyProfit) : "—"} highlight />
+        <ResultCard label="Yearly profit" value={result.valid ? formatMoney(result.yearlyProfit) : "—"} />
         <ResultCard label="Est. orders / mo" value={result.valid ? formatNumber(result.estimatedOrders) : "—"} />
       </div>
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
+import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
@@ -189,10 +190,10 @@ export default async function TopCreatorsPage({
                     {item.creator.country}
                   </td>
                   <td className="py-3 px-4 text-right font-medium text-emerald-700 dark:text-emerald-400">
-                    ${item.estimatedRpm.toFixed(2)}
+                    <Money amount={item.estimatedRpm} />
                   </td>
                   <td className="py-3 px-4 text-right text-slate-600 dark:text-slate-400 hidden lg:table-cell">
-                    ~${formatCompactNumber(item.estimatedMonthlyEarnings)}
+                    ~<Money amount={item.estimatedMonthlyEarnings} compact />
                   </td>
                 </tr>
               ))}
@@ -202,10 +203,4 @@ export default async function TopCreatorsPage({
       </section>
     </div>
   );
-}
-
-function formatCompactNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toFixed(0);
 }

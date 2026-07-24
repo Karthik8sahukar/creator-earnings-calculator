@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { calculateMembershipRevenue } from "@/lib/calculators";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { useFormatMoney } from "@/components/currency";
+import { formatNumber } from "@/lib/format";
 
 export function MembershipCalcClient() {
   const [subscribers, setSubscribers] = useState<number>(100000);
   const [membershipRate, setMembershipRate] = useState<number>(1.5);
   const [avgPrice, setAvgPrice] = useState<number>(4.99);
+  const { formatMoney } = useFormatMoney();
 
   const result = useMemo(
     () => calculateMembershipRevenue({ subscribers, membershipRate, averagePrice: avgPrice, tiers: [] }),
@@ -34,9 +36,9 @@ export function MembershipCalcClient() {
 
       {/* Results */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <ResultCard label="Gross monthly" value={result.valid ? formatCurrency(result.monthlyRevenue, "USD") : "—"} />
-        <ResultCard label="After YouTube's 30% cut" value={result.valid ? formatCurrency(result.revenueAfterYouTubeCut, "USD") : "—"} highlight />
-        <ResultCard label="Yearly (net)" value={result.valid ? formatCurrency(result.revenueAfterYouTubeCut * 12, "USD") : "—"} />
+        <ResultCard label="Gross monthly" value={result.valid ? formatMoney(result.monthlyRevenue) : "—"} />
+        <ResultCard label="After YouTube's 30% cut" value={result.valid ? formatMoney(result.revenueAfterYouTubeCut) : "—"} highlight />
+        <ResultCard label="Yearly (net)" value={result.valid ? formatMoney(result.revenueAfterYouTubeCut * 12) : "—"} />
         <ResultCard label="Est. members" value={result.valid ? formatNumber(result.estimatedMembers) : "—"} />
       </div>
 

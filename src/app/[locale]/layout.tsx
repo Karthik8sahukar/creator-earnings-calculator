@@ -8,6 +8,7 @@ import Script from "next/script";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ThemeScript } from "@/components/ThemeScript";
+import { CurrencyProvider } from "@/components/currency";
 import { HREFLANG_MAP, routing, type AppLocale } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
 
@@ -188,11 +189,13 @@ export default async function LocaleLayout({
           {t("skipToContent")}
         </a>
         <NextIntlClientProvider>
+          <CurrencyProvider>
           <Header />
           <main id="main" className="container-page py-8 sm:py-12">
             {children}
           </main>
           <Footer />
+          </CurrencyProvider>
         </NextIntlClientProvider>
         <Script
           id="ld-json"

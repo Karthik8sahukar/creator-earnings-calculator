@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
+import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { DollarIcon } from "../icons";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
@@ -85,7 +86,7 @@ export async function TopEarningCreators() {
               </div>
               <div className="text-right shrink-0">
                 <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-                  ${rpm.toFixed(2)} RPM
+                  <Money amount={rpm} /> RPM
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   {niche.label}

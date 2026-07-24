@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { calculateChannelValuation } from "@/lib/calculators";
-import { formatCurrency } from "@/lib/format";
+import { useFormatMoney } from "@/components/currency";
 
 export function ValuationCalcClient() {
   const [monthlyRevenue, setMonthlyRevenue] = useState<number>(5000);
   const [subscribers, setSubscribers] = useState<number>(500000);
   const [monthlyViews, setMonthlyViews] = useState<number>(2000000);
   const [growthRate, setGrowthRate] = useState<number>(3);
+  const { formatMoney } = useFormatMoney();
 
   const result = useMemo(
     () => calculateChannelValuation({ monthlyRevenue, subscribers, monthlyViews, growthRate, niche: "general" }),
@@ -39,9 +40,9 @@ export function ValuationCalcClient() {
 
       {/* Results */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <ResultCard label="Conservative valuation" value={result.valid ? formatCurrency(result.lowValuation, "USD") : "—"} />
-        <ResultCard label="Expected valuation" value={result.valid ? formatCurrency(result.expectedValuation, "USD") : "—"} highlight />
-        <ResultCard label="Optimistic valuation" value={result.valid ? formatCurrency(result.highValuation, "USD") : "—"} />
+        <ResultCard label="Conservative valuation" value={result.valid ? formatMoney(result.lowValuation) : "—"} />
+        <ResultCard label="Expected valuation" value={result.valid ? formatMoney(result.expectedValuation) : "—"} highlight />
+        <ResultCard label="Optimistic valuation" value={result.valid ? formatMoney(result.highValuation) : "—"} />
       </div>
 
       {result.valid && (
@@ -53,7 +54,7 @@ export function ValuationCalcClient() {
           </div>
           <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
             <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Annual revenue</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">{formatCurrency(monthlyRevenue * 12, "USD")}</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">{formatMoney(monthlyRevenue * 12)}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">base for valuation</p>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { CreatorCard } from "@/components/creator/CreatorCard";
+import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
@@ -171,9 +172,9 @@ export default async function CountryPage({
           {data.label} YouTube Statistics
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Base RPM" value={`$${data.baseRpm.toFixed(2)}`} subtitle="per 1,000 views" />
-          <StatCard label="Shorts RPM" value={`$${data.shortsRpm.toFixed(4)}`} subtitle="per 1,000 Shorts views" />
-          <StatCard label="Estimated CPM" value={`$${data.estimatedCpm.toFixed(2)}`} subtitle="advertiser cost" />
+          <StatCard label="Base RPM" value={<Money amount={data.baseRpm} />} subtitle="per 1,000 views" />
+          <StatCard label="Shorts RPM" value={<Money amount={data.shortsRpm} />} subtitle="per 1,000 Shorts views" />
+          <StatCard label="Estimated CPM" value={<Money amount={data.estimatedCpm} />} subtitle="advertiser cost" />
           <StatCard label="Creators" value={data.totalCreators.toString()} subtitle="in our database" />
         </div>
       </section>
@@ -303,7 +304,7 @@ export default async function CountryPage({
   );
 }
 
-function StatCard({ label, value, subtitle }: { label: string; value: string; subtitle: string }) {
+function StatCard({ label, value, subtitle }: { label: string; value: React.ReactNode; subtitle: string }) {
   return (
     <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4">
       <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>

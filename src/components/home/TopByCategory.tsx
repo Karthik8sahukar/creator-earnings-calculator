@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { ChartIcon } from "../icons";
 import { getCategoryStats } from "@/lib/creatorDirectory";
@@ -63,7 +64,7 @@ export async function TopByCategory() {
                     {t("avgRpm")}
                   </p>
                   <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                    ${(6.5 * nicheData.rpmMultiplier).toFixed(2)}
+                    <Money amount={6.5 * nicheData.rpmMultiplier} />
                   </p>
                 </div>
               </div>

@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { calculateAffiliateRevenue } from "@/lib/calculators";
-import { formatCurrency, formatNumber } from "@/lib/format";
+import { useFormatMoney } from "@/components/currency";
+import { formatNumber } from "@/lib/format";
 
 export function AffiliateCalcClient() {
   const [monthlyViews, setMonthlyViews] = useState<number>(100000);
@@ -10,6 +11,7 @@ export function AffiliateCalcClient() {
   const [conversionRate, setConversionRate] = useState<number>(2);
   const [aov, setAov] = useState<number>(50);
   const [commission, setCommission] = useState<number>(8);
+  const { formatMoney } = useFormatMoney();
 
   const result = useMemo(
     () => calculateAffiliateRevenue({ monthlyViews, clickThroughRate: ctr, conversionRate, averageOrderValue: aov, commissionRate: commission }),
@@ -43,8 +45,8 @@ export function AffiliateCalcClient() {
 
       {/* Results */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <ResultCard label="Monthly revenue" value={result.valid ? formatCurrency(result.monthlyRevenue, "USD") : "—"} highlight />
-        <ResultCard label="Yearly revenue" value={result.valid ? formatCurrency(result.yearlyRevenue, "USD") : "—"} />
+        <ResultCard label="Monthly revenue" value={result.valid ? formatMoney(result.monthlyRevenue) : "—"} highlight />
+        <ResultCard label="Yearly revenue" value={result.valid ? formatMoney(result.yearlyRevenue) : "—"} />
         <ResultCard label="Est. clicks / mo" value={result.valid ? formatNumber(result.estimatedClicks) : "—"} />
         <ResultCard label="Est. conversions / mo" value={result.valid ? formatNumber(result.estimatedConversions) : "—"} />
       </div>
