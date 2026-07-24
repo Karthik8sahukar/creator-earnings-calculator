@@ -27,11 +27,16 @@ export {
 export {
   type AnalyticsStorage,
   getAnalyticsStorage,
+  getAnalyticsStorageSafe,
   setAnalyticsStorage,
+  resetAnalyticsStorage,
+  StorageUnavailableError,
   JsonFileAdapter,
   rangeToStartDate,
   dateToBucketKey,
 } from "./storage";
+
+export { PostgresAnalyticsStorage } from "./postgres";
 
 export { getCreatorAnalytics } from "./service";
 

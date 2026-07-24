@@ -20,9 +20,11 @@
     "pipeline:enrich": "npx tsx scripts/enrich-creators-v2.ts",
     "pipeline:search-index": "npx tsx scripts/build-search-index.ts",
     "pipeline:validate": "npx tsx scripts/validate-creators.ts",
-    "analytics:snapshot": "npx tsx scripts/analytics-snapshot.ts"
+    "analytics:snapshot": "npx tsx scripts/analytics-snapshot.ts",
+    "analytics:migrate": "psql $DATABASE_URL -f migrations/001_create_creator_snapshots.sql"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.0",
     "@next/third-parties": "^16.2.10",
     "gray-matter": "^4.0.3",
     "next": "^15.5.20",

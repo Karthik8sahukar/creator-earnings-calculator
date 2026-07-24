@@ -15,6 +15,7 @@
  */
 
 import type { CreatorSnapshot, SnapshotQuery, TimeRange } from "./types";
+import { PostgresAnalyticsStorage } from "./postgres";
 
 // ─── Storage Interface ──────────────────────────────────────────────
 
@@ -201,30 +202,19 @@ export class JsonFileAdapter implements AnalyticsStorage {
   }
 }
 
-// ─── Empty Storage (Production fallback) ────────────────────────────
+// ─── Storage Unavailable Error ───────────────────────────────────────
 
 /**
- * A no-op storage adapter used in production when no database is
- * configured. Returns empty results for all queries — analytics
- * charts will show the "still collecting data" empty state.
- *
- * This prevents silent filesystem writes on Vercel's ephemeral FS.
+ * Thrown when analytics storage is required but not configured.
+ * The API route catches this and returns 503.
  */
-class EmptyStorage implements AnalyticsStorage {
-  async saveSnapshot(): Promise<boolean> {
-    return false;
-  }
-  async getSnapshots(): Promise<CreatorSnapshot[]> {
-    return [];
-  }
-  async getLatestSnapshot(): Promise<CreatorSnapshot | null> {
-    return null;
-  }
-  async hasSnapshotInBucket(): Promise<boolean> {
-    return false;
-  }
-  async getTrackedCreatorSlugs(): Promise<string[]> {
-    return [];
+export class StorageUnavailableError extends Error {
+  constructor() {
+    super(
+      "Analytics storage is not configured. Set DATABASE_URL to enable " +
+      "persistent analytics, or use JsonFileAdapter in development.",
+    );
+    this.name = "StorageUnavailableError";
   }
 }
 
@@ -236,30 +226,46 @@ let _instance: AnalyticsStorage | null = null;
  * Get the singleton storage adapter instance.
  *
  * Selection logic:
- *   - Test override via setAnalyticsStorage() → returns that
- *   - Development (NODE_ENV !== "production") → JsonFileAdapter
- *   - Production without database → EmptyStorage (safe no-op)
+ *   1. Test override via setAnalyticsStorage() → returns injected adapter
+ *   2. DATABASE_URL is set → PostgresAnalyticsStorage (production)
+ *   3. NODE_ENV !== "production" without DATABASE_URL → JsonFileAdapter (dev)
+ *   4. Production without DATABASE_URL → throws StorageUnavailableError
  *
- * The JsonFileAdapter is NEVER used during page rendering in
- * production because Vercel's filesystem is ephemeral. It only
- * runs in:
- *   - Local development
- *   - The analytics:snapshot script (CLI, not page render)
- *   - Unit/E2E tests
+ * The JsonFileAdapter is NEVER used during production page renders.
+ * It only runs in local development and tests.
  */
 export function getAnalyticsStorage(): AnalyticsStorage {
-  if (!_instance) {
-    if (process.env.NODE_ENV === "production") {
-      // Production: no filesystem writes. When a database adapter
-      // is added, instantiate it here instead.
-      _instance = new EmptyStorage();
-    } else {
-      // Development / test: JSON files in data/analytics/
-      const basePath = `${process.cwd()}/data/analytics`;
-      _instance = new JsonFileAdapter(basePath);
-    }
+  if (_instance) return _instance;
+
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (databaseUrl) {
+    // Production or development with DATABASE_URL → PostgreSQL
+    _instance = new PostgresAnalyticsStorage(databaseUrl);
+    return _instance;
   }
-  return _instance;
+
+  if (process.env.NODE_ENV !== "production") {
+    // Local development without DATABASE_URL → JSON files
+    const basePath = `${process.cwd()}/data/analytics`;
+    _instance = new JsonFileAdapter(basePath);
+    return _instance;
+  }
+
+  // Production without DATABASE_URL — analytics unavailable
+  throw new StorageUnavailableError();
+}
+
+/**
+ * Safe version that returns null instead of throwing when storage
+ * is unavailable. Used by the API route to return 503 gracefully.
+ */
+export function getAnalyticsStorageSafe(): AnalyticsStorage | null {
+  try {
+    return getAnalyticsStorage();
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -267,4 +273,11 @@ export function getAnalyticsStorage(): AnalyticsStorage {
  */
 export function setAnalyticsStorage(adapter: AnalyticsStorage): void {
   _instance = adapter;
+}
+
+/**
+ * Reset the singleton (used in tests to clear state between runs).
+ */
+export function resetAnalyticsStorage(): void {
+  _instance = null;
 }
