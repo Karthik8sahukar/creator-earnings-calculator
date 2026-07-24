@@ -28,19 +28,9 @@ export async function generateMetadata({
   const category = findCategory(slug);
   if (!category) return { title: "Not found", robots: { index: false } };
 
-  const t = await getTranslations({ locale, namespace: category.labelKey });
-  const tDescription = await getTranslations({
-    locale,
-    namespace: category.descriptionKey,
-  });
-  // Namespaced translations only fire if we call the whole key path
-  // directly, so we resolve via `getTranslations(locale)` too.
   const global = await getTranslations({ locale });
   const label = global(category.labelKey);
   const description = global(category.descriptionKey);
-  // Silence "unused var" warnings for the (now-unused) helpers.
-  void t;
-  void tDescription;
 
   return {
     title: label,
