@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ResultCard, ActionButtons, HistoryPanel } from "@/components/decision";
+import type { HistoryItem } from "@/components/decision";
 import { randomInt, prefersReducedMotion } from "@/lib/decision";
 
 const DEFAULT_SEGMENTS = ["Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6"];
@@ -13,7 +14,7 @@ export function SpinWheelClient() {
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [rotation, setRotation] = useState(0);
-  const [history, setHistory] = useState<{ label: string; color?: "green" | "blue" | "neutral" }[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [reducedMotion, setReducedMotion] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -69,7 +70,7 @@ export function SpinWheelClient() {
     const final = rotation + spins * 360 + (360 - target);
     setRotation(final);
     const delay = reducedMotion ? 0 : 3000;
-    setTimeout(() => { setSpinning(false); setResult(segments[winIdx]); setHistory(h => [{ label: segments[winIdx], color: "blue" }, ...h].slice(0, 30)); }, delay);
+    setTimeout(() => { setSpinning(false); setResult(segments[winIdx]); const item: HistoryItem = { label: segments[winIdx], color: "blue" }; setHistory(h => [item, ...h].slice(0, 30)); }, delay);
   }, [spinning, segments, rotation, reducedMotion]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => { if (e.repeat) return; if (e.key === "Enter" || e.key === " ") { e.preventDefault(); spin(); } }, [spin]);

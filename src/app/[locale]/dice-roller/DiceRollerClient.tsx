@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { ActionButtons, HistoryPanel } from "@/components/decision";
+import type { HistoryItem } from "@/components/decision";
 import { randomInt, prefersReducedMotion } from "@/lib/decision";
 
 const DICE_PRESETS = [4, 6, 8, 10, 12, 20] as const;
@@ -11,7 +12,7 @@ export function DiceRollerClient() {
   const [sides, setSides] = useState(6);
   const [results, setResults] = useState<number[]>([]);
   const [rolling, setRolling] = useState(false);
-  const [history, setHistory] = useState<{ label: string; color?: "blue" | "neutral" }[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
   const roll = useCallback(() => {
     if (rolling) return;
@@ -24,7 +25,8 @@ export function DiceRollerClient() {
       setRolling(false);
       const total = rolls.reduce((a, b) => a + b, 0);
       const label = numDice === 1 ? `${rolls[0]}` : `${rolls.join("+")} = ${total}`;
-      setHistory(h => [{ label, color: "blue" as const }, ...h].slice(0, 50));
+      const item: HistoryItem = { label, color: "blue" };
+      setHistory(h => [item, ...h].slice(0, 50));
     }, delay);
   }, [rolling, numDice, sides]);
 

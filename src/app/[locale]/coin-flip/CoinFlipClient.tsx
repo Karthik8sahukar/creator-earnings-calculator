@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { ResultCard, ActionButtons, HistoryPanel } from "@/components/decision";
+import type { HistoryItem } from "@/components/decision";
 import { randomPick, prefersReducedMotion } from "@/lib/decision";
 
 type CoinResult = "Heads" | "Tails";
@@ -11,7 +12,7 @@ export function CoinFlipClient() {
   const [flipping, setFlipping] = useState(false);
   const [flipCount, setFlipCount] = useState(1);
   const [results, setResults] = useState<CoinResult[]>([]);
-  const [history, setHistory] = useState<{ label: string; color?: "green" | "red" | "neutral" }[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
   const flip = useCallback(() => {
     if (flipping) return;
@@ -25,7 +26,7 @@ export function CoinFlipClient() {
       setFlipping(false);
       setResults(outcomes);
       setResult(outcomes[0]);
-      const newEntries = outcomes.map(o => ({ label: o, color: (o === "Heads" ? "green" : "red") as "green" | "red" }));
+      const newEntries: HistoryItem[] = outcomes.map(o => ({ label: o, color: o === "Heads" ? "green" : "red" }));
       setHistory(h => [...newEntries, ...h].slice(0, 50));
     }, delay);
   }, [flipping, flipCount]);

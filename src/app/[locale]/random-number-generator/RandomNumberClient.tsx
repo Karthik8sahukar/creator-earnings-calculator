@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { ResultCard, ActionButtons, HistoryPanel } from "@/components/decision";
+import type { HistoryItem } from "@/components/decision";
 import { randomInt, prefersReducedMotion } from "@/lib/decision";
 
 export function RandomNumberClient() {
@@ -10,7 +11,7 @@ export function RandomNumberClient() {
   const [count, setCount] = useState(1);
   const [results, setResults] = useState<number[]>([]);
   const [generating, setGenerating] = useState(false);
-  const [history, setHistory] = useState<{ label: string; color?: "blue" | "neutral" }[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
   const generate = useCallback(() => {
     if (generating || min > max) return;
@@ -22,7 +23,8 @@ export function RandomNumberClient() {
       setResults(nums);
       setGenerating(false);
       const label = count === 1 ? `${nums[0]}` : nums.join(", ");
-      setHistory(h => [{ label, color: "blue" as const }, ...h].slice(0, 50));
+      const item: HistoryItem = { label, color: "blue" };
+      setHistory(h => [item, ...h].slice(0, 50));
     }, delay);
   }, [generating, min, max, count]);
 

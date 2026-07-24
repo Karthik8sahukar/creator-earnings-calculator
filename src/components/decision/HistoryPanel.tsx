@@ -1,12 +1,20 @@
 "use client";
 
+/** Shared type for history entries across all Decision Tools. */
+export type HistoryColor = "green" | "red" | "blue" | "neutral";
+
+export interface HistoryItem {
+  label: string;
+  color?: HistoryColor;
+}
+
 interface Props {
-  entries: { label: string; color?: "green" | "red" | "blue" | "neutral" }[];
+  entries: HistoryItem[];
   onClear: () => void;
   title?: string;
 }
 
-const COLOR_MAP = {
+const COLOR_MAP: Record<HistoryColor, string> = {
   green: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   red: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
   blue: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",

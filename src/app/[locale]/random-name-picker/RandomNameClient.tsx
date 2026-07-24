@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { ResultCard, ActionButtons, HistoryPanel } from "@/components/decision";
+import type { HistoryItem } from "@/components/decision";
 import { randomPick, shuffle, prefersReducedMotion } from "@/lib/decision";
 
 export function RandomNameClient() {
@@ -9,7 +10,7 @@ export function RandomNameClient() {
   const [pickCount, setPickCount] = useState(1);
   const [results, setResults] = useState<string[]>([]);
   const [picking, setPicking] = useState(false);
-  const [history, setHistory] = useState<{ label: string; color?: "blue" | "neutral" }[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
   const names = useMemo(() => namesInput.split(/[\n,]+/).map(n => n.trim()).filter(Boolean), [namesInput]);
 
@@ -28,7 +29,8 @@ export function RandomNameClient() {
       setResults(picks);
       setPicking(false);
       const label = picks.join(", ");
-      setHistory(h => [{ label, color: "blue" as const }, ...h].slice(0, 50));
+      const item: HistoryItem = { label, color: "blue" };
+      setHistory(h => [item, ...h].slice(0, 50));
     }, delay);
   }, [picking, names, pickCount]);
 
