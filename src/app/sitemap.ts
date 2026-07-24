@@ -57,7 +57,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/dice-roller",
     "/random-number-generator",
     "/random-name-picker",
-    "/tools",
     "/blog",
     "/creators",
   ];

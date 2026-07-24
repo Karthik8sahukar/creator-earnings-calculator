@@ -78,17 +78,6 @@ export function DecisionTools() {
           </li>
         ))}
       </ul>
-
-      {/* View All Tools link */}
-      <div className="mt-8 text-center">
-        <Link
-          href={"/tools" as never}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
-        >
-          View All Tools
-          <span aria-hidden>&rarr;</span>
-        </Link>
-      </div>
     </section>
   );
 }

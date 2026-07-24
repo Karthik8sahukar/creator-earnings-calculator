@@ -78,12 +78,12 @@ export default async function HomePage({
       </Hero>
 
       <FeaturedTools />
-      <DecisionTools />
       <TrendingCreators />
       <FeaturedCreators />
       <TopEarningCreators />
       <TopByCountry />
       <TopByCategory />
+      <DecisionTools />
       <PopularCreators />
       <LatestBlogs />
       <PlatformStats />
