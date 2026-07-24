@@ -8,6 +8,7 @@ import { CreatorFaqSection } from "@/components/creator/CreatorFaqSection";
 import { CreatorHero } from "@/components/creator/CreatorHero";
 import { CreatorRelatedArticles } from "@/components/creator/CreatorRelatedArticles";
 import { CreatorStats } from "@/components/creator/CreatorStats";
+import { CreatorAnalyticsSection } from "@/components/creator/CreatorAnalyticsSection";
 import { CreatorVideoStrip } from "@/components/creator/CreatorVideoStrip";
 import { RelatedCalculators } from "@/components/creator/RelatedCalculators";
 import { RelatedCreators } from "@/components/creator/RelatedCreators";
@@ -275,6 +276,8 @@ export default async function CreatorPage({ params }: PageProps) {
       <CreatorEarnings profile={profile} />
 
       <CreatorStats profile={profile} />
+
+      <CreatorAnalyticsSection slug={creator.slug} initialData={null} />
 
       <CreatorVideoStrip
         titleKey="recentTitle"

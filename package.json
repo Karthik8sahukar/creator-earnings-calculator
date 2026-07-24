@@ -19,7 +19,8 @@
     "pipeline:verify": "npx tsx scripts/verify-creators-v2.ts",
     "pipeline:enrich": "npx tsx scripts/enrich-creators-v2.ts",
     "pipeline:search-index": "npx tsx scripts/build-search-index.ts",
-    "pipeline:validate": "npx tsx scripts/validate-creators.ts"
+    "pipeline:validate": "npx tsx scripts/validate-creators.ts",
+    "analytics:snapshot": "npx tsx scripts/analytics-snapshot.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.10",

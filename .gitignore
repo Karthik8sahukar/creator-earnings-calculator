@@ -156,3 +156,6 @@ reports/
 data/pipeline/*.json
 !data/pipeline/.gitkeep
 !data/pipeline/sample-import.json
+
+# Analytics snapshot data (captured by analytics:snapshot script)
+data/analytics/
