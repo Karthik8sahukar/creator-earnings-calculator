@@ -3,12 +3,13 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
+import { DecisionTools } from "@/components/home/DecisionTools";
 import { Faq } from "@/components/home/Faq";
 import { FeaturedCreators } from "@/components/home/FeaturedCreators";
+import { FeaturedTools } from "@/components/home/FeaturedTools";
 import { Hero } from "@/components/home/Hero";
 import { LatestBlogs } from "@/components/home/LatestBlogs";
 import { PlatformStats } from "@/components/home/PlatformStats";
-import { PopularCalculators } from "@/components/home/PopularCalculators";
 import { PopularCreators } from "@/components/home/PopularCreators";
 import { TopByCategory } from "@/components/home/TopByCategory";
 import { TopByCountry } from "@/components/home/TopByCountry";
@@ -18,20 +19,21 @@ import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 /**
- * Homepage — the Creator Intelligence Platform landing page.
+ * Homepage — the Creator Analytics Platform landing page.
  *
  * Sections (in order):
- *   1. Hero (search + YouTube Money Calculator CTA)
- *   2. Trending Creators
- *   3. Featured Creators
- *   4. Top Earning Creators
- *   5. Top Creators by Country
- *   6. Top Creators by Category
- *   7. Popular Calculators
- *   8. Latest Blog Posts
- *   9. Platform Statistics
- *  10. Why BeHumler
- *  11. FAQ
+ *   1. Hero (platform identity + search)
+ *   2. Featured Tools (categorized tool grid)
+ *   3. Trending Creators
+ *   4. Featured Creators
+ *   5. Top Earning Creators
+ *   6. Top Creators by Country
+ *   7. Top Creators by Category
+ *   8. Popular Creators
+ *   9. Latest Blog Posts
+ *  10. Platform Statistics
+ *  11. Why BeHumler
+ *  12. FAQ
  *
  * Every section is a server component for maximum performance.
  * Creator avatars are lazy-loaded from the YouTube cache.
@@ -75,12 +77,13 @@ export default async function HomePage({
         </Suspense>
       </Hero>
 
+      <FeaturedTools />
       <TrendingCreators />
       <FeaturedCreators />
       <TopEarningCreators />
       <TopByCountry />
       <TopByCategory />
-      <PopularCalculators />
+      <DecisionTools />
       <PopularCreators />
       <LatestBlogs />
       <PlatformStats />

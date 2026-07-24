@@ -109,6 +109,70 @@ export function Footer() {
                 {t("adsenseCalculator") ?? "AdSense Calculator"}
               </Link>
             </li>
+            <li>
+              <Link
+                href="/twitch-bits-calculator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("twitchBitsCalculator") ?? "Twitch Bits Calculator"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/yes-no-picker-wheel"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("yesNoPickerWheel") ?? "Yes/No Picker Wheel"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/random-team-generator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("teamGenerator") ?? "Random Team Generator"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/spin-the-wheel"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("spinWheel") ?? "Spin the Wheel"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/coin-flip"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("coinFlip") ?? "Coin Flip"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/dice-roller"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("diceRoller") ?? "Dice Roller"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/random-number-generator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("randomNumber") ?? "Random Number Generator"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/random-name-picker"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("namePicker") ?? "Random Name Picker"}
+              </Link>
+            </li>
           </ul>
         </div>
 

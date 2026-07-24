@@ -66,6 +66,9 @@
     "sponsorshipCalculator": "Sponsorship calculator",
     "engagementCalculator": "Engagement Calculator",
     "adsenseCalculator": "AdSense Calculator",
+    "twitchBitsCalculator": "Twitch Bits Calculator",
+    "yesNoPickerWheel": "Yes/No Picker Wheel",
+    "teamGenerator": "Random Team Generator",
     "instagramCalculator": "Instagram Money Calculator",
     "about": "About",
     "methodology": "Methodology",
@@ -78,7 +81,12 @@
     "notFinancialAdvice": "Estimates only. Not financial advice.",
     "blog": "Blog",
     "creators": "Creators",
-    "estimatesBlurb": "Revenue figures on this site are independently calculated estimates."
+    "estimatesBlurb": "Revenue figures on this site are independently calculated estimates.",
+    "spinWheel": "Spin the Wheel",
+    "coinFlip": "Coin Flip",
+    "diceRoller": "Dice Roller",
+    "randomNumber": "Random Number Generator",
+    "namePicker": "Random Name Picker"
   },
   "search": {
     "srLabel": "Search channel",
@@ -734,6 +742,44 @@
     "valuation": {
       "label": "Channel Valuation",
       "description": "Estimate the market value of a YouTube channel."
+    },
+    "twitchBits": {
+      "label": "Twitch Bits Calculator",
+      "description": "Convert Twitch Bits to USD and back."
+    },
+    "yesNoPicker": {
+      "label": "Yes/No Picker Wheel",
+      "description": "Spin a wheel to decide yes or no."
+    },
+    "teamGenerator": {
+      "label": "Random Team Generator",
+      "description": "Split a list of names into random teams."
+    },
+    "headings": {
+      "creatorAnalytics": "Creator Analytics",
+      "streaming": "Streaming",
+      "utilities": "Utilities",
+      "decisionTools": "Decision Tools"
+    },
+    "spinWheel": {
+      "label": "Spin the Wheel",
+      "description": "Customizable random spinner."
+    },
+    "coinFlip": {
+      "label": "Coin Flip",
+      "description": "Heads or tails instantly."
+    },
+    "diceRoller": {
+      "label": "Dice Roller",
+      "description": "Roll any dice online."
+    },
+    "randomNumber": {
+      "label": "Random Number Generator",
+      "description": "Numbers in any range."
+    },
+    "namePicker": {
+      "label": "Random Name Picker",
+      "description": "Pick names from a list."
     }
   },
   "popularCalculators": {
@@ -766,6 +812,65 @@
       }
     },
     "openCta": "Open"
+  },
+  "featuredTools": {
+    "title": "Explore Creator Analytics",
+    "subtitle": "Analytics, calculators and revenue tools for creators across multiple platforms.",
+    "badges": {
+      "analytics": "Creator Analytics",
+      "streaming": "Streaming"
+    },
+    "categories": {
+      "analytics": "Analytics",
+      "streaming": "Streaming",
+      "utilities": "Utilities"
+    },
+    "cards": {
+      "money": {
+        "title": "YouTube Money Calculator",
+        "description": "Estimate a channel's total monthly revenue from views, RPM, and ad performance across long-form and Shorts."
+      },
+      "rpm": {
+        "title": "RPM Calculator",
+        "description": "Calculate revenue per 1,000 monetized views — the key metric for understanding creator earnings."
+      },
+      "cpm": {
+        "title": "CPM Calculator",
+        "description": "See what advertisers pay per 1,000 ad impressions. Essential for pricing benchmarks."
+      },
+      "shorts": {
+        "title": "Shorts Calculator",
+        "description": "Estimate Creator Pool payouts from YouTube Shorts views based on audience country and niche."
+      },
+      "sponsorship": {
+        "title": "Sponsorship Calculator",
+        "description": "Estimate brand deal rates based on subscribers, engagement, niche, and deliverable type."
+      },
+      "engagement": {
+        "title": "Engagement Calculator",
+        "description": "Calculate engagement rate from views, likes, comments and shares to benchmark performance."
+      },
+      "adsense": {
+        "title": "AdSense Calculator",
+        "description": "Estimate AdSense revenue from your RPM and monthly view count with daily and yearly projections."
+      },
+      "instagram": {
+        "title": "Instagram Calculator",
+        "description": "Estimate Instagram creator earnings from sponsored posts, reels, stories, affiliate income and subscriptions."
+      },
+      "twitch": {
+        "title": "Twitch Bits Calculator",
+        "description": "Convert Twitch Bits to USD and see package pricing. Understand streamer payout vs viewer cost."
+      },
+      "yesNo": {
+        "title": "Yes/No Picker Wheel",
+        "description": "Spin the wheel for a random yes or no decision."
+      },
+      "teams": {
+        "title": "Random Team Generator",
+        "description": "Split a list of names into balanced random teams."
+      }
+    }
   },
   "creatorPlatforms": {
     "eyebrow": "Choose your platform",
@@ -964,6 +1069,19 @@
     "chip": "Powered by the YouTube Data API v3",
     "title": "YouTube Money Calculator",
     "subtitle": "Estimate a YouTube channel's potential monthly earnings using public YouTube data, estimated RPM, CPM, and view analytics.",
+    "platformHeadline": "Creator Analytics Platform",
+    "platformSubtitle": "Analyze creators across YouTube, Instagram, Twitch and more. Estimate revenue, calculate engagement, and discover insights with free, transparent tools.",
+    "ctaSearch": "Search Creator",
+    "ctaTools": "Browse Tools",
+    "featuredToolLabel": "Featured Tool",
+    "badges": {
+      "youtube": "YouTube",
+      "instagram": "Instagram",
+      "twitch": "Twitch",
+      "creatorEconomy": "Creator Economy",
+      "revenue": "Revenue",
+      "analytics": "Analytics"
+    },
     "workspaceHint": "Start typing a channel name, @handle, URL, or channel ID above.",
     "trustBadges": {
       "poweredBy": "Powered by YouTube Data API",
@@ -1192,6 +1310,42 @@
       "description": "Discover {name}'s estimated monthly earnings, yearly revenue, sponsorship value, RPM, CPM and YouTube statistics on {site}.",
       "notFoundTitle": "Creator not found",
       "notFoundDescription": "We do not have a profile for that creator yet."
+    }
+  },
+  "decisionTools": {
+    "eyebrow": "Interactive Tools",
+    "title": "Decision Tools",
+    "subtitle": "Free interactive tools for games, classrooms, meetings and quick decisions. No login, no tracking.",
+    "badge": "Decision Tool",
+    "cards": {
+      "spinWheel": {
+        "title": "Spin the Wheel",
+        "description": "Create a customizable spinning wheel with unlimited options."
+      },
+      "coinFlip": {
+        "title": "Coin Flip",
+        "description": "Flip a virtual coin for quick and unbiased decisions."
+      },
+      "diceRoller": {
+        "title": "Dice Roller",
+        "description": "Roll one or more virtual dice for games, classrooms and tabletop RPGs."
+      },
+      "randomNumber": {
+        "title": "Random Number Generator",
+        "description": "Generate random numbers instantly within any custom range."
+      },
+      "namePicker": {
+        "title": "Random Name Picker",
+        "description": "Pick a random winner from a list of names."
+      },
+      "yesNo": {
+        "title": "Yes / No Picker Wheel",
+        "description": "Spin a wheel to get a random Yes or No answer."
+      },
+      "teamGenerator": {
+        "title": "Random Team Generator",
+        "description": "Split names into balanced random teams instantly."
+      }
     }
   }
 }

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { CALCULATOR_LINKS } from "./CalculatorsMenu";
+import { CALCULATOR_CATEGORIES } from "./CalculatorsMenu";
 import { LanguageSelector } from "./LanguageSelector";
 import { Link } from "@/i18n/navigation";
 import { MenuIcon, XIcon } from "./icons";
@@ -167,19 +167,26 @@ export function MobileNav({ className = "" }: { className?: string }) {
                 <p className="px-3 pt-1 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {t("nav.calculators")}
                 </p>
-                <ul className="mb-4 space-y-0.5">
-                  {CALCULATOR_LINKS.map((c) => (
-                    <li key={c.href}>
-                      <Link
-                        href={c.href}
-                        onClick={close}
-                        className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
-                      >
-                        {t(c.labelKey)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                {CALCULATOR_CATEGORIES.map((category) => (
+                  <div key={category.headingKey} className="mb-3">
+                    <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                      {t(category.headingKey)}
+                    </p>
+                    <ul className="space-y-0.5">
+                      {category.links.map((c) => (
+                        <li key={c.href}>
+                          <Link
+                            href={c.href}
+                            onClick={close}
+                            className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
+                          >
+                            {t(c.labelKey)}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
 
               <div>

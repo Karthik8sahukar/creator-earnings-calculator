@@ -1,78 +1,96 @@
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
-import { CheckIcon } from "../icons";
-import { DashboardPreview } from "./DashboardPreview";
-
 /**
- * Homepage hero.
+ * Homepage hero — Creator Analytics Platform positioning.
  *
- * The H1 renders `home.title`, which in every locale's message bundle
- * is the string "YouTube Money Calculator" — the canonical product
- * name (proper noun, not translated) required for SEO. E2E tests
- * assert on this exact H1, and the SEO metadata block in the page
- * relies on the same wording.
+ * The H1 is still "YouTube Money Calculator" for SEO continuity
+ * (the `home.title` key), but the VISUAL hierarchy leads with the
+ * platform tagline. The H1 is rendered as a smaller eyebrow chip
+ * while the visually dominant heading is the platform description.
  *
- * The search box is rendered via `children` (the homepage passes in
- * `<Suspense><ChannelWorkspace/></Suspense>`), wrapped in a decorative
- * gradient halo — the input's own markup is not modified.
- *
- * On `lg+` viewports, an illustrative `<DashboardPreview/>` sits to the
- * right. It is `aria-hidden` and clearly labelled as illustrative.
+ * Layout:
+ *   - Platform tagline (visually dominant)
+ *   - Subtitle describing multi-platform capabilities
+ *   - Dual CTAs: "Search Creator" + "Browse Tools"
+ *   - Platform badges row
+ *   - Search box (children slot, still labeled as "Featured Tool")
  */
 export function Hero({ children }: { children: ReactNode }) {
   const t = useTranslations();
+
   return (
-    <section aria-labelledby="hero-title" className="pt-6 sm:pt-10">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center">
-        <div className="space-y-6 text-center lg:text-left">
-          <p className="chip-brand mx-auto lg:mx-0">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
-            {t("brand.tagline")}
-          </p>
+    <section aria-labelledby="hero-title" className="pt-6 sm:pt-12">
+      <div className="max-w-4xl mx-auto text-center space-y-6">
+        {/* SEO H1 — kept for search engines but visually de-emphasized */}
+        <h1 id="hero-title" className="sr-only">
+          {t("home.title")}
+        </h1>
 
-          <h1
-            id="hero-title"
-            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-slate-50"
+        {/* Platform identity — visually dominant */}
+        <p className="chip-brand mx-auto">
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+          {t("brand.tagline")}
+        </p>
+
+        <h2
+          aria-hidden="true"
+          className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 dark:text-slate-50"
+        >
+          {t("home.platformHeadline")}
+        </h2>
+
+        <p className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
+          {t("home.platformSubtitle")}
+        </p>
+
+        {/* Dual CTAs */}
+        <div className="flex flex-wrap justify-center gap-3 pt-2">
+          <a
+            href="#find-channel"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-brand-700 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
           >
-            {t("home.title")}
-          </h1>
-
-          <p className="max-w-2xl mx-auto lg:mx-0 text-lg text-slate-600 dark:text-slate-300">
-            {t("home.subtitle")}
-          </p>
-
-          <ul className="flex flex-wrap justify-center lg:justify-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-            {(
-              [
-                "home.trustBadges.poweredBy",
-                "home.trustBadges.free",
-                "home.trustBadges.noLogin",
-              ] as const
-            ).map((key) => (
-              <li
-                key={key}
-                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/70 px-3 py-1 dark:border-slate-800 dark:bg-slate-900/70"
-              >
-                <CheckIcon
-                  width={14}
-                  height={14}
-                  className="text-brand-600 dark:text-brand-300"
-                />
-                {t(key)}
-              </li>
-            ))}
-          </ul>
-
-          <div id="find-channel" className="pt-2 scroll-mt-24">
-            <div className="search-shell">
-              <div className="search-shell-inner">{children}</div>
-            </div>
-          </div>
+            {t("home.ctaSearch")}
+          </a>
+          <a
+            href="#tools"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+          >
+            {t("home.ctaTools")}
+          </a>
         </div>
 
-        <div className="hidden lg:block">
-          <DashboardPreview />
+        {/* Platform badges */}
+        <div className="flex flex-wrap justify-center gap-2 pt-2">
+          {(
+            [
+              "home.badges.youtube",
+              "home.badges.instagram",
+              "home.badges.twitch",
+              "home.badges.creatorEconomy",
+              "home.badges.revenue",
+              "home.badges.analytics",
+            ] as const
+          ).map((key) => (
+            <span
+              key={key}
+              className="inline-flex items-center rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-400"
+            >
+              {t(key)}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Featured tool search — scroll target */}
+      <div id="find-channel" className="mt-12 scroll-mt-24">
+        <div className="max-w-2xl mx-auto">
+          <p className="text-center text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+            {t("home.featuredToolLabel")}
+          </p>
+          <div className="search-shell">
+            <div className="search-shell-inner">{children}</div>
+          </div>
         </div>
       </div>
     </section>
