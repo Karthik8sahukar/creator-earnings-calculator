@@ -15,7 +15,7 @@ import {
 import { useFormatMoney } from "@/components/currency";
 import { TrendingUpIcon, CalendarIcon } from "@/components/icons";
 import { formatCompact } from "@/lib/format";
-import type { CreatorAnalytics, GrowthMetrics, TimeRange } from "@/lib/analytics/types";
+import type { CreatorAnalytics, TimeRange } from "@/lib/analytics/types";
 
 // ─── Types ──────────────────────────────────────────────────────────
 

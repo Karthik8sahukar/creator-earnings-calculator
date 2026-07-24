@@ -8,12 +8,11 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
-import { getCreatorBySlug, listCreators } from "@/lib/creators";
+import { listCreators } from "@/lib/creators";
 import {
   getAllCountrySlugs,
   getCountryPageData,
   buildCountryFaq,
-  COUNTRY_CODE_TO_SLUG,
 } from "@/lib/countryData";
 import { buildAlternates } from "@/lib/i18nMetadata";
 import {

@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import type { CreatorAnalytics, SnapshotQuery, TimeRange } from "./types";
+import type { CreatorAnalytics, TimeRange } from "./types";
 import { getAnalyticsStorage } from "./storage";
 import { calculateAllGrowth } from "./growth";
 

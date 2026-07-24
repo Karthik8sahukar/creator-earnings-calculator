@@ -33,14 +33,6 @@ type SortOption = "subscribers" | "name" | "country" | "category" | "newest";
 
 const SORT_OPTIONS: SortOption[] = ["subscribers", "name", "country", "category", "newest"];
 
-const SUBSCRIBER_TIERS = [
-  { value: "all", label: "All" },
-  { value: "mega", label: "Mega (30M+)" },
-  { value: "large", label: "Large (5M+)" },
-  { value: "mid", label: "Mid (1M+)" },
-  { value: "emerging", label: "Emerging" },
-] as const;
-
 /**
  * Enhanced creator directory client component with URL-synced filters,
  * server-side pagination, and sort options.

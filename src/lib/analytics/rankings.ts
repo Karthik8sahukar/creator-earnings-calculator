@@ -11,7 +11,7 @@
  *   - Ranking movement (subscriber tier change)
  */
 
-import type { CreatorSnapshot, GrowthMetrics } from "./types";
+import type { GrowthMetrics } from "./types";
 import { calculateGrowth } from "./growth";
 import { getAnalyticsStorage } from "./storage";
 

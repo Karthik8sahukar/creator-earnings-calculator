@@ -201,6 +201,33 @@ export class JsonFileAdapter implements AnalyticsStorage {
   }
 }
 
+// ─── Empty Storage (Production fallback) ────────────────────────────
+
+/**
+ * A no-op storage adapter used in production when no database is
+ * configured. Returns empty results for all queries — analytics
+ * charts will show the "still collecting data" empty state.
+ *
+ * This prevents silent filesystem writes on Vercel's ephemeral FS.
+ */
+class EmptyStorage implements AnalyticsStorage {
+  async saveSnapshot(): Promise<boolean> {
+    return false;
+  }
+  async getSnapshots(): Promise<CreatorSnapshot[]> {
+    return [];
+  }
+  async getLatestSnapshot(): Promise<CreatorSnapshot | null> {
+    return null;
+  }
+  async hasSnapshotInBucket(): Promise<boolean> {
+    return false;
+  }
+  async getTrackedCreatorSlugs(): Promise<string[]> {
+    return [];
+  }
+}
+
 // ─── Factory ────────────────────────────────────────────────────────
 
 let _instance: AnalyticsStorage | null = null;
@@ -208,22 +235,35 @@ let _instance: AnalyticsStorage | null = null;
 /**
  * Get the singleton storage adapter instance.
  *
- * In the current architecture (no database), this always returns the
- * JsonFileAdapter. When a database is added, swap the implementation
- * here — all consumers get the new backend automatically.
+ * Selection logic:
+ *   - Test override via setAnalyticsStorage() → returns that
+ *   - Development (NODE_ENV !== "production") → JsonFileAdapter
+ *   - Production without database → EmptyStorage (safe no-op)
+ *
+ * The JsonFileAdapter is NEVER used during page rendering in
+ * production because Vercel's filesystem is ephemeral. It only
+ * runs in:
+ *   - Local development
+ *   - The analytics:snapshot script (CLI, not page render)
+ *   - Unit/E2E tests
  */
 export function getAnalyticsStorage(): AnalyticsStorage {
   if (!_instance) {
-    // Default: JSON files in data/analytics/
-    const path = require("node:path");
-    const basePath = path.resolve(process.cwd(), "data/analytics");
-    _instance = new JsonFileAdapter(basePath);
+    if (process.env.NODE_ENV === "production") {
+      // Production: no filesystem writes. When a database adapter
+      // is added, instantiate it here instead.
+      _instance = new EmptyStorage();
+    } else {
+      // Development / test: JSON files in data/analytics/
+      const basePath = `${process.cwd()}/data/analytics`;
+      _instance = new JsonFileAdapter(basePath);
+    }
   }
   return _instance;
 }
 
 /**
- * Override the storage adapter (used in tests).
+ * Override the storage adapter (used in tests and scripts).
  */
 export function setAnalyticsStorage(adapter: AnalyticsStorage): void {
   _instance = adapter;
