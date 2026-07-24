@@ -109,6 +109,30 @@ export function Footer() {
                 {t("adsenseCalculator") ?? "AdSense Calculator"}
               </Link>
             </li>
+            <li>
+              <Link
+                href="/twitch-bits-calculator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("twitchBitsCalculator") ?? "Twitch Bits Calculator"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/yes-no-picker-wheel"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("yesNoPickerWheel") ?? "Yes/No Picker Wheel"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/random-team-generator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("teamGenerator") ?? "Random Team Generator"}
+              </Link>
+            </li>
           </ul>
         </div>
 

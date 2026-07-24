@@ -127,7 +127,7 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
           role="menu"
           aria-label={t("nav.calculators")}
           onKeyDown={onMenuKey}
-          className="absolute left-0 mt-2 w-80 rounded-xl bg-white shadow-pop border border-slate-200 dark:bg-slate-900 dark:border-slate-800 z-50 overflow-hidden animate-fade-in"
+          className="absolute left-0 mt-2 w-80 max-h-[70vh] rounded-xl bg-white shadow-pop border border-slate-200 dark:bg-slate-900 dark:border-slate-800 z-50 overflow-y-auto animate-fade-in"
         >
           <ul className="p-1.5">
             {CALCULATOR_LINKS.map(({ href, labelKey, descriptionKey, Icon }) => (
@@ -178,7 +178,10 @@ export interface CalculatorLink {
     | "/youtube-membership-calculator"
     | "/youtube-merch-calculator"
     | "/youtube-channel-valuation-calculator"
-    | "/youtube-adsense-calculator";
+    | "/youtube-adsense-calculator"
+    | "/twitch-bits-calculator"
+    | "/yes-no-picker-wheel"
+    | "/random-team-generator";
   labelKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -238,5 +241,23 @@ export const CALCULATOR_LINKS: CalculatorLink[] = [
     labelKey: "calculatorsMenu.valuation.label",
     descriptionKey: "calculatorsMenu.valuation.description",
     Icon: ChartIcon,
+  },
+  {
+    href: "/twitch-bits-calculator",
+    labelKey: "calculatorsMenu.twitchBits.label",
+    descriptionKey: "calculatorsMenu.twitchBits.description",
+    Icon: DollarIcon,
+  },
+  {
+    href: "/yes-no-picker-wheel",
+    labelKey: "calculatorsMenu.yesNoPicker.label",
+    descriptionKey: "calculatorsMenu.yesNoPicker.description",
+    Icon: ChartIcon,
+  },
+  {
+    href: "/random-team-generator",
+    labelKey: "calculatorsMenu.teamGenerator.label",
+    descriptionKey: "calculatorsMenu.teamGenerator.description",
+    Icon: ShareIcon,
   },
 ];

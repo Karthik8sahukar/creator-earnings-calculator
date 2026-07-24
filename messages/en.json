@@ -66,6 +66,9 @@
     "sponsorshipCalculator": "Sponsorship calculator",
     "engagementCalculator": "Engagement Calculator",
     "adsenseCalculator": "AdSense Calculator",
+    "twitchBitsCalculator": "Twitch Bits Calculator",
+    "yesNoPickerWheel": "Yes/No Picker Wheel",
+    "teamGenerator": "Random Team Generator",
     "instagramCalculator": "Instagram Money Calculator",
     "about": "About",
     "methodology": "Methodology",
@@ -734,6 +737,18 @@
     "valuation": {
       "label": "Channel Valuation",
       "description": "Estimate the market value of a YouTube channel."
+    },
+    "twitchBits": {
+      "label": "Twitch Bits Calculator",
+      "description": "Convert Twitch Bits to USD and back."
+    },
+    "yesNoPicker": {
+      "label": "Yes/No Picker Wheel",
+      "description": "Spin a wheel to decide yes or no."
+    },
+    "teamGenerator": {
+      "label": "Random Team Generator",
+      "description": "Split a list of names into random teams."
     }
   },
   "popularCalculators": {
