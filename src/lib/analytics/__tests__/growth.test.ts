@@ -26,7 +26,7 @@ function makeSnapshot(
     id: `snap-${overrides.capturedAt}`,
     creatorSlug: "test-creator",
     capturedAt: overrides.capturedAt,
-    subscribers: overrides.subscribers ?? 1_000_000,
+    subscribers: "subscribers" in overrides ? (overrides.subscribers ?? null) : 1_000_000,
     totalViews: overrides.totalViews ?? 100_000_000,
     videoCount: overrides.videoCount ?? 500,
     estimatedDailyEarningsUsd: overrides.estimatedDailyEarningsUsd ?? 100,
