@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Link } from "@/i18n/navigation";
 
 // ─── Constants ──────────────────────────────────────────────────────
 
@@ -228,21 +229,21 @@ export function TwitchBitsClient() {
         </h2>
         <ul className="grid gap-2 sm:grid-cols-2 text-sm">
           <li>
-            <a href="/youtube-adsense-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
+            <Link href="/youtube-adsense-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
               YouTube AdSense Calculator
-            </a>
+            </Link>
             <span className="text-slate-500 dark:text-slate-400"> — Estimate ad revenue from views.</span>
           </li>
           <li>
-            <a href="/youtube-sponsorship-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
+            <Link href="/youtube-sponsorship-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
               Sponsorship Rate Calculator
-            </a>
+            </Link>
             <span className="text-slate-500 dark:text-slate-400"> — Estimate brand deal rates.</span>
           </li>
           <li>
-            <a href="/instagram-money-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
+            <Link href="/instagram-money-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
               Instagram Money Calculator
-            </a>
+            </Link>
             <span className="text-slate-500 dark:text-slate-400"> — Estimate Instagram creator earnings.</span>
           </li>
         </ul>

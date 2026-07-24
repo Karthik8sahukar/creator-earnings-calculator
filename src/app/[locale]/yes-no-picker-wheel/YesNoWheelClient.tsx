@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "@/i18n/navigation";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -277,15 +278,15 @@ export function YesNoWheelClient() {
         </h2>
         <ul className="grid gap-2 sm:grid-cols-2 text-sm">
           <li>
-            <a href="/random-team-generator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
+            <Link href="/random-team-generator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
               Random Team Generator
-            </a>
+            </Link>
             <span className="text-slate-500 dark:text-slate-400"> — Split names into random groups.</span>
           </li>
           <li>
-            <a href="/twitch-bits-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
+            <Link href="/twitch-bits-calculator" className="text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-200 underline-offset-2 hover:underline">
               Twitch Bits Calculator
-            </a>
+            </Link>
             <span className="text-slate-500 dark:text-slate-400"> — Convert Bits to USD.</span>
           </li>
         </ul>
