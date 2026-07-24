@@ -3,26 +3,38 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
-import { CreatorPlatforms } from "@/components/home/CreatorPlatforms";
 import { Faq } from "@/components/home/Faq";
+import { FeaturedCreators } from "@/components/home/FeaturedCreators";
 import { Hero } from "@/components/home/Hero";
+import { LatestBlogs } from "@/components/home/LatestBlogs";
+import { PlatformStats } from "@/components/home/PlatformStats";
 import { PopularCalculators } from "@/components/home/PopularCalculators";
 import { PopularCreators } from "@/components/home/PopularCreators";
+import { TopByCategory } from "@/components/home/TopByCategory";
+import { TopByCountry } from "@/components/home/TopByCountry";
+import { TopEarningCreators } from "@/components/home/TopEarningCreators";
+import { TrendingCreators } from "@/components/home/TrendingCreators";
 import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 /**
- * Homepage — locale-aware composition of the redesigned home sections.
+ * Homepage — the Creator Intelligence Platform landing page.
  *
- * H1 stays "YouTube Money Calculator" for SEO (English key in every
- * locale's `home.title` — the same string, deliberately, so the SEO
- * meaning is preserved). Non-English locales still render the H1 in
- * English because the string IS "YouTube Money Calculator" — a proper
- * product name that is not localized.
+ * Sections (in order):
+ *   1. Hero (search + YouTube Money Calculator CTA)
+ *   2. Trending Creators
+ *   3. Featured Creators
+ *   4. Top Earning Creators
+ *   5. Top Creators by Country
+ *   6. Top Creators by Category
+ *   7. Popular Calculators
+ *   8. Latest Blog Posts
+ *   9. Platform Statistics
+ *  10. Why BeHumler
+ *  11. FAQ
  *
- * The homepage is a thin composition: Hero > PopularCalculators >
- * WhyBeHumler > Faq. Every visible string inside those sections comes
- * from `messages/{locale}.json`.
+ * Every section is a server component for maximum performance.
+ * Creator avatars are lazy-loaded from the YouTube cache.
  */
 export async function generateMetadata({
   params,
@@ -63,9 +75,15 @@ export default async function HomePage({
         </Suspense>
       </Hero>
 
+      <TrendingCreators />
+      <FeaturedCreators />
+      <TopEarningCreators />
+      <TopByCountry />
+      <TopByCategory />
       <PopularCalculators />
       <PopularCreators />
-      <CreatorPlatforms />
+      <LatestBlogs />
+      <PlatformStats />
       <WhyBeHumler />
       <Faq />
     </div>

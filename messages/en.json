@@ -42,7 +42,8 @@
     "menu": "Menu",
     "mobilePrimary": "Primary",
     "creators": "Creators",
-    "creatorsAria": "Browse YouTube creator profiles"
+    "creatorsAria": "Browse YouTube creator profiles",
+    "rankings": "Rankings"
   },
   "languageSelector": {
     "trigger": "Language",
@@ -63,6 +64,8 @@
     "cpmCalculator": "CPM calculator",
     "shortsCalculator": "Shorts calculator",
     "sponsorshipCalculator": "Sponsorship calculator",
+    "engagementCalculator": "Engagement Calculator",
+    "adsenseCalculator": "AdSense Calculator",
     "instagramCalculator": "Instagram Money Calculator",
     "about": "About",
     "methodology": "Methodology",
@@ -76,17 +79,6 @@
     "blog": "Blog",
     "creators": "Creators",
     "estimatesBlurb": "Revenue figures on this site are independently calculated estimates."
-  },
-  "home": {
-    "chip": "Powered by the YouTube Data API v3",
-    "title": "YouTube Money Calculator",
-    "subtitle": "Estimate a YouTube channel's potential monthly earnings using public YouTube data, estimated RPM, CPM, and view analytics.",
-    "workspaceHint": "Start typing a channel name, @handle, URL, or channel ID above.",
-    "trustBadges": {
-      "poweredBy": "Powered by YouTube Data API",
-      "free": "Free Forever",
-      "noLogin": "No Login Required"
-    }
   },
   "search": {
     "srLabel": "Search channel",
@@ -730,6 +722,18 @@
     "instagram": {
       "label": "Instagram Money Calculator",
       "description": "Estimate Instagram creator earnings."
+    },
+    "engagement": {
+      "label": "Engagement Calculator",
+      "description": "Calculate engagement rate from views and interactions."
+    },
+    "adsense": {
+      "label": "AdSense Calculator",
+      "description": "Estimate AdSense revenue from RPM and views."
+    },
+    "valuation": {
+      "label": "Channel Valuation",
+      "description": "Estimate the market value of a YouTube channel."
     }
   },
   "popularCalculators": {
@@ -956,10 +960,73 @@
     "title": "Popular creators",
     "viewAll": "View all creators"
   },
+  "home": {
+    "chip": "Powered by the YouTube Data API v3",
+    "title": "YouTube Money Calculator",
+    "subtitle": "Estimate a YouTube channel's potential monthly earnings using public YouTube data, estimated RPM, CPM, and view analytics.",
+    "workspaceHint": "Start typing a channel name, @handle, URL, or channel ID above.",
+    "trustBadges": {
+      "poweredBy": "Powered by YouTube Data API",
+      "free": "Free Forever",
+      "noLogin": "No Login Required"
+    },
+    "trending": {
+      "eyebrow": "Trending",
+      "title": "Trending creators",
+      "viewAll": "View all"
+    },
+    "featured": {
+      "eyebrow": "Featured",
+      "title": "Featured creators",
+      "subtitle": "Hand-picked creators from around the world representing diverse niches and countries.",
+      "viewAll": "View all creators"
+    },
+    "topEarning": {
+      "eyebrow": "Highest RPM",
+      "title": "Top earning creators",
+      "subtitle": "Ranked by estimated RPM based on country and niche.",
+      "viewAll": "View all"
+    },
+    "byCountry": {
+      "eyebrow": "By Country",
+      "title": "Top creators by country",
+      "creators": "creators",
+      "rpm": "Base RPM",
+      "shortsRpm": "Shorts RPM",
+      "explore": "Explore country"
+    },
+    "byCategory": {
+      "eyebrow": "By Category",
+      "title": "Top creators by category",
+      "creators": "creators",
+      "rpmMultiplier": "RPM multiplier",
+      "avgRpm": "US RPM",
+      "explore": "Explore category"
+    },
+    "stats": {
+      "eyebrow": "Platform data",
+      "title": "Platform statistics",
+      "subtitle": "The data powering the Creator Intelligence Platform.",
+      "totalCreators": "Creators tracked",
+      "verifiedCreators": "Verified creators",
+      "countriesCovered": "Countries covered",
+      "categories": "Content categories",
+      "nichesTracked": "Niches with RPM data",
+      "rpmCountries": "Countries with RPM data"
+    },
+    "latestBlogs": {
+      "eyebrow": "Blog",
+      "title": "Latest articles",
+      "subtitle": "Practical guides on YouTube monetization, growth, and the creator economy.",
+      "viewAll": "View all articles",
+      "readMore": "Read article"
+    }
+  },
   "creators": {
     "eyebrow": "Creators directory",
     "title": "YouTube Creators",
     "subtitle": "Browse and search YouTube creators. Every profile includes independent earnings estimates, channel statistics, and links to the calculators.",
+    "creatorsCount": "creators",
     "searchLabel": "Search creators",
     "searchPlaceholder": "Search by name, handle, category or country",
     "clearSearchAria": "Clear search",
@@ -967,9 +1034,20 @@
     "filterCountry": "Country",
     "filterCategory": "Category",
     "filterAlphabet": "Starts with",
+    "filterVerified": "Verified",
+    "filterVerifiedOnly": "Verified only",
+    "filterSort": "Sort by",
     "clearFilters": "Clear filters",
     "resultCount": "{count, plural, =0 {No creators} one {# creator} other {# creators}}",
+    "pageInfo": "Page {page} of {total}",
     "emptyResults": "No creators match your filters. Try clearing them or searching for a different name.",
+    "sortOptions": {
+      "subscribers": "Subscribers",
+      "name": "Alphabetical",
+      "country": "Country",
+      "category": "Category",
+      "newest": "Newest"
+    },
     "card": {
       "cardAria": "Open {name} profile"
     },

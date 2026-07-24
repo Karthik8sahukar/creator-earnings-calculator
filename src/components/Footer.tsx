@@ -93,6 +93,22 @@ export function Footer() {
                 {t("sponsorshipCalculator")}
               </Link>
             </li>
+            <li>
+              <Link
+                href="/youtube-engagement-calculator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("engagementCalculator") ?? "Engagement Calculator"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/youtube-adsense-calculator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("adsenseCalculator") ?? "AdSense Calculator"}
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -116,6 +132,14 @@ export function Footer() {
                 data-testid="footer-creators-link"
               >
                 {t("creators")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/top-creators"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                Top Creators
               </Link>
             </li>
             <li>

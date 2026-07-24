@@ -172,7 +172,13 @@ export interface CalculatorLink {
     | "/youtube-cpm-calculator"
     | "/youtube-shorts-calculator"
     | "/youtube-sponsorship-calculator"
-    | "/instagram-money-calculator";
+    | "/instagram-money-calculator"
+    | "/youtube-engagement-calculator"
+    | "/youtube-affiliate-calculator"
+    | "/youtube-membership-calculator"
+    | "/youtube-merch-calculator"
+    | "/youtube-channel-valuation-calculator"
+    | "/youtube-adsense-calculator";
   labelKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -214,5 +220,23 @@ export const CALCULATOR_LINKS: CalculatorLink[] = [
     labelKey: "calculatorsMenu.sponsorship.label",
     descriptionKey: "calculatorsMenu.sponsorship.description",
     Icon: ShareIcon,
+  },
+  {
+    href: "/youtube-engagement-calculator",
+    labelKey: "calculatorsMenu.engagement.label",
+    descriptionKey: "calculatorsMenu.engagement.description",
+    Icon: TrendingUpIcon,
+  },
+  {
+    href: "/youtube-adsense-calculator",
+    labelKey: "calculatorsMenu.adsense.label",
+    descriptionKey: "calculatorsMenu.adsense.description",
+    Icon: DollarIcon,
+  },
+  {
+    href: "/youtube-channel-valuation-calculator",
+    labelKey: "calculatorsMenu.valuation.label",
+    descriptionKey: "calculatorsMenu.valuation.description",
+    Icon: ChartIcon,
   },
 ];
