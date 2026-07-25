@@ -36,7 +36,18 @@ export interface CalculatorLink {
     | "/coin-flip"
     | "/dice-roller"
     | "/random-number-generator"
-    | "/random-name-picker";
+    | "/random-name-picker"
+    | "/developer-tools"
+    | "/jwt-decoder"
+    | "/json-formatter"
+    | "/base64-encoder-decoder"
+    | "/uuid-generator"
+    | "/cron-expression-generator"
+    | "/unix-timestamp-converter"
+    | "/url-encoder-decoder"
+    | "/regex-tester"
+    | "/sql-to-json-converter"
+    | "/csv-to-json-converter";
   labelKey: string;
   descriptionKey: string;
   Icon: (props: { width?: number; height?: number }) => React.ReactElement;
@@ -82,6 +93,17 @@ export const CALCULATOR_CATEGORIES: CalculatorCategory[] = [
       { href: "/dice-roller", labelKey: "calculatorsMenu.diceRoller.label", descriptionKey: "calculatorsMenu.diceRoller.description", Icon: FilmIcon },
       { href: "/random-number-generator", labelKey: "calculatorsMenu.randomNumber.label", descriptionKey: "calculatorsMenu.randomNumber.description", Icon: TrendingUpIcon },
       { href: "/random-name-picker", labelKey: "calculatorsMenu.namePicker.label", descriptionKey: "calculatorsMenu.namePicker.description", Icon: ShareIcon },
+    ],
+  },
+  {
+    headingKey: "calculatorsMenu.headings.developerTools",
+    links: [
+      { href: "/json-formatter", labelKey: "calculatorsMenu.jsonFormatter.label", descriptionKey: "calculatorsMenu.jsonFormatter.description", Icon: ChartIcon },
+      { href: "/jwt-decoder", labelKey: "calculatorsMenu.jwtDecoder.label", descriptionKey: "calculatorsMenu.jwtDecoder.description", Icon: DollarIcon },
+      { href: "/base64-encoder-decoder", labelKey: "calculatorsMenu.base64.label", descriptionKey: "calculatorsMenu.base64.description", Icon: TrendingUpIcon },
+      { href: "/uuid-generator", labelKey: "calculatorsMenu.uuidGenerator.label", descriptionKey: "calculatorsMenu.uuidGenerator.description", Icon: ShareIcon },
+      { href: "/regex-tester", labelKey: "calculatorsMenu.regexTester.label", descriptionKey: "calculatorsMenu.regexTester.description", Icon: DollarIcon },
+      { href: "/unix-timestamp-converter", labelKey: "calculatorsMenu.timestamp.label", descriptionKey: "calculatorsMenu.timestamp.description", Icon: ChartIcon },
     ],
   },
 ];
