@@ -126,10 +126,10 @@ export function getAllComparisonSlugs(): string[] {
 export function getPopularComparisons(): Array<{ slug: string; name1: string; name2: string }> {
   const popular = [
     { slug1: "mrbeast", slug2: "pewdiepie" },
-    { slug1: "carryminati", slug2: "triggeredinsaan" },
+    { slug1: "ishowspeed", slug2: "coryxkenshin" },
     { slug1: "mkbhd", slug2: "linustechtips" },
-    { slug1: "ksi", slug2: "loganpaul" },
-    { slug1: "markiplier", slug2: "dream" },
+    { slug1: "markiplier", slug2: "jacksepticeye" },
+    { slug1: "veritasium", slug2: "kurzgesagt" },
     { slug1: "grahamstephan", slug2: "aliabdaal" },
   ];
 

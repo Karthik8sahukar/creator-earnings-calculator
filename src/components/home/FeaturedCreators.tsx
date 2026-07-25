@@ -11,13 +11,13 @@ import { getCreatorBySlug } from "@/lib/creators";
  */
 const FEATURED_SLUGS = [
   "mrbeast",
-  "carryminati",
-  "ksi",
-  "hikakintv",
-  "whindersson-nunes",
   "pewdiepie",
   "mkbhd",
+  "hikakintv",
+  "linustechtips",
+  "kurzgesagt",
   "blackpink",
+  "markiplier",
 ] as const;
 
 export async function FeaturedCreators() {
