@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { encodeBase64, decodeBase64, encodeBase64Url, decodeBase64Url, isValidBase64, getByteCount, BASE64_SAMPLE_TEXT, SAMPLE_BASE64 } from "@/lib/developer";
+import { encodeBase64, decodeBase64, encodeBase64Url, decodeBase64Url, getByteCount, BASE64_SAMPLE_TEXT, SAMPLE_BASE64 } from "@/lib/developer";
 import { CopyButton, PrivacyBadge, ToolError } from "@/components/developer";
 
 type Mode = "encode" | "decode" | "encodeUrl" | "decodeUrl";

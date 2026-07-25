@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { decodeJwt, isExpired, getExpiryInfo, unixToDate, SAMPLE_JWT } from "@/lib/developer";
+import { decodeJwt, getExpiryInfo, unixToDate, SAMPLE_JWT } from "@/lib/developer";
 import { CopyButton, PrivacyBadge, ToolError } from "@/components/developer";
 
 export function JwtDecoderClient() {
