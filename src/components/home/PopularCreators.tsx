@@ -13,11 +13,11 @@ import { getCreatorBySlug } from "@/lib/creators";
  */
 const POPULAR_SLUGS = [
   "mrbeast",
-  "carryminati",
   "ishowspeed",
-  "techburner",
   "pewdiepie",
-  "triggeredinsaan",
+  "markiplier",
+  "dream",
+  "coryxkenshin",
 ] as const;
 
 /**

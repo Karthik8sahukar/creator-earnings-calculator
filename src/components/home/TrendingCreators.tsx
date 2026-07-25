@@ -13,10 +13,10 @@ import { TrendingUpIcon } from "../icons";
 const TRENDING_SLUGS = [
   "ishowspeed",
   "mrbeast",
-  "samay-raina",
   "markrober",
   "dream",
-  "casimiro",
+  "xqc",
+  "airrack",
 ] as const;
 
 export async function TrendingCreators() {
@@ -46,6 +46,7 @@ export async function TrendingCreators() {
         <Link
           href="/creators"
           className="btn-secondary text-sm"
+          data-testid="creators-directory-link"
         >
           {t("viewAll")}
         </Link>
