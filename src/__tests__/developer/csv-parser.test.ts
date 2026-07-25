@@ -37,9 +37,50 @@ describe("CSV parser", () => {
     expect(address.zip).toBe(560001);
   });
 
-  it("rejects prototype pollution keys", () => {
+  it("rejects __proto__ pollution in nested keys", () => {
     const csv = "__proto__.polluted,name\ntrue,test";
     const result = parseCsv(csv, { nested: true });
-    expect((result.data[0] as Record<string, unknown>).__proto__).toBeUndefined();
+    const row = result.data[0] as Record<string, unknown>;
+    expect(Object.prototype.hasOwnProperty.call(row, "__proto__")).toBe(false);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    expect(row.name).toBe("test");
+  });
+
+  it("rejects constructor.prototype pollution in nested keys", () => {
+    const csv = "constructor.prototype.polluted,name\ntrue,test";
+    const result = parseCsv(csv, { nested: true });
+    const row = result.data[0] as Record<string, unknown>;
+    expect(Object.prototype.hasOwnProperty.call(row, "constructor")).toBe(false);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    expect(row.name).toBe("test");
+  });
+
+  it("rejects prototype at any depth in nested keys", () => {
+    const csv = "safe.prototype.polluted,name\ntrue,test";
+    const result = parseCsv(csv, { nested: true });
+    const row = result.data[0] as Record<string, unknown>;
+    const safe = row.safe as Record<string, unknown> | undefined;
+    if (safe) {
+      expect(Object.prototype.hasOwnProperty.call(safe, "prototype")).toBe(false);
+    }
+    expect(row.name).toBe("test");
+  });
+
+  it("rejects dangerous flat keys without nested mode", () => {
+    const csv = "__proto__,name\nmalicious,test";
+    const result = parseCsv(csv, { nested: false });
+    const row = result.data[0] as Record<string, unknown>;
+    expect(Object.prototype.hasOwnProperty.call(row, "__proto__")).toBe(false);
+    expect(row.name).toBe("test");
+  });
+
+  it("valid nested fields work alongside dangerous rejections", () => {
+    const csv = "user.name,__proto__.hack,user.age\nAlice,bad,30";
+    const result = parseCsv(csv, { nested: true });
+    const row = result.data[0] as Record<string, unknown>;
+    const user = row.user as Record<string, unknown>;
+    expect(user.name).toBe("Alice");
+    expect(user.age).toBe(30);
+    expect(Object.prototype.hasOwnProperty.call(row, "__proto__")).toBe(false);
   });
 });

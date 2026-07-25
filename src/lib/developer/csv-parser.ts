@@ -63,7 +63,7 @@ export function parseCsv(input: string, options: CsvParseOptions = {}): CsvParse
 
   for (const row of dataRows) {
     if (row.every((cell) => cell === "")) continue;
-    const obj: Record<string, unknown> = {};
+    const obj: Record<string, unknown> = Object.create(null);
     headers.forEach((header, i) => {
       const value = i < row.length ? row[i] : "";
       const processed = options.typeInference !== false
@@ -72,6 +72,7 @@ export function parseCsv(input: string, options: CsvParseOptions = {}): CsvParse
       if (options.nested && header.includes(".")) {
         setNestedValue(obj, header, processed);
       } else {
+        if (DANGEROUS_KEYS.has(header)) return;
         obj[header] = processed;
       }
     });
@@ -136,21 +137,25 @@ function inferType(value: string): unknown {
   return value;
 }
 
+/** Check if any segment in a dot-path is dangerous. */
+function hasDangerousSegment(path: string): boolean {
+  return path.split(".").some((seg) => DANGEROUS_KEYS.has(seg));
+}
+
 /** Set a nested value using dot notation with prototype pollution protection. */
 function setNestedValue(obj: Record<string, unknown>, path: string, value: unknown): void {
+  if (hasDangerousSegment(path)) return;
+
   const keys = path.split(".");
   let current: Record<string, unknown> = obj;
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i];
-    if (DANGEROUS_KEYS.has(key)) return; // reject dangerous keys
     if (!(key in current) || typeof current[key] !== "object" || current[key] === null) {
-      current[key] = {};
+      current[key] = Object.create(null);
     }
     current = current[key] as Record<string, unknown>;
   }
-  const lastKey = keys[keys.length - 1];
-  if (DANGEROUS_KEYS.has(lastKey)) return;
-  current[lastKey] = value;
+  current[keys[keys.length - 1]] = value;
 }
 
 export const SAMPLE_CSV = `name,email,age,address.city,address.zip
