@@ -17,7 +17,7 @@ interface CategoryCard {
 
 const CATEGORIES: CategoryCard[] = [
   {
-    href: "/#find-channel",
+    href: "/creator-tools",
     title: "Creator Intelligence",
     subtitle: "YouTube revenue estimation, RPM/CPM analysis, channel valuation, and sponsorship pricing.",
     tools: ["Money Calculator", "RPM", "CPM", "Shorts", "Sponsorship", "Instagram"],

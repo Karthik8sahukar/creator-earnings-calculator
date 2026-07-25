@@ -42,6 +42,7 @@ export interface CalculatorLink {
     | "/random-color-generator"
     | "/truth-or-dare-generator"
     | "/decision-tools"
+    | "/creator-tools"
     | "/developer-tools"
     | "/jwt-decoder"
     | "/json-formatter"

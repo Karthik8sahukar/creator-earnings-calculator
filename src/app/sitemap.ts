@@ -62,6 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/random-color-generator",
     "/truth-or-dare-generator",
     "/decision-tools",
+    "/creator-tools",
     "/developer-tools",
     "/jwt-decoder",
     "/json-formatter",
