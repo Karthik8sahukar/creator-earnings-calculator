@@ -22,6 +22,10 @@ const TOOLS: readonly Tool[] = [
   { href: "/random-name-picker", titleKey: "decisionTools.cards.namePicker.title", descriptionKey: "decisionTools.cards.namePicker.description", Icon: ShareIcon },
   { href: "/yes-no-picker-wheel", titleKey: "decisionTools.cards.yesNo.title", descriptionKey: "decisionTools.cards.yesNo.description", Icon: ChartIcon },
   { href: "/random-team-generator", titleKey: "decisionTools.cards.teamGenerator.title", descriptionKey: "decisionTools.cards.teamGenerator.description", Icon: ShareIcon },
+  { href: "/character-counter", titleKey: "decisionTools.cards.characterCounter.title", descriptionKey: "decisionTools.cards.characterCounter.description", Icon: TrendingUpIcon },
+  { href: "/word-counter", titleKey: "decisionTools.cards.wordCounter.title", descriptionKey: "decisionTools.cards.wordCounter.description", Icon: TrendingUpIcon },
+  { href: "/random-color-generator", titleKey: "decisionTools.cards.colorGenerator.title", descriptionKey: "decisionTools.cards.colorGenerator.description", Icon: ChartIcon },
+  { href: "/truth-or-dare-generator", titleKey: "decisionTools.cards.truthOrDare.title", descriptionKey: "decisionTools.cards.truthOrDare.description", Icon: FilmIcon },
 ];
 
 /**
