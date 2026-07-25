@@ -23,18 +23,17 @@ test.describe("Creators directory", () => {
       page.getByRole("heading", { level: 1, name: /YouTube Creators/i }),
     ).toBeVisible();
 
-    // Grid renders — at least MrBeast and CarryMinati should be present.
+    // Grid renders — MrBeast should be present (verified curated creator).
     await expect(page.getByTestId("creator-card-mrbeast")).toBeVisible();
-    await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
   });
 
   test("search filters the creator grid", async ({ page }) => {
     await page.goto("/en/creators");
 
     // Search for a specific creator.
-    await page.getByTestId("creators-search").fill("carryminati");
+    await page.getByTestId("creators-search").fill("markiplier");
     // Wait for the search to take effect (debounced URL navigation).
-    await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
+    await expect(page.getByTestId("creator-card-markiplier")).toBeVisible();
     await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
   });
 
@@ -44,21 +43,19 @@ test.describe("Creators directory", () => {
     // Visit with a clean slate — no search state.
     await page.goto("/en/creators");
 
-    // Apply country = India via the filter select.
-    await page.getByTestId("creators-filter-country").selectOption("India");
+    // Apply country = Japan via the filter select.
+    await page.getByTestId("creators-filter-country").selectOption("Japan");
 
-    // Wait for an India creator to appear — confirms navigation completed.
-    await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
-    // TechBurner is an India creator (subscriberTier: mid, verified: true).
-    await expect(page.getByTestId("creator-card-techburner")).toBeVisible();
-    // A non-India creator should NOT be visible.
+    // Wait for a Japan creator to appear — confirms navigation completed.
+    await expect(page.getByTestId("creator-card-hikakintv")).toBeVisible();
+    // A non-Japan creator should NOT be visible.
     await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
   });
 
   test("clear filters restores the full grid", async ({ page }) => {
     // Start with a filter active.
-    await page.goto("/en/creators?country=India");
-    await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
+    await page.goto("/en/creators?country=Japan");
+    await expect(page.getByTestId("creator-card-hikakintv")).toBeVisible();
     await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
 
     // Clear all filters.
@@ -73,9 +70,9 @@ test.describe("Creators directory", () => {
   }) => {
     await page.goto("/en/creators");
 
-    // First: search for TechBurner specifically.
-    await page.getByTestId("creators-search").fill("Tech Burner");
-    await expect(page.getByTestId("creator-card-techburner")).toBeVisible();
+    // First: search for Markiplier specifically.
+    await page.getByTestId("creators-search").fill("Markiplier");
+    await expect(page.getByTestId("creator-card-markiplier")).toBeVisible();
 
     // Clear search by emptying the input and pressing Enter for
     // immediate sync (avoids debounce timing).
@@ -84,10 +81,9 @@ test.describe("Creators directory", () => {
     // Wait for full grid to reload.
     await expect(page.getByTestId("creator-card-mrbeast")).toBeVisible();
 
-    // Now apply India filter on the clean slate.
-    await page.getByTestId("creators-filter-country").selectOption("India");
-    await expect(page.getByTestId("creator-card-carryminati")).toBeVisible();
-    await expect(page.getByTestId("creator-card-techburner")).toBeVisible();
+    // Now apply Japan filter on the clean slate.
+    await page.getByTestId("creators-filter-country").selectOption("Japan");
+    await expect(page.getByTestId("creator-card-hikakintv")).toBeVisible();
     await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
   });
 
@@ -191,17 +187,14 @@ test.describe("Creator profile page", () => {
 });
 
 test.describe("Navigation", () => {
-  test("Creators link is present in header + footer + homepage strip", async ({
+  test("Creators link is present in header, footer, and homepage trending section", async ({
     page,
   }) => {
     await page.goto("/en");
 
-    // Homepage strip.
+    // Homepage Trending Creators section has a link to /creators.
     await expect(
-      page.getByRole("heading", { level: 2, name: /Popular creators/i }),
-    ).toBeVisible();
-    await expect(
-      page.getByTestId("popular-creators-view-all"),
+      page.getByTestId("creators-directory-link"),
     ).toBeVisible();
 
     // Header nav (desktop viewport).
@@ -211,11 +204,11 @@ test.describe("Navigation", () => {
     await expect(page.getByTestId("footer-creators-link")).toBeVisible();
   });
 
-  test("'View all creators' link navigates to /en/creators", async ({
+  test("Creators directory link navigates to /en/creators", async ({
     page,
   }) => {
     await page.goto("/en");
-    await page.getByTestId("popular-creators-view-all").click();
+    await page.getByTestId("creators-directory-link").click();
     await expect(page).toHaveURL(/\/en\/creators$/);
     await expect(
       page.getByRole("heading", { level: 1, name: /YouTube Creators/i }),

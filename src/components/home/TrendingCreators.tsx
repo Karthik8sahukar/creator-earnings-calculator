@@ -46,6 +46,7 @@ export async function TrendingCreators() {
         <Link
           href="/creators"
           className="btn-secondary text-sm"
+          data-testid="creators-directory-link"
         >
           {t("viewAll")}
         </Link>
