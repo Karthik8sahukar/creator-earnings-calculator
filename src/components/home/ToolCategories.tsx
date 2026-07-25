@@ -35,7 +35,7 @@ const CATEGORIES: CategoryCard[] = [
     iconBg: "bg-blue-500/15 text-blue-400",
   },
   {
-    href: "/spin-the-wheel",
+    href: "/decision-tools",
     title: "Smart Utilities",
     subtitle: "Spin wheels, coin flips, dice rollers, random teams, and decision-making tools.",
     tools: ["Spin Wheel", "Coin Flip", "Dice", "Teams", "Name Picker", "Yes/No"],

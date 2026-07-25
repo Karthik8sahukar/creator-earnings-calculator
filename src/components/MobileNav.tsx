@@ -119,7 +119,8 @@ export function MobileNav({ className = "" }: { className?: string }) {
 
           <div
             ref={sheetRef}
-            className="absolute right-0 top-0 h-full w-[86%] max-w-sm bg-white shadow-pop border-l border-slate-200 dark:bg-slate-950 dark:border-slate-800 flex flex-col animate-fade-in"
+            className="absolute right-0 top-0 h-[100dvh] w-[86%] max-w-sm bg-white shadow-pop border-l border-slate-200 dark:bg-slate-950 dark:border-slate-800 flex flex-col animate-fade-in supports-[height:100dvh]:h-[100dvh]"
+            style={{ height: "100dvh", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
           >
             <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-slate-800">
               <span
