@@ -90,7 +90,11 @@
     "jsonFormatter": "JSON Formatter",
     "jwtDecoder": "JWT Decoder",
     "uuidGenerator": "UUID Generator",
-    "regexTester": "Regex Tester"
+    "regexTester": "Regex Tester",
+    "characterCounter": "Character Counter",
+    "wordCounter": "Word Counter",
+    "colorGenerator": "Random Color Generator",
+    "truthOrDare": "Truth or Dare"
   },
   "home": {
     "chip": "Basierend auf der YouTube Data API v3",
@@ -622,6 +626,22 @@
     "timestamp": {
       "label": "Unix Timestamp",
       "description": "Convert timestamps to dates."
+    },
+    "characterCounter": {
+      "label": "Character Counter",
+      "description": "Count characters, words, and sentences."
+    },
+    "wordCounter": {
+      "label": "Word Counter",
+      "description": "Word count and keyword density."
+    },
+    "colorGenerator": {
+      "label": "Random Color Generator",
+      "description": "Generate colors with palettes."
+    },
+    "truthOrDare": {
+      "label": "Truth or Dare",
+      "description": "Party game question generator."
     }
   },
   "popularCalculators": {
@@ -1374,6 +1394,22 @@
       "teamGenerator": {
         "title": "Random Team Generator",
         "description": "Split names into balanced random teams instantly."
+      },
+      "characterCounter": {
+        "title": "Character Counter",
+        "description": "Count characters, words, sentences, and paragraphs in real time."
+      },
+      "wordCounter": {
+        "title": "Word Counter",
+        "description": "Analyze word count, keyword density, and reading time."
+      },
+      "colorGenerator": {
+        "title": "Random Color Generator",
+        "description": "Generate random colors with palettes and contrast checking."
+      },
+      "truthOrDare": {
+        "title": "Truth or Dare",
+        "description": "Generate truth or dare questions for parties and game nights."
       }
     }
   }

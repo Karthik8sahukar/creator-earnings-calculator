@@ -175,6 +175,38 @@ export function Footer() {
             </li>
             <li>
               <Link
+                href="/character-counter"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("characterCounter") ?? "Character Counter"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/word-counter"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("wordCounter") ?? "Word Counter"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/random-color-generator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("colorGenerator") ?? "Random Color Generator"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/truth-or-dare-generator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("truthOrDare") ?? "Truth or Dare"}
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/json-formatter"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >

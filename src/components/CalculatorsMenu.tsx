@@ -37,6 +37,10 @@ export interface CalculatorLink {
     | "/dice-roller"
     | "/random-number-generator"
     | "/random-name-picker"
+    | "/character-counter"
+    | "/word-counter"
+    | "/random-color-generator"
+    | "/truth-or-dare-generator"
     | "/developer-tools"
     | "/jwt-decoder"
     | "/json-formatter"
@@ -83,6 +87,9 @@ export const CALCULATOR_CATEGORIES: CalculatorCategory[] = [
     links: [
       { href: "/yes-no-picker-wheel", labelKey: "calculatorsMenu.yesNoPicker.label", descriptionKey: "calculatorsMenu.yesNoPicker.description", Icon: ChartIcon },
       { href: "/random-team-generator", labelKey: "calculatorsMenu.teamGenerator.label", descriptionKey: "calculatorsMenu.teamGenerator.description", Icon: ShareIcon },
+      { href: "/character-counter", labelKey: "calculatorsMenu.characterCounter.label", descriptionKey: "calculatorsMenu.characterCounter.description", Icon: TrendingUpIcon },
+      { href: "/word-counter", labelKey: "calculatorsMenu.wordCounter.label", descriptionKey: "calculatorsMenu.wordCounter.description", Icon: TrendingUpIcon },
+      { href: "/random-color-generator", labelKey: "calculatorsMenu.colorGenerator.label", descriptionKey: "calculatorsMenu.colorGenerator.description", Icon: ChartIcon },
     ],
   },
   {
@@ -93,6 +100,7 @@ export const CALCULATOR_CATEGORIES: CalculatorCategory[] = [
       { href: "/dice-roller", labelKey: "calculatorsMenu.diceRoller.label", descriptionKey: "calculatorsMenu.diceRoller.description", Icon: FilmIcon },
       { href: "/random-number-generator", labelKey: "calculatorsMenu.randomNumber.label", descriptionKey: "calculatorsMenu.randomNumber.description", Icon: TrendingUpIcon },
       { href: "/random-name-picker", labelKey: "calculatorsMenu.namePicker.label", descriptionKey: "calculatorsMenu.namePicker.description", Icon: ShareIcon },
+      { href: "/truth-or-dare-generator", labelKey: "calculatorsMenu.truthOrDare.label", descriptionKey: "calculatorsMenu.truthOrDare.description", Icon: FilmIcon },
     ],
   },
   {
