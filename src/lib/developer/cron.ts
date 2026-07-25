@@ -161,15 +161,15 @@ export function getNextRuns(expr: string, count = 5): Date[] {
 
 function matchesCron(date: Date, fields: CronFields): boolean {
   return (
-    matchesField(date.getMinutes(), fields.minute, 0, 59) &&
-    matchesField(date.getHours(), fields.hour, 0, 23) &&
-    matchesField(date.getDate(), fields.dayOfMonth, 1, 31) &&
-    matchesField(date.getMonth() + 1, fields.month, 1, 12) &&
-    matchesField(date.getDay(), fields.dayOfWeek, 0, 7)
+    matchesField(date.getMinutes(), fields.minute, 0) &&
+    matchesField(date.getHours(), fields.hour, 0) &&
+    matchesField(date.getDate(), fields.dayOfMonth, 1) &&
+    matchesField(date.getMonth() + 1, fields.month, 1) &&
+    matchesField(date.getDay(), fields.dayOfWeek, 0)
   );
 }
 
-function matchesField(value: number, field: string, min: number, max: number): boolean {
+function matchesField(value: number, field: string, min: number): boolean {
   if (field === "*") return true;
   const parts = field.split(",");
   for (const part of parts) {

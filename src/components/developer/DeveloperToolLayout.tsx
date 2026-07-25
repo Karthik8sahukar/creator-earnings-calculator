@@ -37,7 +37,7 @@ export function DeveloperToolLayout({
             </li>
             <li className="flex items-center gap-1">
               <span aria-hidden>&rsaquo;</span>
-              <Link href="/developer-tools" className="hover:text-slate-900 dark:hover:text-slate-100">
+              <Link href={"/developer-tools" as never} className="hover:text-slate-900 dark:hover:text-slate-100">
                 Developer Tools
               </Link>
             </li>

@@ -29,7 +29,7 @@ export function safeDecode(input: string, mode: UrlMode): { result: string; erro
   try {
     const result = mode === "component" ? decodeUrlComponent(input) : decodeFullUrl(input);
     return { result };
-  } catch (e) {
+  } catch {
     return { result: "", error: "Malformed percent-encoded sequence" };
   }
 }
@@ -39,7 +39,7 @@ export function safeEncode(input: string, mode: UrlMode): { result: string; erro
   try {
     const result = mode === "component" ? encodeUrlComponent(input) : encodeFullUrl(input);
     return { result };
-  } catch (e) {
+  } catch {
     return { result: "", error: "Unable to encode input" };
   }
 }

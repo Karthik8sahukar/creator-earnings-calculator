@@ -56,7 +56,7 @@ export function DeveloperTools() {
       </ul>
 
       <div className="mt-6 text-center sm:text-left">
-        <Link href="/developer-tools" className="text-sm font-medium text-accent-600 dark:text-accent-400 hover:underline">
+        <Link href={"/developer-tools" as never} className="text-sm font-medium text-accent-600 dark:text-accent-400 hover:underline">
           View all developer tools &rarr;
         </Link>
       </div>

@@ -51,12 +51,12 @@ export function countJsonStats(input: string): JsonStats {
   const stats: JsonStats = { objects: 0, arrays: 0, strings: 0, numbers: 0, booleans: 0, nulls: 0, keys: 0 };
   try {
     const parsed = JSON.parse(input);
-    traverse(parsed, stats, true);
+    traverse(parsed, stats);
   } catch { /* return zeroes */ }
   return stats;
 }
 
-function traverse(value: unknown, stats: JsonStats, isRoot = false): void {
+function traverse(value: unknown, stats: JsonStats): void {
   if (value === null) { stats.nulls++; return; }
   if (Array.isArray(value)) {
     stats.arrays++;

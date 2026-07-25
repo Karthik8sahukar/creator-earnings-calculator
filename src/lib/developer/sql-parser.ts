@@ -54,7 +54,7 @@ function parseWithoutColumns(sql: string): SqlParseResult {
   const rows = parseValueRows(afterValues);
   if (rows.error) return { data: [], rowCount: 0, error: rows.error };
 
-  const data = rows.values.map((row, idx) => {
+  const data = rows.values.map((row) => {
     const obj: Record<string, unknown> = {};
     row.forEach((val, i) => { obj[`col${i + 1}`] = val; });
     return obj;
