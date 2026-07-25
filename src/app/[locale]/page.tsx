@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
 import { DecisionTools } from "@/components/home/DecisionTools";
+import { DeveloperTools } from "@/components/home/DeveloperTools";
 import { Faq } from "@/components/home/Faq";
 import { FeaturedTools } from "@/components/home/FeaturedTools";
 import { HeroRedesign } from "@/components/home/HeroRedesign";
@@ -23,12 +24,13 @@ import { buildAlternates } from "@/lib/i18nMetadata";
  *   2. Trust Stats (metric cards)
  *   3. Tool Categories (3 category cards)
  *   4. Quick Actions (popular tools)
- *   5. Featured Tools (premium grid)
- *   6. Trending Creators (carousel)
- *   7. Decision Tools
- *   8. Why BeHumler (value props)
- *   9. Blog (latest 3)
- *  10. FAQ
+ *   5. Featured Tools (Creator Analytics)
+ *   6. Trending Creators
+ *   7. Developer Tools
+ *   8. Decision Tools
+ *   9. Why BeHumler
+ *  10. Blog
+ *  11. FAQ
  */
 export async function generateMetadata({
   params,
@@ -74,6 +76,7 @@ export default async function HomePage({
       <QuickActions />
       <FeaturedTools />
       <TrendingCreators />
+      <DeveloperTools />
       <DecisionTools />
       <WhyBeHumler />
       <LatestBlogs />

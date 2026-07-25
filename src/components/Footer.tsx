@@ -173,6 +173,38 @@ export function Footer() {
                 {t("namePicker") ?? "Random Name Picker"}
               </Link>
             </li>
+            <li>
+              <Link
+                href="/json-formatter"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("jsonFormatter") ?? "JSON Formatter"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/jwt-decoder"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("jwtDecoder") ?? "JWT Decoder"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/uuid-generator"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("uuidGenerator") ?? "UUID Generator"}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/regex-tester"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("regexTester") ?? "Regex Tester"}
+              </Link>
+            </li>
           </ul>
         </div>
 

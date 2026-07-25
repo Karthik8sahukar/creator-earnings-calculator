@@ -86,7 +86,11 @@
     "coinFlip": "Coin Flip",
     "diceRoller": "Dice Roller",
     "randomNumber": "Random Number Generator",
-    "namePicker": "Random Name Picker"
+    "namePicker": "Random Name Picker",
+    "jsonFormatter": "JSON Formatter",
+    "jwtDecoder": "JWT Decoder",
+    "uuidGenerator": "UUID Generator",
+    "regexTester": "Regex Tester"
   },
   "home": {
     "chip": "YouTube Data API v3 पर आधारित",
@@ -572,7 +576,8 @@
       "creatorAnalytics": "Creator Analytics",
       "streaming": "Streaming",
       "utilities": "Utilities",
-      "decisionTools": "Decision Tools"
+      "decisionTools": "Decision Tools",
+      "developerTools": "Developer Tools"
     },
     "spinWheel": {
       "label": "Spin the Wheel",
@@ -593,6 +598,30 @@
     "namePicker": {
       "label": "Random Name Picker",
       "description": "Pick names from a list."
+    },
+    "jsonFormatter": {
+      "label": "JSON Formatter",
+      "description": "Beautify and validate JSON."
+    },
+    "jwtDecoder": {
+      "label": "JWT Decoder",
+      "description": "Decode JWT tokens locally."
+    },
+    "base64": {
+      "label": "Base64 Encoder/Decoder",
+      "description": "Encode and decode Base64."
+    },
+    "uuidGenerator": {
+      "label": "UUID Generator",
+      "description": "Generate UUID v4 identifiers."
+    },
+    "regexTester": {
+      "label": "Regex Tester",
+      "description": "Test regex patterns live."
+    },
+    "timestamp": {
+      "label": "Unix Timestamp",
+      "description": "Convert timestamps to dates."
     }
   },
   "popularCalculators": {
