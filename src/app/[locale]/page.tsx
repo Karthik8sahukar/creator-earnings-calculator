@@ -5,38 +5,30 @@ import { Suspense } from "react";
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
 import { DecisionTools } from "@/components/home/DecisionTools";
 import { Faq } from "@/components/home/Faq";
-import { FeaturedCreators } from "@/components/home/FeaturedCreators";
 import { FeaturedTools } from "@/components/home/FeaturedTools";
-import { Hero } from "@/components/home/Hero";
+import { HeroRedesign } from "@/components/home/HeroRedesign";
 import { LatestBlogs } from "@/components/home/LatestBlogs";
-import { PlatformStats } from "@/components/home/PlatformStats";
-import { PopularCreators } from "@/components/home/PopularCreators";
-import { TopByCategory } from "@/components/home/TopByCategory";
-import { TopByCountry } from "@/components/home/TopByCountry";
-import { TopEarningCreators } from "@/components/home/TopEarningCreators";
+import { QuickActions } from "@/components/home/QuickActions";
+import { ToolCategories } from "@/components/home/ToolCategories";
 import { TrendingCreators } from "@/components/home/TrendingCreators";
+import { TrustStats } from "@/components/home/TrustStats";
 import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 /**
- * Homepage — the Creator Analytics Platform landing page.
+ * Homepage — Premium landing page for BeHumler.
  *
- * Sections (in order):
- *   1. Hero (platform identity + search)
- *   2. Featured Tools (categorized tool grid)
- *   3. Trending Creators
- *   4. Featured Creators
- *   5. Top Earning Creators
- *   6. Top Creators by Country
- *   7. Top Creators by Category
- *   8. Popular Creators
- *   9. Latest Blog Posts
- *  10. Platform Statistics
- *  11. Why BeHumler
- *  12. FAQ
- *
- * Every section is a server component for maximum performance.
- * Creator avatars are lazy-loaded from the YouTube cache.
+ * Redesigned section order:
+ *   1. Hero (platform headline + search)
+ *   2. Trust Stats (metric cards)
+ *   3. Tool Categories (3 category cards)
+ *   4. Quick Actions (popular tools)
+ *   5. Featured Tools (premium grid)
+ *   6. Trending Creators (carousel)
+ *   7. Decision Tools
+ *   8. Why BeHumler (value props)
+ *   9. Blog (latest 3)
+ *  10. FAQ
  */
 export async function generateMetadata({
   params,
@@ -71,23 +63,20 @@ export default async function HomePage({
 
   return (
     <div className="space-y-20 sm:space-y-28">
-      <Hero>
+      <HeroRedesign>
         <Suspense fallback={<WorkspaceFallback />}>
           <ChannelWorkspace />
         </Suspense>
-      </Hero>
+      </HeroRedesign>
 
+      <TrustStats />
+      <ToolCategories />
+      <QuickActions />
       <FeaturedTools />
       <TrendingCreators />
-      <FeaturedCreators />
-      <TopEarningCreators />
-      <TopByCountry />
-      <TopByCategory />
       <DecisionTools />
-      <PopularCreators />
-      <LatestBlogs />
-      <PlatformStats />
       <WhyBeHumler />
+      <LatestBlogs />
       <Faq />
     </div>
   );
