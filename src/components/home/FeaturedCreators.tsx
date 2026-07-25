@@ -15,7 +15,6 @@ const FEATURED_SLUGS = [
   "ksi",
   "hikakintv",
   "whindersson-nunes",
-  "julien-bam",
   "pewdiepie",
   "mkbhd",
   "blackpink",

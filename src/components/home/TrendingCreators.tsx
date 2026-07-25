@@ -13,10 +13,10 @@ import { TrendingUpIcon } from "../icons";
 const TRENDING_SLUGS = [
   "ishowspeed",
   "mrbeast",
-  "samay-raina",
+  "samayraina",
   "markrober",
   "dream",
-  "casimiro",
+  "ksi",
 ] as const;
 
 export async function TrendingCreators() {
