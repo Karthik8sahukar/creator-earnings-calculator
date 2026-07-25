@@ -64,6 +64,30 @@ export const ALL_DECISION_TOOLS: readonly DecisionToolDef[] = [
     description: "Split names into balanced random teams instantly.",
     Icon: ShareIcon,
   },
+  {
+    href: "/character-counter",
+    title: "Character Counter",
+    description: "Count characters, words, and sentences in real time with platform limits.",
+    Icon: TrendingUpIcon,
+  },
+  {
+    href: "/word-counter",
+    title: "Word Counter",
+    description: "Analyze word count, keyword density, and reading time instantly.",
+    Icon: TrendingUpIcon,
+  },
+  {
+    href: "/random-color-generator",
+    title: "Random Color Generator",
+    description: "Generate random colors with palettes and WCAG contrast checking.",
+    Icon: ChartIcon,
+  },
+  {
+    href: "/truth-or-dare-generator",
+    title: "Truth or Dare",
+    description: "Generate truth or dare questions for parties and game nights.",
+    Icon: FilmIcon,
+  },
 ];
 
 // ─── Component ──────────────────────────────────────────────────────

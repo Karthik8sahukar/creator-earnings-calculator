@@ -72,6 +72,7 @@ export function parseCsv(input: string, options: CsvParseOptions = {}): CsvParse
       if (options.nested && header.includes(".")) {
         setNestedValue(obj, header, processed);
       } else {
+        // Reject dangerous flat keys
         if (DANGEROUS_KEYS.has(header)) return;
         obj[header] = processed;
       }
