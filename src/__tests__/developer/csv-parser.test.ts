@@ -37,9 +37,66 @@ describe("CSV parser", () => {
     expect(address.zip).toBe(560001);
   });
 
-  it("rejects prototype pollution keys", () => {
+  it("rejects __proto__ pollution in nested keys", () => {
     const csv = "__proto__.polluted,name\ntrue,test";
     const result = parseCsv(csv, { nested: true });
-    expect((result.data[0] as Record<string, unknown>).__proto__).toBeUndefined();
+    const row = result.data[0] as Record<string, unknown>;
+
+    // __proto__ must not be created as an own property
+    expect(Object.prototype.hasOwnProperty.call(row, "__proto__")).toBe(false);
+    // Object.prototype must not be polluted
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    // Safe key must still be parsed
+    expect(row.name).toBe("test");
+  });
+
+  it("rejects constructor.prototype pollution in nested keys", () => {
+    const csv = "constructor.prototype.polluted,name\ntrue,test";
+    const result = parseCsv(csv, { nested: true });
+    const row = result.data[0] as Record<string, unknown>;
+
+    // constructor must not be created as an own property
+    expect(Object.prototype.hasOwnProperty.call(row, "constructor")).toBe(false);
+    // Object.prototype must not be polluted
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    // Safe key still works
+    expect(row.name).toBe("test");
+  });
+
+  it("rejects prototype key at any depth in nested keys", () => {
+    const csv = "safe.prototype.polluted,name\ntrue,test";
+    const result = parseCsv(csv, { nested: true });
+    const row = result.data[0] as Record<string, unknown>;
+
+    // The entire path should be rejected — no 'safe' property created
+    // with a 'prototype' child
+    const safe = row.safe as Record<string, unknown> | undefined;
+    if (safe) {
+      expect(Object.prototype.hasOwnProperty.call(safe, "prototype")).toBe(false);
+    }
+    // Safe key still works
+    expect(row.name).toBe("test");
+  });
+
+  it("rejects dangerous flat keys without nested mode", () => {
+    const csv = "__proto__,name\nmalicious,test";
+    const result = parseCsv(csv, { nested: false });
+    const row = result.data[0] as Record<string, unknown>;
+
+    // __proto__ must not be an own property
+    expect(Object.prototype.hasOwnProperty.call(row, "__proto__")).toBe(false);
+    // Safe key still works
+    expect(row.name).toBe("test");
+  });
+
+  it("valid nested fields still work alongside dangerous rejections", () => {
+    const csv = "user.name,__proto__.hack,user.age\nAlice,bad,30";
+    const result = parseCsv(csv, { nested: true });
+    const row = result.data[0] as Record<string, unknown>;
+    const user = row.user as Record<string, unknown>;
+
+    expect(user.name).toBe("Alice");
+    expect(user.age).toBe(30);
+    expect(Object.prototype.hasOwnProperty.call(row, "__proto__")).toBe(false);
   });
 });
