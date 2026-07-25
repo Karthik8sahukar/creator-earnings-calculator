@@ -17,14 +17,14 @@ import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 /**
- * Homepage — Premium landing page for BeHumler.
+ * Homepage — Premium dark landing page for BeHumler.
  *
- * Redesigned section order:
- *   1. Hero (platform headline + search)
- *   2. Trust Stats (metric cards)
- *   3. Tool Categories (3 category cards)
- *   4. Quick Actions (popular tools)
- *   5. Featured Tools (Creator Analytics)
+ * Matches approved mockup layout:
+ *   1. Hero (dark, two-col: headline+search left, dashboard preview right, trust bar)
+ *   2. TrustStats (no-op — trust bar moved into hero)
+ *   3. Tool Categories (3 product cards: Creator/Developer/Utilities)
+ *   4. Featured Experience (YouTube Money Calculator card)
+ *   5. Featured Tools (Creator Analytics grid)
  *   6. Trending Creators
  *   7. Developer Tools
  *   8. Decision Tools
@@ -64,7 +64,7 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   return (
-    <div className="space-y-20 sm:space-y-28">
+    <div className="space-y-24 sm:space-y-32">
       <HeroRedesign>
         <Suspense fallback={<WorkspaceFallback />}>
           <ChannelWorkspace />
