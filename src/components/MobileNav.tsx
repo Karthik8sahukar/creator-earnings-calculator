@@ -3,7 +3,6 @@
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { CurrencySelector } from "./currency";
 import { LanguageSelector } from "./LanguageSelector";
 import { Link } from "@/i18n/navigation";
 import { MenuIcon, XIcon } from "./icons";
@@ -239,8 +238,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
             </nav>
 
             {/* Footer */}
-            <div className="border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-2">
-              <CurrencySelector />
+            <div className="border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-end gap-2">
               <LanguageSelector />
               <ThemeToggle />
             </div>
