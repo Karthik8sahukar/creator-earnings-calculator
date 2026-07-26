@@ -6,7 +6,6 @@
  */
 
 import {
-  type ToolCategoryId,
   type ToolEntry,
   TOOL_REGISTRY,
   getToolsByCategory,

@@ -34,13 +34,13 @@ export function CalculatorCta({
   body?: string;
   ctaText?: string;
 }) {
-  const HREF: Record<typeof to, "/" | "/youtube-rpm-calculator" | "/youtube-cpm-calculator" | "/youtube-shorts-calculator" | "/youtube-sponsorship-calculator"> = {
+  const HREF = {
     money: "/youtube-money-calculator",
     rpm: "/youtube-rpm-calculator",
     cpm: "/youtube-cpm-calculator",
     shorts: "/youtube-shorts-calculator",
     sponsorship: "/youtube-sponsorship-calculator",
-  };
+  } as const;
   const DEFAULT_CTA: Record<typeof to, string> = {
     money: "Open the YouTube Money Calculator",
     rpm: "Open the RPM Calculator",
