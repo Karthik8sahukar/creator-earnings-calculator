@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 
-import { listCategorySlugs, listCountrySlugs } from "@/data/creators";
+import { listCategorySlugs, listCountrySlugs, COUNTRY_PAGES } from "@/data/creators";
 import { listLeaderboardSlugs } from "@/data/creators/leaderboards";
 import { HREFLANG_MAP, routing } from "@/i18n/routing";
 import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
+import { getAllCategorySlugs } from "@/lib/categoryData";
 import { publicConfig } from "@/lib/config";
+import { getAllCountrySlugs, COUNTRY_SLUGS } from "@/lib/countryData";
 import { listCreators } from "@/lib/creators";
 import { getAllRankingFilterSlugs } from "@/lib/rankings";
 
@@ -157,9 +159,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
   }
 
-  // NOTE: /country/[slug] and /category/[slug] are intentionally excluded.
-  // They duplicate /creators/country/[country] and /creators/[category]
-  // respectively. The /creators/* variants are the preferred canonicals.
+  // NOTE: /country/[slug] and /category/[slug] are intentionally excluded
+  // when they overlap with /creators/country/[country] or /creators/[category].
+  // Only non-overlapping routes (unique content with no curated equivalent)
+  // are included. Overlap is detected via countryCode for countries and
+  // slug match for categories.
+
+  // Country codes already covered by /creators/country/[country]
+  const curatedCountryCodes = new Set(COUNTRY_PAGES.map((c) => c.countryCode));
+  // Category slugs already covered by /creators/[category]
+  const curatedCategorySlugs = new Set(listCategorySlugs());
+
+  for (const slug of getAllCountrySlugs()) {
+    const countryCode = COUNTRY_SLUGS[slug];
+    if (countryCode && curatedCountryCodes.has(countryCode)) continue; // duplicate
+    entries.push(
+      ...perLocaleWithAlternates(`/country/${slug}`, 0.5, "monthly"),
+    );
+  }
+
+  for (const slug of getAllCategorySlugs()) {
+    if (curatedCategorySlugs.has(slug)) continue; // duplicate
+    entries.push(
+      ...perLocaleWithAlternates(`/category/${slug}`, 0.5, "monthly"),
+    );
+  }
 
   // 3: blog article pages — English canonical only.
   try {

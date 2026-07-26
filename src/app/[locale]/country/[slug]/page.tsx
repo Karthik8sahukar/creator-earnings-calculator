@@ -296,10 +296,15 @@ export default async function CountryPage({
             .map((s) => {
               const otherData = getCountryPageData(s);
               if (!otherData) return null;
+              // Link to the preferred /creators/country/ route when one exists
+              const curatedPage = COUNTRY_PAGES.find((c) => c.countryCode === otherData.countryCode);
+              const linkHref = curatedPage
+                ? `/creators/country/${curatedPage.slug}` as `/creators/country/${string}`
+                : `/country/${s}` as `/country/${string}`;
               return (
                 <Link
                   key={s}
-                  href={`/country/${s}` as `/country/${string}`}
+                  href={linkHref}
                   className="chip hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                 >
                   {otherData.label}
