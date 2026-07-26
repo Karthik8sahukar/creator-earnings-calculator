@@ -7,7 +7,6 @@ import { HorizontalScroll, ScrollItem } from "@/components/ui/HorizontalScroll";
 import { Star, Sparkles, Trophy } from "@/components/ui/Icon";
 import { SectionHeader } from "@/components/AppShell";
 import { getPopularTools, getFeaturedTools, TOOL_REGISTRY, type ToolEntry } from "@/lib/tools";
-import { card } from "@/lib/design-tokens";
 
 // ─── Tab Definitions ────────────────────────────────────────────────
 
@@ -103,11 +102,13 @@ export function QuickDiscovery() {
       />
 
       {/* Tab switcher */}
-      <div className="flex items-center gap-1.5 mb-6 overflow-x-auto scrollbar-hide pb-1">
+      <div role="tablist" aria-label="Discovery filter" className="flex items-center gap-1.5 mb-6 overflow-x-auto scrollbar-hide pb-1">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`inline-flex items-center gap-1.5 shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
               activeTab === tab.id
@@ -122,13 +123,19 @@ export function QuickDiscovery() {
       </div>
 
       {/* Horizontal scroll of tool cards */}
-      <HorizontalScroll label={`${activeDef.label} tools`}>
-        {tools.map((tool) => (
-          <ScrollItem key={tool.slug} className="w-[260px] sm:w-[280px]">
-            <ToolCard tool={tool} variant="standard" />
-          </ScrollItem>
-        ))}
-      </HorizontalScroll>
+      {tools.length > 0 ? (
+        <HorizontalScroll label={`${activeDef.label} tools`}>
+          {tools.map((tool) => (
+            <ScrollItem key={tool.slug} className="w-[260px] sm:w-[280px]">
+              <ToolCard tool={tool} variant="standard" />
+            </ScrollItem>
+          ))}
+        </HorizontalScroll>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-8 text-center">
+          <p className="text-sm text-slate-500 dark:text-slate-400">No tools in this category yet.</p>
+        </div>
+      )}
     </section>
   );
 }

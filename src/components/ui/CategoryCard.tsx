@@ -29,7 +29,7 @@ export function CategoryCard({ category }: Props) {
         <span className="text-3xl" aria-hidden>
           {category.emoji}
         </span>
-        <span className="inline-flex items-center rounded-full bg-white/80 dark:bg-slate-800/80 px-2.5 py-1 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-sm">
+        <span className="inline-flex items-center justify-center min-w-[28px] rounded-full bg-white/80 dark:bg-slate-800/80 px-2.5 py-1 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-sm">
           {category.count}
         </span>
       </div>

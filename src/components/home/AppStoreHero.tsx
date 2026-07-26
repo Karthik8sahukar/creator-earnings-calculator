@@ -68,7 +68,7 @@ export function AppStoreHero({ onSearchOpen, creatorSearch }: Props) {
         {/* Search Tabs */}
         <div className="max-w-xl mx-auto pt-4">
           {/* Tab switcher */}
-          <div className="flex items-center justify-center gap-1 mb-4">
+          <div role="tablist" aria-label="Search mode" className="flex items-center justify-center gap-1 mb-4">
             <TabButton active={tab === "tools"} onClick={() => setTab("tools")}>
               Tools
             </TabButton>
@@ -158,6 +158,8 @@ function TabButton({
   return (
     <button
       type="button"
+      role="tab"
+      aria-selected={active}
       onClick={onClick}
       className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
         active

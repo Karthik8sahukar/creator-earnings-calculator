@@ -1,5 +1,6 @@
 import { ToolCard } from "@/components/ui/ToolCard";
 import { HorizontalScroll, ScrollItem } from "@/components/ui/HorizontalScroll";
+import { SectionHeader } from "@/components/AppShell";
 import { getHomepageCollections, type ToolCollection } from "@/lib/tools";
 
 /**
@@ -23,17 +24,12 @@ export function CollectionSection() {
 
   return (
     <section aria-labelledby="collections-title" className="scroll-mt-20 space-y-14 sm:space-y-16">
-      <div className="text-center">
-        <h2
-          id="collections-title"
-          className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50"
-        >
-          Collections
-        </h2>
-        <p className="mt-2 text-slate-600 dark:text-slate-300 max-w-xl mx-auto">
-          Curated tool sets for specific needs — pick a collection and explore.
-        </p>
-      </div>
+      <SectionHeader
+        title="Collections"
+        subtitle="Curated tool sets for specific needs — pick a collection and explore."
+        id="collections-title"
+        centered
+      />
 
       {collections.map((collection) => (
         <CollectionRow key={collection.id} collection={collection} />

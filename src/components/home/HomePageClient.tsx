@@ -43,8 +43,12 @@ export function HomePageClient({
       {/* Quick discovery — tabbed horizontal scroll (client component) */}
       <QuickDiscovery />
 
-      {/* Server-rendered sections passed from the page */}
-      {children}
+      {/* Server-rendered sections passed from the page.
+          Wrapped in a div to apply consistent section spacing since
+          children are already wrapped in AppShell's space-y. */}
+      <div className="contents">
+        {children}
+      </div>
     </>
   );
 }

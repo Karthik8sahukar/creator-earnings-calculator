@@ -20,6 +20,9 @@ import { grid } from "@/lib/design-tokens";
  */
 export function FeaturedGrid() {
   const tools = getFeaturedMixed(8);
+
+  if (tools.length === 0) return null;
+
   const [first, ...rest] = tools;
 
   return (
