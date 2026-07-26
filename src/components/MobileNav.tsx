@@ -262,7 +262,7 @@ function NavSection({ title, children }: { title: string; children: React.ReactN
   );
 }
 
-function AccordionCategory({ category, label, children, onLinkClick }: { category: ToolCategoryId; label: string; children: React.ReactNode; onLinkClick: () => void }) {
+function AccordionCategory({ category, label, children, onLinkClick: _onLinkClick }: { category: ToolCategoryId; label: string; children: React.ReactNode; onLinkClick: () => void }) {
   const [expanded, setExpanded] = useState(false);
 
   return (

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";

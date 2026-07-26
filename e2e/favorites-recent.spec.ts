@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 /**
  * E2E tests for Milestone 1 — Favorites, Recent Tools, and Share integration.
@@ -15,12 +15,6 @@ import { expect, test, type Page } from "@playwright/test";
  *   9. Share button shows copy feedback
  *  10. Non-English locale preserves navigation
  */
-
-// Helper: get the favorite button within a tool card by tool title
-async function getFavoriteButtonInCard(page: Page, toolTitle: string) {
-  const card = page.locator('[class*="card"]', { has: page.getByRole("heading", { name: toolTitle }) }).first();
-  return card.getByRole("button", { name: /favorite/i });
-}
 
 test.describe("Favorites from ToolCard", () => {
   test("favorite a tool from a tool card", async ({ page }) => {

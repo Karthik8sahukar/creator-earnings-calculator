@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 import { useSearchAnalytics } from "./useSearchAnalytics";
 
@@ -54,7 +54,8 @@ describe("useSearchAnalytics", () => {
     const now = new Date("2026-07-26T12:00:00Z").getTime();
     vi.setSystemTime(now);
 
-    const { result } = renderHook(() => useSearchAnalytics());
+    // First mount (unused but initializes hook)
+    renderHook(() => useSearchAnalytics());
 
     // Seed old events in localStorage (older than 7 days)
     const oldEvents = [
