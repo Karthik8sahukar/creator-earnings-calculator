@@ -237,6 +237,14 @@ export function Footer() {
                 {t("regexTester") ?? "Regex Tester"}
               </Link>
             </li>
+            <li>
+              <Link
+                href="/developer-tools"
+                className="hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                {t("allDeveloperTools") ?? "All Developer Tools"}
+              </Link>
+            </li>
           </ul>
         </div>
 

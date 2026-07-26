@@ -1,11 +1,14 @@
 import type { MetadataRoute } from "next";
 
-import { listCategorySlugs, listCountrySlugs } from "@/data/creators";
+import { listCategorySlugs, listCountrySlugs, COUNTRY_PAGES } from "@/data/creators";
 import { listLeaderboardSlugs } from "@/data/creators/leaderboards";
 import { HREFLANG_MAP, routing } from "@/i18n/routing";
 import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
+import { getAllCategorySlugs } from "@/lib/categoryData";
 import { publicConfig } from "@/lib/config";
+import { getAllCountrySlugs, COUNTRY_SLUGS } from "@/lib/countryData";
 import { listCreators } from "@/lib/creators";
+import { getAllRankingFilterSlugs } from "@/lib/rankings";
 
 /**
  * Sitemap.
@@ -48,6 +51,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/youtube-engagement-calculator",
     "/youtube-adsense-calculator",
     "/youtube-channel-valuation-calculator",
+    "/youtube-affiliate-calculator",
+    "/youtube-membership-calculator",
+    "/youtube-merch-calculator",
     "/instagram-money-calculator",
     "/twitch-bits-calculator",
     "/yes-no-picker-wheel",
@@ -74,6 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/csv-to-json-converter",
     "/blog",
     "/creators",
+    "/top-creators",
   ];
 
   const blogCategoryRoutes = BLOG_CATEGORIES.map((c) => `/blog/category/${c.slug}`);
@@ -142,6 +149,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of listLeaderboardSlugs()) {
     entries.push(
       ...perLocaleWithAlternates(`/leaderboard/${slug}`, 0.6, "weekly"),
+    );
+  }
+
+  // Ranking filter pages: /top-creators/[filter] (country + category slugs)
+  for (const filter of getAllRankingFilterSlugs()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/top-creators/${filter}`, 0.5, "weekly"),
+    );
+  }
+
+  // NOTE: /country/[slug] and /category/[slug] are intentionally excluded
+  // when they overlap with /creators/country/[country] or /creators/[category].
+  // Only non-overlapping routes (unique content with no curated equivalent)
+  // are included. Overlap is detected via countryCode for countries and
+  // slug match for categories.
+
+  // Country codes already covered by /creators/country/[country]
+  const curatedCountryCodes = new Set(COUNTRY_PAGES.map((c) => c.countryCode));
+  // Category slugs already covered by /creators/[category]
+  const curatedCategorySlugs = new Set(listCategorySlugs());
+
+  for (const slug of getAllCountrySlugs()) {
+    const countryCode = COUNTRY_SLUGS[slug];
+    if (countryCode && curatedCountryCodes.has(countryCode)) continue; // duplicate
+    entries.push(
+      ...perLocaleWithAlternates(`/country/${slug}`, 0.5, "monthly"),
+    );
+  }
+
+  for (const slug of getAllCategorySlugs()) {
+    if (curatedCategorySlugs.has(slug)) continue; // duplicate
+    entries.push(
+      ...perLocaleWithAlternates(`/category/${slug}`, 0.5, "monthly"),
     );
   }
 

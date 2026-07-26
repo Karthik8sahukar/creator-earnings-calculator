@@ -6,6 +6,7 @@ import { CreatorCard } from "@/components/creator/CreatorCard";
 import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { getCategoryBySlug as getCuratedCategory, COUNTRY_PAGES } from "@/data/creators";
 import { publicConfig } from "@/lib/config";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { listCreators } from "@/lib/creators";
@@ -67,7 +68,15 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: buildAlternates({ locale, pathSuffix: `/category/${slug}` }),
+    alternates: (() => {
+      // If a curated /creators/[category] page exists for the same slug,
+      // point canonical there to avoid duplicate indexing.
+      const curatedCat = getCuratedCategory(slug);
+      if (curatedCat) {
+        return buildAlternates({ locale, pathSuffix: `/creators/${curatedCat.slug}` });
+      }
+      return buildAlternates({ locale, pathSuffix: `/category/${slug}` });
+    })(),
     openGraph: {
       title,
       description,
@@ -186,10 +195,15 @@ export default async function CategoryPage({
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {data.topCountries.slice(0, 8).map((countryItem) => {
             const countrySlug = COUNTRY_CODE_TO_SLUG[countryItem.countryCode];
+            // Prefer the curated /creators/country/ route when one exists
+            const curatedCountry = COUNTRY_PAGES.find((c) => c.countryCode === countryItem.countryCode);
+            const linkHref = curatedCountry
+              ? `/creators/country/${curatedCountry.slug}` as `/creators/country/${string}`
+              : `/country/${countrySlug}` as `/country/${string}`;
             return (
               <Link
                 key={countryItem.countryCode}
-                href={`/country/${countrySlug}` as `/country/${string}`}
+                href={linkHref}
                 className="card p-4 hover:-translate-y-0.5 transition hover:shadow-pop"
               >
                 <p className="font-semibold text-slate-900 dark:text-slate-100">{countryItem.country}</p>
@@ -297,10 +311,15 @@ export default async function CategoryPage({
             .map((s) => {
               const otherData = getCategoryPageData(s);
               if (!otherData) return null;
+              // Link to the preferred /creators/ route when a curated category exists
+              const curated = getCuratedCategory(s);
+              const linkHref = curated
+                ? `/creators/${curated.slug}` as `/creators/${string}`
+                : `/category/${s}` as `/category/${string}`;
               return (
                 <Link
                   key={s}
-                  href={`/category/${s}` as `/category/${string}`}
+                  href={linkHref}
                   className="chip hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                 >
                   {otherData.displayName}

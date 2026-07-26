@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { CALCULATOR_CATEGORIES } from "./CalculatorsMenu";
+import { CurrencySelector } from "./currency";
 import { LanguageSelector } from "./LanguageSelector";
 import { Link } from "@/i18n/navigation";
 import { MenuIcon, XIcon } from "./icons";
@@ -11,6 +12,8 @@ import { ThemeToggle } from "./ThemeToggle";
 
 const PRIMARY_LINKS = [
   { href: "/creators", labelKey: "nav.creators" },
+  { href: "/top-creators", labelKey: "nav.rankings" },
+  { href: "/blog", labelKey: "nav.blog" },
   { href: "/methodology", labelKey: "nav.methodology" },
   { href: "/about", labelKey: "nav.about" },
 ] as const;
@@ -54,12 +57,27 @@ export function MobileNav({ className = "" }: { className?: string }) {
   }, [open, close]);
 
   // Body scroll lock while the sheet is open.
+  // iOS Safari requires position:fixed + width:100% to truly prevent scroll.
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPosition = body.style.position;
+    const prevTop = body.style.top;
+    const prevWidth = body.style.width;
+
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+
     return () => {
-      document.body.style.overflow = prev;
+      body.style.overflow = prevOverflow;
+      body.style.position = prevPosition;
+      body.style.top = prevTop;
+      body.style.width = prevWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [open]);
 
@@ -102,7 +120,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
 
       {open && (
         <div
-          className="fixed inset-0 z-[60]"
+          className="fixed inset-0 z-[60] h-[100dvh]"
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
@@ -119,9 +137,10 @@ export function MobileNav({ className = "" }: { className?: string }) {
 
           <div
             ref={sheetRef}
-            className="absolute right-0 top-0 h-full w-[86%] max-w-sm bg-white shadow-pop border-l border-slate-200 dark:bg-slate-950 dark:border-slate-800 flex flex-col animate-fade-in"
+            className="absolute right-0 top-0 h-[100dvh] w-[86%] max-w-sm bg-white shadow-pop border-l border-slate-200 dark:bg-slate-950 dark:border-slate-800 flex flex-col animate-fade-in"
+            style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
           >
-            <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200 dark:border-slate-800" style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}>
               <span
                 id={titleId}
                 className="text-sm font-semibold text-slate-900 dark:text-slate-100"
@@ -194,15 +213,6 @@ export function MobileNav({ className = "" }: { className?: string }) {
                   {t("footer.company")}
                 </p>
                 <ul className="space-y-0.5">
-                  <li>
-                    <Link
-                      href="/blog"
-                      onClick={close}
-                      className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
-                    >
-                      {t("nav.blog")}
-                    </Link>
-                  </li>
                   {PRIMARY_LINKS.map((l) => (
                     <li key={l.href}>
                       <Link
@@ -219,6 +229,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
             </nav>
 
             <div className="border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-2">
+              <CurrencySelector />
               <LanguageSelector />
               <ThemeToggle />
             </div>

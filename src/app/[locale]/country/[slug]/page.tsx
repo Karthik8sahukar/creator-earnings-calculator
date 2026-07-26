@@ -6,6 +6,7 @@ import { CreatorCard } from "@/components/creator/CreatorCard";
 import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { COUNTRY_PAGES } from "@/data/creators";
 import { publicConfig } from "@/lib/config";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { listCreators } from "@/lib/creators";
@@ -66,7 +67,15 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: buildAlternates({ locale, pathSuffix: `/country/${slug}` }),
+    alternates: (() => {
+      // If a curated /creators/country/ page exists for the same country,
+      // point canonical there to avoid duplicate indexing.
+      const curatedPage = COUNTRY_PAGES.find((c) => c.countryCode === data.countryCode);
+      if (curatedPage) {
+        return buildAlternates({ locale, pathSuffix: `/creators/country/${curatedPage.slug}` });
+      }
+      return buildAlternates({ locale, pathSuffix: `/country/${slug}` });
+    })(),
     openGraph: {
       title,
       description,
@@ -287,10 +296,15 @@ export default async function CountryPage({
             .map((s) => {
               const otherData = getCountryPageData(s);
               if (!otherData) return null;
+              // Link to the preferred /creators/country/ route when one exists
+              const curatedPage = COUNTRY_PAGES.find((c) => c.countryCode === otherData.countryCode);
+              const linkHref = curatedPage
+                ? `/creators/country/${curatedPage.slug}` as `/creators/country/${string}`
+                : `/country/${s}` as `/country/${string}`;
               return (
                 <Link
                   key={s}
-                  href={`/country/${s}` as `/country/${string}`}
+                  href={linkHref}
                   className="chip hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                 >
                   {otherData.label}
