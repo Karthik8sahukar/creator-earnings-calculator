@@ -91,6 +91,22 @@ export function searchTools(query: string, limit = 12): SearchResult[] {
       }
     }
 
+    // Alias scoring — alternative names/phrases for the tool
+    if (tool.aliases) {
+      for (const alias of tool.aliases) {
+        const aliasLower = alias.toLowerCase();
+        if (aliasLower === q) {
+          score += 90; // Almost as good as exact title match
+          if (!matchedOn.includes("title")) matchedOn.push("title");
+          break;
+        } else if (aliasLower.includes(q) || q.includes(aliasLower)) {
+          score += 45;
+          if (!matchedOn.includes("title")) matchedOn.push("title");
+          break;
+        }
+      }
+    }
+
     // Category scoring (matches category label or id)
     if (tool.category.includes(q) || q.includes(tool.category.replace("-", " "))) {
       score += 20;

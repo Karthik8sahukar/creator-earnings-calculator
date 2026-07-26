@@ -40,12 +40,43 @@ export interface ToolEntry {
   category: ToolCategoryId;
   /** Search tags — keywords users might type to find this tool. */
   tags: string[];
+  /**
+   * Search aliases — alternative names or phrases users commonly
+   * type when looking for this tool. Improves fuzzy search matching.
+   * E.g. "head tail", "coin toss", "heads or tails" for Coin Flip.
+   */
+  aliases?: string[];
   /** Whether this tool is featured on the homepage. */
   featured?: boolean;
   /** Whether this tool is considered popular (high usage). */
   popular?: boolean;
   /** Badge text override (defaults to category label). */
   badge?: string;
+  /**
+   * SEO metadata overrides. When provided, these take precedence
+   * over auto-generated values in sitemap and metadata.
+   */
+  seo?: {
+    /** Override meta title. */
+    title?: string;
+    /** Override meta description. */
+    description?: string;
+    /** Additional keywords beyond tags. */
+    keywords?: string[];
+  };
+  /**
+   * Analytics fields — populated from real usage data.
+   * These drive the "Popular" and "Most Used" collections.
+   * When not set, the tool uses manual featured/popular flags.
+   */
+  analytics?: {
+    /** Total page views (all time). */
+    views?: number;
+    /** Computed popularity score (0-100). */
+    popularityScore?: number;
+    /** Date the tool was launched. */
+    launchDate?: string;
+  };
 }
 
 // ─── Registry ───────────────────────────────────────────────────────
@@ -59,6 +90,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Estimate any YouTube channel's monthly earnings from public statistics.",
     category: "creator-analytics",
     tags: ["youtube", "money", "earnings", "revenue", "income", "channel", "creator"],
+    aliases: ["how much does a youtuber make", "youtube income", "channel earnings estimator"],
     featured: true,
     popular: true,
     badge: "Flagship",
@@ -171,6 +203,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Beautify, minify, and validate JSON with customizable indentation.",
     category: "developer-tools",
     tags: ["json", "format", "beautify", "minify", "validate", "prettify"],
+    aliases: ["json beautifier", "json validator", "pretty print json", "json lint"],
     featured: true,
     popular: true,
   },
@@ -199,6 +232,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Generate cryptographically secure UUID v4 identifiers in bulk.",
     category: "developer-tools",
     tags: ["uuid", "guid", "unique id", "random", "v4", "identifier"],
+    aliases: ["guid generator", "unique id generator", "random id"],
     featured: true,
     popular: true,
   },
@@ -260,6 +294,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Customizable spinning wheel to randomly pick from your options.",
     category: "decision-random",
     tags: ["spin", "wheel", "random", "picker", "decision", "choose"],
+    aliases: ["spinner wheel", "random wheel picker", "wheel of fortune", "prize wheel"],
     featured: true,
     popular: true,
   },
@@ -270,6 +305,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Flip a virtual coin for instant Heads or Tails with multi-flip support.",
     category: "decision-random",
     tags: ["coin", "flip", "heads", "tails", "random", "toss"],
+    aliases: ["heads or tails", "coin toss", "head tail", "flip a coin"],
     featured: true,
     popular: true,
   },
@@ -280,6 +316,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Roll virtual dice from d4 to d100 with animated results and history.",
     category: "decision-random",
     tags: ["dice", "roll", "d20", "d6", "rpg", "tabletop", "game"],
+    aliases: ["roll dice", "d20 roller", "dnd dice", "virtual dice"],
     popular: true,
   },
   {
@@ -289,6 +326,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Generate random numbers in any range with multi-generation support.",
     category: "decision-random",
     tags: ["random", "number", "rng", "generator", "range", "integer"],
+    aliases: ["rng", "pick a number", "number picker", "random integer"],
     popular: true,
   },
   {
@@ -341,6 +379,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     description: "Analyze word count, keyword density, reading time, and page estimates.",
     category: "text-tools",
     tags: ["word", "count", "keyword", "density", "reading time", "seo", "text"],
+    aliases: ["word count tool", "text length", "essay word counter", "how many words"],
     featured: true,
     popular: true,
   },
