@@ -242,7 +242,7 @@ export function Footer() {
                 href="/developer-tools"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                {t("allDeveloperTools") ?? "All Developer Tools"}
+                {t("allDeveloperTools") ?? "View All Developer Tools"}
               </Link>
             </li>
           </ul>

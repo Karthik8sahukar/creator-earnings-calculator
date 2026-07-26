@@ -1,13 +1,20 @@
+import { getTotalToolCount } from "@/lib/tools";
+import { listCreators } from "@/lib/creators";
+
 /**
- * Trust statistics section — large metric cards immediately below hero.
+ * Trust statistics section — large metric cards.
+ * All values are computed dynamically — no hardcoded numbers.
  */
 export function TrustStats() {
+  const toolCount = getTotalToolCount();
+  const creatorCount = listCreators().length;
+
   return (
     <section aria-label="Platform statistics" className="scroll-mt-20">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <StatCard value="200+" label="Creator Profiles" />
-        <StatCard value="40+" label="Free Tools" />
-        <StatCard value="20+" label="Countries" />
+        <StatCard value={`${creatorCount}+`} label="Creator Profiles" />
+        <StatCard value={`${toolCount}+`} label="Free Tools" />
+        <StatCard value="7" label="Languages" />
         <StatCard value="100%" label="Browser Based" />
       </div>
     </section>

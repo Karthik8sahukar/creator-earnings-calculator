@@ -28,38 +28,48 @@ export interface ToolCollection {
 /**
  * Get all homepage collections.
  * Each collection is a curated grouping for discovery.
+ * Collections intentionally avoid repeating tools shown in the FeaturedGrid
+ * (which uses getFeaturedMixed) by filtering popular-only tools per category.
  */
 export function getHomepageCollections(): ToolCollection[] {
+  // Tools already shown in the FeaturedGrid — exclude from collections
+  const featuredSlugs = new Set(getFeaturedTools().map((t) => t.slug));
+
   return [
     {
-      id: "popular-creator-tools",
-      title: "Best Creator Tools",
-      description: "Top tools for YouTube, Instagram, and Twitch creators.",
-      tools: getToolsByCategory("creator-analytics")
-        .filter((t) => t.popular)
-        .slice(0, 8),
-    },
-    {
-      id: "popular-developer-tools",
-      title: "Most Popular Developer Tools",
-      description: "The developer tools everyone reaches for daily.",
+      id: "for-developers",
+      title: "For Developers",
+      description: "Browser-based dev tools — no data leaves your device.",
       tools: getToolsByCategory("developer-tools")
-        .filter((t) => t.popular || t.featured)
+        .filter((t) => !featuredSlugs.has(t.slug))
         .slice(0, 8),
     },
     {
-      id: "popular-random-tools",
-      title: "Best Random & Decision Tools",
-      description: "Quick decisions, random picks, and fun generators.",
+      id: "for-creators",
+      title: "For Creators",
+      description: "Revenue calculators and analytics for YouTube, Instagram, and Twitch.",
+      tools: getToolsByCategory("creator-analytics")
+        .filter((t) => !featuredSlugs.has(t.slug))
+        .slice(0, 8),
+    },
+    {
+      id: "quick-decisions",
+      title: "Quick Decisions",
+      description: "Random generators and decision makers for any situation.",
       tools: getToolsByCategory("decision-random")
-        .filter((t) => t.popular || t.featured)
+        .filter((t) => !featuredSlugs.has(t.slug))
         .slice(0, 8),
     },
     {
-      id: "most-used",
-      title: "Most Used Tools",
-      description: "The tools our users reach for most often.",
-      tools: getPopularTools().slice(0, 10),
+      id: "text-and-data",
+      title: "Text & Data",
+      description: "Analyze text, convert data, and work with content.",
+      tools: [
+        ...getToolsByCategory("text-tools"),
+        ...getToolsByCategory("converters"),
+      ]
+        .filter((t) => !featuredSlugs.has(t.slug))
+        .slice(0, 8),
     },
   ];
 }

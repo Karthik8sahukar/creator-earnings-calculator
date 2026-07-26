@@ -11,7 +11,7 @@ type LogoSize = "sm" | "md" | "lg";
 interface LogoProps {
   /** Visual size of the mark + wordmark. Defaults to `md`. */
   size?: LogoSize;
-  /** Show the "Creator Analytics Platform" tagline below the wordmark. */
+  /** Show the "Free Online Tools" tagline below the wordmark. */
   withTagline?: boolean;
   /**
    * When true, renders as a plain block instead of a Link. Useful when
@@ -78,7 +78,7 @@ export function Logo({
         </span>
         {withTagline && (
           <span className="mt-1 text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Creator Analytics Platform
+            Free Online Tools
           </span>
         )}
       </span>

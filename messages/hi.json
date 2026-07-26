@@ -91,6 +91,7 @@
     "jwtDecoder": "JWT Decoder",
     "uuidGenerator": "UUID Generator",
     "regexTester": "Regex Tester",
+    "allDeveloperTools": "View All Developer Tools",
     "characterCounter": "Character Counter",
     "wordCounter": "Word Counter",
     "colorGenerator": "Random Color Generator",
