@@ -11,8 +11,7 @@ import { CHANNEL_IDS } from "./fixtures/ids";
 
 /** Navigate to homepage and open the Creators tab to reveal YouTube search. */
 async function openCreatorSearch(page: import("@playwright/test").Page) {
-  await page.goto("/");
-  await page.getByRole("tab", { name: /creators/i }).click();
+  await page.goto("/youtube-money-calculator");
 }
 
 test.describe("channel search workflow", () => {

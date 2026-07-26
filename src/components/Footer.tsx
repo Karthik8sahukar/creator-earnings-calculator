@@ -46,7 +46,7 @@ export function Footer() {
           <ul className="mt-3 space-y-2">
             <li>
               <Link
-                href="/"
+                href="/youtube-money-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
                 {t("moneyCalculator")}

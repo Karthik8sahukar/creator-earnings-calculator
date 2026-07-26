@@ -19,11 +19,8 @@ import { QuickDiscovery } from "./QuickDiscovery";
  * the `children` slot so they remain server-rendered.
  */
 export function HomePageClient({
-  creatorSearch,
   children,
 }: {
-  /** The existing ChannelWorkspace (server-rendered, passed as slot). */
-  creatorSearch: ReactNode;
   /** Server-rendered sections below the client sections. */
   children: ReactNode;
 }) {
@@ -34,11 +31,8 @@ export function HomePageClient({
       {/* Command palette search modal */}
       <ToolSearchModal open={open} onClose={onClose} />
 
-      {/* Hero with search trigger + creator search tab */}
-      <AppStoreHero
-        onSearchOpen={() => setOpen(true)}
-        creatorSearch={creatorSearch}
-      />
+      {/* Hero with search trigger (Tools only — no Creators tab) */}
+      <AppStoreHero onSearchOpen={() => setOpen(true)} />
 
       {/* Quick discovery — tabbed horizontal scroll (client component) */}
       <QuickDiscovery />

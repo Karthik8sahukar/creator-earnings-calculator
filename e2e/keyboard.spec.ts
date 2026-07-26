@@ -9,8 +9,7 @@ import { expect, test } from "@playwright/test";
 
 /** Navigate to homepage and open the Creators tab to reveal YouTube search. */
 async function openCreatorSearch(page: import("@playwright/test").Page) {
-  await page.goto("/");
-  await page.getByRole("tab", { name: /creators/i }).click();
+  await page.goto("/youtube-money-calculator");
 }
 
 test("pressing Enter submits the search and loads results", async ({

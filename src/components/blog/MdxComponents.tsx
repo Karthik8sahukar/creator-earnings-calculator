@@ -35,7 +35,7 @@ export function CalculatorCta({
   ctaText?: string;
 }) {
   const HREF: Record<typeof to, "/" | "/youtube-rpm-calculator" | "/youtube-cpm-calculator" | "/youtube-shorts-calculator" | "/youtube-sponsorship-calculator"> = {
-    money: "/",
+    money: "/youtube-money-calculator",
     rpm: "/youtube-rpm-calculator",
     cpm: "/youtube-cpm-calculator",
     shorts: "/youtube-shorts-calculator",

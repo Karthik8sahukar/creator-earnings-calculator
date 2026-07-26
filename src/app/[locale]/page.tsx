@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Suspense } from "react";
 
-import { ChannelWorkspace } from "@/components/ChannelWorkspace";
 import { AppShell } from "@/components/AppShell";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { CollectionSection } from "@/components/home/CollectionSection";
@@ -15,21 +13,22 @@ import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 /**
- * Homepage — "App Store for Free Online Tools"
+ * Homepage — "The App Store for Free Online Tools"
  *
- * New section order:
- *   1. Hero (BeHumler branding + Tools/Creators tab + search trigger)
- *   2. Quick Discovery (tabbed horizontal scroll: Popular/Featured/Recent/Recommended)
+ * A pure discovery page. No tool-specific functionality lives here.
+ * Individual tools (including YouTube Money Calculator) have their
+ * own dedicated pages.
+ *
+ * Section order:
+ *   1. Hero (branding + tool search trigger)
+ *   2. Quick Discovery (tabbed: Popular/Featured/Recent/Recommended)
  *   3. Category Grid (8 categories with dynamic counts)
  *   4. Featured Grid (mixed-category featured tools)
- *   5. Collections (horizontal scroll: For Developers, For Creators, etc.)
- *   6. Trust Stats (reused)
- *   7. Why BeHumler (reused)
- *   8. Latest Blogs (reused)
- *   9. FAQ (reused)
- *
- * SEO: All metadata, canonical, hreflang, schema preserved exactly.
- * The H1 remains as a sr-only element matching the existing home.title key.
+ *   5. Collections (horizontal scroll)
+ *   6. Trust Stats
+ *   7. Why BeHumler
+ *   8. Latest Blogs
+ *   9. FAQ
  */
 export async function generateMetadata({
   params,
@@ -64,19 +63,7 @@ export default async function HomePage({
 
   return (
     <AppShell variant="landing">
-      {/*
-        HomePageClient is the client boundary — owns the search modal
-        state and renders: Hero + QuickDiscovery (both need client JS).
-        Server sections are passed as children to stay server-rendered.
-      */}
-      <HomePageClient
-        creatorSearch={
-          <Suspense fallback={<WorkspaceFallback />}>
-            <ChannelWorkspace />
-          </Suspense>
-        }
-      >
-        {/* Everything below here is server-rendered */}
+      <HomePageClient>
         <CategoryGrid />
         <FeaturedGrid />
         <CollectionSection />
@@ -86,15 +73,5 @@ export default async function HomePage({
         <Faq />
       </HomePageClient>
     </AppShell>
-  );
-}
-
-async function WorkspaceFallback() {
-  const t = await getTranslations("common.labels");
-  return (
-    <div className="max-w-2xl mx-auto w-full">
-      <div className="skeleton h-14 w-full rounded-2xl" aria-hidden />
-      <span className="sr-only">{t("loadingCalculator")}</span>
-    </div>
   );
 }

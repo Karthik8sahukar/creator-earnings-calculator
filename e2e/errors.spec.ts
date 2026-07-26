@@ -23,9 +23,8 @@ test.describe("error workflows", () => {
    * The App Store redesign defaults to the Tools tab.
    */
   async function openCreatorSearch(page: import("@playwright/test").Page) {
-    await page.goto("/");
+    await page.goto("/youtube-money-calculator");
     // Switch to Creators tab to reveal the YouTube channel search
-    await page.getByRole("tab", { name: /creators/i }).click();
   }
 
   test("no results state", async ({ page }) => {
