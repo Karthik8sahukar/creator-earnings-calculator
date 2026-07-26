@@ -26,7 +26,11 @@ export function RegexTesterClient() {
 
   const toggleFlag = (f: RegexFlag) => {
     const next = new Set(flags);
-    next.has(f) ? next.delete(f) : next.add(f);
+    if (next.has(f)) {
+      next.delete(f);
+    } else {
+      next.add(f);
+    }
     setFlags(next);
   };
 

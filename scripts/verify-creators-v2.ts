@@ -27,7 +27,6 @@
  */
 
 import * as fs from "node:fs";
-import * as path from "node:path";
 import {
   PATHS,
   normalizeHandle,
@@ -38,7 +37,7 @@ import {
   ensureDir,
   log,
   logSuccess,
-  logWarn,
+
   logError,
   logSection,
 } from "./pipeline/utils.js";
