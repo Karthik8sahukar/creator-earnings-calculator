@@ -6,28 +6,35 @@ import { CHANNEL_IDS } from "./fixtures/ids";
  * Responsive smoke tests. The project configuration in
  * `playwright.config.ts` runs this file across three viewports:
  * 375×812 (mobile), 768×1024 (tablet), 1440×900 (desktop).
+ *
+ * The App Store redesign moved channel search to the "Creators" tab.
+ * The homepage H1 is now sr-only (screen-reader accessible but not
+ * visually displayed). Tests assert on the visible heading instead.
  */
 
-test("homepage renders with search textbox and Search Channel button", async ({
+/** Navigate to homepage and open the Creators tab to reveal YouTube search. */
+async function openCreatorSearch(page: import("@playwright/test").Page) {
+  await page.goto("/youtube-money-calculator");
+}
+
+test("homepage renders the App Store hero and navigation", async ({
   page,
 }) => {
   await page.goto("/");
+  // The visible heading is "The App Store for Free Online Tools"
   await expect(
-    page.getByRole("heading", {
-      level: 1,
-      name: /youtube money calculator/i,
-    }),
+    page.getByText(/the app store for/i),
   ).toBeVisible();
-  await expect(page.getByRole("textbox")).toBeVisible();
+  // Search trigger button should be visible
   await expect(
-    page.getByRole("button", { name: /search channel/i }),
+    page.getByRole("button", { name: /search tools/i }),
   ).toBeVisible();
 });
 
-test("search textbox and button remain usable on all viewports", async ({
+test("Creators tab reveals search textbox and Search Channel button", async ({
   page,
 }) => {
-  await page.goto("/");
+  await openCreatorSearch(page);
   const input = page.getByRole("textbox");
   const btn = page.getByRole("button", { name: /search channel/i });
 

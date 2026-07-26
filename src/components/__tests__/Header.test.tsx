@@ -1,44 +1,83 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { Header } from "../Header";
 
 /**
- * Header visibility tests.
+ * Header navigation tests — App Store redesign.
  *
- * The Instagram Money Calculator must be directly reachable from the
- * top navigation without opening the Calculators dropdown. These
- * tests fail if the visible header link is removed or if its href
- * regresses to `/en/en/…`.
+ * Desktop structure:
+ *   Logo | Tools▼ | Creators▼ | Rankings | Blog | About▼ | [Search] | Language | Theme
  */
 
-describe("Header — Instagram Money Calculator visibility", () => {
-  it("renders a visible direct link to /instagram-money-calculator", () => {
+describe("Header — App Store navigation", () => {
+  it("renders the BeHumler home link (Logo)", () => {
     render(<Header />);
-    const link = screen.getByTestId("header-instagram-link");
-    expect(link).toBeInTheDocument();
-    // `@/i18n/navigation` Link is aliased to next/link in tests, so the
-    // href attribute is the raw path (no locale prefix). The important
-    // property is that it is a BARE path — production locale prefixing
-    // works via next-intl's routing helpers.
-    expect(link).toHaveAttribute("href", "/instagram-money-calculator");
-    // Must never emit a duplicated `/en/en/…` even under adversarial
-    // configuration — the raw href stays a bare path.
-    expect(link.getAttribute("href") ?? "").not.toMatch(/\/en\/en\//);
+    const homeLink = screen.getByRole("link", { name: /behumler/i });
+    expect(homeLink).toBeInTheDocument();
   });
 
-  it("uses descriptive accessible label", () => {
+  it("renders all top-level navigation items", () => {
     render(<Header />);
-    const link = screen.getByTestId("header-instagram-link");
-    // aria-label maps to the full "Instagram Money Calculator" name.
-    expect(link.getAttribute("aria-label") ?? "").toMatch(/Instagram/);
+    expect(screen.getByRole("button", { name: /^tools$/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^creators$/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /rankings/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /blog/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^about$/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /search tools/i })).toBeInTheDocument();
   });
 
-  it("keeps the Calculators dropdown trigger present alongside the direct link", () => {
+  it("clicking Tools opens the mega menu with registry-driven content", async () => {
+    const user = userEvent.setup();
     render(<Header />);
-    // The dropdown trigger remains — this test guards against
-    // accidentally REPLACING the dropdown with just the direct link.
-    const dropdownTrigger = screen.getByRole("button", { name: /calculators/i });
-    expect(dropdownTrigger).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /^tools$/i }));
+
+    // Mega menu should show category labels and Popular Tools
+    expect(screen.getByText(/creator tools/i)).toBeInTheDocument();
+    expect(screen.getByText(/developer tools/i)).toBeInTheDocument();
+    expect(screen.getByText(/popular tools/i)).toBeInTheDocument();
+  });
+
+  it("Tools mega menu contains expected tool links (scoped to avoid duplicates)", async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+
+    await user.click(screen.getByRole("button", { name: /^tools$/i }));
+
+    // Multiple links for the same tool may exist (category + popular sidebar).
+    // Use getAllByRole and assert at least one exists.
+    const youtubeLinks = screen.getAllByRole("link", {
+      name: /youtube money calculator/i,
+    });
+    expect(youtubeLinks.length).toBeGreaterThan(0);
+
+    const instagramLinks = screen.getAllByRole("link", {
+      name: /instagram money calculator/i,
+    });
+    expect(instagramLinks.length).toBeGreaterThan(0);
+  });
+
+  it("clicking Tools again closes the menu", async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+
+    await user.click(screen.getByRole("button", { name: /^tools$/i }));
+    expect(screen.getByText(/popular tools/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /^tools$/i }));
+    expect(screen.queryByText(/popular tools/i)).not.toBeInTheDocument();
+  });
+
+  it("Escape closes an open dropdown", async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+
+    await user.click(screen.getByRole("button", { name: /^tools$/i }));
+    expect(screen.getByText(/popular tools/i)).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(screen.queryByText(/popular tools/i)).not.toBeInTheDocument();
   });
 });

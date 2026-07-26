@@ -46,7 +46,7 @@ export function Footer() {
           <ul className="mt-3 space-y-2">
             <li>
               <Link
-                href="/#find-channel"
+                href="/youtube-money-calculator"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
                 {t("moneyCalculator")}
@@ -242,7 +242,7 @@ export function Footer() {
                 href="/developer-tools"
                 className="hover:text-slate-900 dark:hover:text-slate-100"
               >
-                {t("allDeveloperTools") ?? "All Developer Tools"}
+                {t("allDeveloperTools") ?? "View All Developer Tools"}
               </Link>
             </li>
           </ul>

@@ -1,36 +1,34 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Suspense } from "react";
 
-import { ChannelWorkspace } from "@/components/ChannelWorkspace";
-import { DecisionTools } from "@/components/home/DecisionTools";
-import { DeveloperTools } from "@/components/home/DeveloperTools";
+import { AppShell } from "@/components/AppShell";
+import { CategoryGrid } from "@/components/home/CategoryGrid";
+import { CollectionSection } from "@/components/home/CollectionSection";
 import { Faq } from "@/components/home/Faq";
-import { FeaturedTools } from "@/components/home/FeaturedTools";
-import { HeroRedesign } from "@/components/home/HeroRedesign";
+import { FeaturedGrid } from "@/components/home/FeaturedGrid";
+import { HomePageClient } from "@/components/home/HomePageClient";
 import { LatestBlogs } from "@/components/home/LatestBlogs";
-import { QuickActions } from "@/components/home/QuickActions";
-import { ToolCategories } from "@/components/home/ToolCategories";
-import { TrendingCreators } from "@/components/home/TrendingCreators";
 import { TrustStats } from "@/components/home/TrustStats";
 import { WhyBeHumler } from "@/components/home/WhyBeHumler";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 /**
- * Homepage — Premium landing page for BeHumler.
+ * Homepage — "The App Store for Free Online Tools"
  *
- * Redesigned section order:
- *   1. Hero (platform headline + search)
- *   2. Trust Stats (metric cards)
- *   3. Tool Categories (3 category cards)
- *   4. Quick Actions (popular tools)
- *   5. Featured Tools (Creator Analytics)
- *   6. Trending Creators
- *   7. Developer Tools
- *   8. Decision Tools
- *   9. Why BeHumler
- *  10. Blog
- *  11. FAQ
+ * A pure discovery page. No tool-specific functionality lives here.
+ * Individual tools (including YouTube Money Calculator) have their
+ * own dedicated pages.
+ *
+ * Section order:
+ *   1. Hero (branding + tool search trigger)
+ *   2. Quick Discovery (tabbed: Popular/Featured/Recent/Recommended)
+ *   3. Category Grid (8 categories with dynamic counts)
+ *   4. Featured Grid (mixed-category featured tools)
+ *   5. Collections (horizontal scroll)
+ *   6. Trust Stats
+ *   7. Why BeHumler
+ *   8. Latest Blogs
+ *   9. FAQ
  */
 export async function generateMetadata({
   params,
@@ -64,33 +62,16 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   return (
-    <div className="space-y-20 sm:space-y-28">
-      <HeroRedesign>
-        <Suspense fallback={<WorkspaceFallback />}>
-          <ChannelWorkspace />
-        </Suspense>
-      </HeroRedesign>
-
-      <TrustStats />
-      <ToolCategories />
-      <QuickActions />
-      <FeaturedTools />
-      <TrendingCreators />
-      <DeveloperTools />
-      <DecisionTools />
-      <WhyBeHumler />
-      <LatestBlogs />
-      <Faq />
-    </div>
-  );
-}
-
-async function WorkspaceFallback() {
-  const t = await getTranslations("common.labels");
-  return (
-    <div className="max-w-2xl mx-auto w-full">
-      <div className="skeleton h-14 w-full rounded-2xl" aria-hidden />
-      <span className="sr-only">{t("loadingCalculator")}</span>
-    </div>
+    <AppShell variant="landing">
+      <HomePageClient>
+        <CategoryGrid />
+        <FeaturedGrid />
+        <CollectionSection />
+        <TrustStats />
+        <WhyBeHumler />
+        <LatestBlogs />
+        <Faq />
+      </HomePageClient>
+    </AppShell>
   );
 }

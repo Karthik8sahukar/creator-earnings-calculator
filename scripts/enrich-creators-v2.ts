@@ -22,7 +22,6 @@
  * Requires: YOUTUBE_API_KEY environment variable
  */
 
-import * as fs from "node:fs";
 import {
   PATHS,
   readDatasetEntries,
@@ -32,7 +31,7 @@ import {
   ensureDir,
   log,
   logSuccess,
-  logWarn,
+
   logError,
   logSection,
 } from "./pipeline/utils.js";

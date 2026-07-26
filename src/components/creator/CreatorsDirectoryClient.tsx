@@ -260,7 +260,7 @@ export function CreatorsDirectoryClient({
         </p>
         {totalPages > 1 && (
           <p>
-            {t("pageInfo") ?? `Page ${currentFilters.page} of ${totalPages}`}
+            {t("pageInfo", { page: currentFilters.page, total: totalPages })}
           </p>
         )}
       </div>

@@ -1,61 +1,92 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { MobileNav } from "../MobileNav";
 
 /**
- * MobileNav visibility tests.
+ * MobileNav tests — App Store accordion navigation.
  *
- * Requirements:
- *   - Instagram Money Calculator appears as a top-level menu entry.
- *   - It is NOT nested behind an expandable/collapsible submenu — the
- *     "Calculators" heading in MobileNav is a section label, not a
- *     disclosure widget. This test guards against a regression that
- *     would hide the Instagram entry behind a click.
- *   - The link points to `/instagram-money-calculator`, never
- *     `/en/en/…`.
+ * The mobile drawer uses category accordions from the tool registry.
+ * Only the first 8 tools per category are shown in the accordion.
+ * Instagram Money Calculator is at position 12 in Creator Tools and
+ * is intentionally NOT visible without scrolling/expanding further.
  */
 
-describe("MobileNav — Instagram Money Calculator visibility", () => {
-  it("shows the pinned Instagram link immediately when the menu opens", async () => {
+describe("MobileNav — accordion navigation", () => {
+  it("opens the drawer when clicking the menu button", async () => {
+    const user = userEvent.setup();
     render(<MobileNav />);
-    await userEvent.click(
-      screen.getByRole("button", { name: /open menu/i }),
-    );
-    const link = screen.getByTestId("mobile-instagram-link");
-    expect(link).toBeVisible();
-    expect(link).toHaveAttribute("href", "/instagram-money-calculator");
-    expect(link.getAttribute("href") ?? "").not.toMatch(/\/en\/en\//);
+
+    await user.click(screen.getByRole("button", { name: /open menu/i }));
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: /mobile navigation/i })).toBeInTheDocument();
   });
 
-  it("also lists Instagram Money Calculator flat under the Calculators section", async () => {
+  it("shows category accordion buttons", async () => {
+    const user = userEvent.setup();
     render(<MobileNav />);
-    await userEvent.click(
-      screen.getByRole("button", { name: /open menu/i }),
-    );
-    // There must be at least one link whose href is
-    // `/instagram-money-calculator` inside the mobile nav — proving
-    // the flat-list entry is present (in addition to the pinned one).
-    const links = screen.getAllByRole("link", {
-      name: /instagram money calculator/i,
-    });
-    expect(links.length).toBeGreaterThanOrEqual(1);
-    for (const l of links) {
-      expect(l).toHaveAttribute("href", "/instagram-money-calculator");
-    }
+
+    await user.click(screen.getByRole("button", { name: /open menu/i }));
+
+    const nav = screen.getByRole("navigation", { name: /mobile navigation/i });
+
+    expect(within(nav).getByRole("button", { name: /creator tools/i })).toBeInTheDocument();
+    expect(within(nav).getByRole("button", { name: /developer tools/i })).toBeInTheDocument();
+    expect(within(nav).getByRole("button", { name: /random & decision/i })).toBeInTheDocument();
   });
 
-  it("Calculators heading is a section label, not a collapsible disclosure", async () => {
+  it("expanding Creator Tools reveals tool links from the registry", async () => {
+    const user = userEvent.setup();
     render(<MobileNav />);
-    await userEvent.click(
-      screen.getByRole("button", { name: /open menu/i }),
+
+    await user.click(screen.getByRole("button", { name: /open menu/i }));
+
+    const nav = screen.getByRole("navigation", { name: /mobile navigation/i });
+
+    // YouTube Money Calculator should NOT be visible before expanding
+    expect(within(nav).queryByRole("link", { name: /youtube money calculator/i })).not.toBeInTheDocument();
+
+    // Expand Creator Tools accordion
+    await user.click(within(nav).getByRole("button", { name: /creator tools/i }));
+
+    // Now the first 8 Creator Tools should be visible
+    // YouTube Money Calculator is position 1 — should be visible
+    expect(within(nav).getByRole("link", { name: /youtube money calculator/i })).toBeInTheDocument();
+    // YouTube RPM Calculator is position 2 — should be visible
+    expect(within(nav).getByRole("link", { name: /youtube rpm calculator/i })).toBeInTheDocument();
+  });
+
+  it("shows the Search tools button", async () => {
+    const user = userEvent.setup();
+    render(<MobileNav />);
+
+    await user.click(screen.getByRole("button", { name: /open menu/i }));
+
+    expect(screen.getByText(/search tools\.\.\./i)).toBeInTheDocument();
+  });
+
+  it("close icon button closes the dialog", async () => {
+    const user = userEvent.setup();
+    render(<MobileNav />);
+
+    await user.click(screen.getByRole("button", { name: /open menu/i }));
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeInTheDocument();
+
+    // There are two close controls: backdrop (tabIndex=-1) and icon button.
+    // Get all close buttons within the dialog and click the visible icon one.
+    const closeButtons = within(dialog).getAllByRole("button", { name: /close menu/i });
+    // The icon button is the one that is NOT the backdrop (backdrop has tabIndex=-1)
+    const iconClose = closeButtons.find(
+      (btn) => btn.getAttribute("tabindex") !== "-1",
     );
-    // There should be NO button with the accessible name "Calculators"
-    // acting as a disclosure inside the mobile menu.
-    const buttons = screen.queryAllByRole("button", {
-      name: /^Calculators$/,
-    });
-    expect(buttons.length).toBe(0);
+    expect(iconClose).toBeDefined();
+
+    await user.click(iconClose!);
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

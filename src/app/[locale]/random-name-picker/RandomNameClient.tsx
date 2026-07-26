@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { ResultCard, ActionButtons, HistoryPanel } from "@/components/decision";
 import type { HistoryItem } from "@/components/decision";
-import { randomPick, shuffle, prefersReducedMotion } from "@/lib/decision";
+import { shuffle, prefersReducedMotion } from "@/lib/decision";
 
 export function RandomNameClient() {
   const [namesInput, setNamesInput] = useState("");

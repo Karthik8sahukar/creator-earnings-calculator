@@ -303,7 +303,7 @@ export default async function InstagramCalculatorPage({
         </p>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <RelatedLink
-            href="/#find-channel"
+            href="/youtube-money-calculator"
             title={t("related.links.money.title")}
             description={t("related.links.money.description")}
           />
@@ -378,7 +378,7 @@ function RelatedLink({
   description,
 }: {
   href:
-    | "/#find-channel"
+    | "/youtube-money-calculator"
     | "/youtube-rpm-calculator"
     | "/youtube-cpm-calculator"
     | "/youtube-shorts-calculator"

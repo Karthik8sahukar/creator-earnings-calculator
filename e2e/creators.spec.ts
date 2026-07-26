@@ -187,28 +187,31 @@ test.describe("Creator profile page", () => {
 });
 
 test.describe("Navigation", () => {
-  test("Creators link is present in header, footer, and homepage trending section", async ({
+  test("Creators is accessible from header dropdown and footer link", async ({
     page,
   }) => {
     await page.goto("/en");
 
-    // Homepage Trending Creators section has a link to /creators.
+    // Header nav (desktop) — Creators is a dropdown button in the new navigation.
     await expect(
-      page.getByTestId("creators-directory-link"),
+      page.getByRole("button", { name: /^Creators$/i }),
     ).toBeVisible();
 
-    // Header nav (desktop viewport).
-    await expect(page.getByTestId("header-creators-link")).toBeVisible();
-
-    // Footer.
+    // Footer still has a direct link to /creators.
     await expect(page.getByTestId("footer-creators-link")).toBeVisible();
   });
 
-  test("Creators directory link navigates to /en/creators", async ({
+  test("Creators dropdown navigates to /en/creators", async ({
     page,
   }) => {
     await page.goto("/en");
-    await page.getByTestId("creators-directory-link").click();
+
+    // Open Creators dropdown
+    await page.getByRole("button", { name: /^Creators$/i }).click();
+
+    // Click "Browse Creators" link in the dropdown
+    await page.getByRole("link", { name: /Browse Creators/i }).click();
+
     await expect(page).toHaveURL(/\/en\/creators$/);
     await expect(
       page.getByRole("heading", { level: 1, name: /YouTube Creators/i }),

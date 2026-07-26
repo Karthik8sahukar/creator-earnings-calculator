@@ -3,14 +3,19 @@ import { expect, test } from "@playwright/test";
 /**
  * Keyboard interactions for the channel search.
  *
- * The new UX has no combobox, no arrow-key navigation, no Escape.
- * Enter submits the search, just like clicking "Search Channel".
+ * The App Store redesign moved channel search to the "Creators" tab.
+ * Tests must switch to that tab before interacting with the search input.
  */
+
+/** Navigate to homepage and open the Creators tab to reveal YouTube search. */
+async function openCreatorSearch(page: import("@playwright/test").Page) {
+  await page.goto("/youtube-money-calculator");
+}
 
 test("pressing Enter submits the search and loads results", async ({
   page,
 }) => {
-  await page.goto("/");
+  await openCreatorSearch(page);
   const input = page.getByRole("textbox");
   await input.focus();
   await input.fill("@test");
@@ -23,7 +28,7 @@ test("pressing Enter submits the search and loads results", async ({
 test("pressing Enter navigates to channel after clicking a result", async ({
   page,
 }) => {
-  await page.goto("/");
+  await openCreatorSearch(page);
   const input = page.getByRole("textbox");
   await input.fill("@test");
   await input.press("Enter");
@@ -37,7 +42,7 @@ test("pressing Enter navigates to channel after clicking a result", async ({
 test("Enter with invalid input shows validation message", async ({
   page,
 }) => {
-  await page.goto("/");
+  await openCreatorSearch(page);
   const input = page.getByRole("textbox");
   await input.fill("gaming channel");
   await input.press("Enter");

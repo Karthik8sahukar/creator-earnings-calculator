@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { ResultCard, ActionButtons, HistoryPanel } from "@/components/decision";
+import { ActionButtons } from "@/components/decision";
 import type { HistoryItem } from "@/components/decision";
 import { randomPick, prefersReducedMotion } from "@/lib/decision";
 
@@ -31,7 +31,6 @@ export function CoinFlipClient() {
     }, delay);
   }, [flipping, flipCount]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => { if (e.repeat) return; if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } }, [flip]);
 
   const headsCount = history.filter(h => h.label === "Heads").length;
   const tailsCount = history.filter(h => h.label === "Tails").length;
