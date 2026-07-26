@@ -11,7 +11,7 @@ import {
 
 interface CalcCard {
   href:
-    | "/#find-channel"
+    | "/"
     | "/youtube-rpm-calculator"
     | "/youtube-cpm-calculator"
     | "/youtube-shorts-calculator"
@@ -29,7 +29,7 @@ interface CalcCard {
  */
 const CARDS: readonly CalcCard[] = [
   {
-    href: "/#find-channel",
+    href: "/",
     titleKey: "money.title",
     descriptionKey: "money.description",
     Icon: DollarIcon,
