@@ -17,8 +17,19 @@ import { CHANNEL_IDS } from "./fixtures/ids";
  */
 
 test.describe("error workflows", () => {
-  test("no results state", async ({ page }) => {
+  /**
+   * Helper: navigate to homepage and switch to the Creators tab
+   * so the YouTube channel search (ChannelWorkspace) is visible.
+   * The App Store redesign defaults to the Tools tab.
+   */
+  async function openCreatorSearch(page: import("@playwright/test").Page) {
     await page.goto("/");
+    // Switch to Creators tab to reveal the YouTube channel search
+    await page.getByRole("tab", { name: /creators/i }).click();
+  }
+
+  test("no results state", async ({ page }) => {
+    await openCreatorSearch(page);
     await page.getByRole("textbox").fill("@empty");
     await page.getByRole("button", { name: /search channel/i }).click();
     const error = page.getByTestId("channel-search-error");
@@ -27,9 +38,6 @@ test.describe("error workflows", () => {
   });
 
   test("invalid channel id in URL → not-found segment", async ({ page }) => {
-    // Note: Next dev may serve notFound() responses with 200 or 404
-    // depending on the caching layer. The content check is the source
-    // of truth for the user-visible outcome.
     await page.goto(`/channel/${CHANNEL_IDS.invalid}`);
     await expect(
       page.getByRole("heading", { name: /channel not found/i }),
@@ -39,7 +47,7 @@ test.describe("error workflows", () => {
   test("YouTube quota exceeded on search shows a safe message", async ({
     page,
   }) => {
-    await page.goto("/");
+    await openCreatorSearch(page);
     await page.getByRole("textbox").fill("@quota");
     await page.getByRole("button", { name: /search channel/i }).click();
     const error = page.getByTestId("channel-search-error");
@@ -50,7 +58,7 @@ test.describe("error workflows", () => {
   test("YouTube upstream unavailable on search shows a safe message", async ({
     page,
   }) => {
-    await page.goto("/");
+    await openCreatorSearch(page);
     await page.getByRole("textbox").fill("@unavailable");
     await page.getByRole("button", { name: /search channel/i }).click();
     const error = page.getByTestId("channel-search-error");
@@ -86,16 +94,12 @@ test.describe("error workflows", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: /charlie channel/i }),
     ).toBeVisible();
-    // The Subscribers stat shows "Hidden".
     await expect(page.getByText(/^Hidden$/).first()).toBeVisible();
   });
 
   test("missing API key surfaces a safe error on the search route", async ({
     page,
   }) => {
-    // Route interception: force /api/search to respond as if
-    // MISSING_API_KEY was thrown. This tests the client-side UX
-    // without needing to disable the mock env.
     await page.route("**/api/search**", (route) =>
       route.fulfill({
         status: 500,
@@ -106,7 +110,7 @@ test.describe("error workflows", () => {
         }),
       }),
     );
-    await page.goto("/");
+    await openCreatorSearch(page);
     await page.getByRole("textbox").fill("@something");
     await page.getByRole("button", { name: /search channel/i }).click();
     await expect(
