@@ -85,7 +85,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
   // ── Creator Analytics ─────────────────────────────────────────────
   {
     slug: "youtube-money-calculator",
-    href: "/#find-channel",
+    href: "/",
     title: "YouTube Money Calculator",
     description: "Estimate any YouTube channel's monthly earnings from public statistics.",
     category: "creator-analytics",

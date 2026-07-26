@@ -34,7 +34,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Creator Tools",
     emoji: "\uD83C\uDFA5", // 🎥
     description: "Revenue calculators, RPM analysis, and monetization tools for YouTube, Instagram, and Twitch creators.",
-    href: "/#find-channel",
+    href: "/tools/creator-analytics",
     gradient: "from-brand-500/10 to-brand-600/5",
     badgeColor: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
   },
@@ -43,7 +43,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Developer Tools",
     emoji: "\uD83D\uDCBB", // 💻
     description: "JSON, JWT, Base64, UUID, regex, cron, and more — all running locally in your browser.",
-    href: "/developer-tools",
+    href: "/tools/developer-tools",
     gradient: "from-accent-500/10 to-accent-600/5",
     badgeColor: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
   },
@@ -52,7 +52,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Text Tools",
     emoji: "\uD83D\uDCDD", // 📝
     description: "Character counting, word analysis, keyword density, and text statistics.",
-    href: "/character-counter",
+    href: "/tools/text-tools",
     gradient: "from-emerald-500/10 to-emerald-600/5",
     badgeColor: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
   },
@@ -61,7 +61,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Random & Decision",
     emoji: "\uD83C\uDFB2", // 🎲
     description: "Wheels, coin flips, dice, name pickers, and team generators for quick decisions.",
-    href: "/spin-the-wheel",
+    href: "/tools/decision-random",
     gradient: "from-purple-500/10 to-purple-600/5",
     badgeColor: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
   },
@@ -70,7 +70,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Calculators",
     emoji: "\uD83D\uDCCA", // 📊
     description: "Financial and analytics calculators for creators and businesses.",
-    href: "/youtube-rpm-calculator",
+    href: "/tools/calculators",
     gradient: "from-amber-500/10 to-amber-600/5",
     badgeColor: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
   },
@@ -79,7 +79,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Converters",
     emoji: "\uD83D\uDD04", // 🔄
     description: "Convert between data formats: SQL, CSV, JSON, timestamps, and URLs.",
-    href: "/csv-to-json-converter",
+    href: "/tools/converters",
     gradient: "from-rose-500/10 to-rose-600/5",
     badgeColor: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
   },
@@ -88,7 +88,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Utilities",
     emoji: "\u2699\uFE0F", // ⚙️
     description: "Color generators, design helpers, and miscellaneous utility tools.",
-    href: "/random-color-generator",
+    href: "/tools/utilities",
     gradient: "from-slate-500/10 to-slate-600/5",
     badgeColor: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
   },
@@ -97,7 +97,7 @@ export const TOOL_CATEGORIES: readonly ToolCategoryDef[] = [
     label: "Web Tools",
     emoji: "\uD83C\uDF10", // 🌐
     description: "URL encoding, regex testing, and web development helpers.",
-    href: "/url-encoder-decoder",
+    href: "/tools/web-tools",
     gradient: "from-indigo-500/10 to-indigo-600/5",
     badgeColor: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300",
   },
