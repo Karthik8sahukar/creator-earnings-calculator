@@ -31,7 +31,8 @@
  */
 
 // ─── Layout ─────────────────────────────────────────────────────────
-export { ToolLayout, type ToolLayoutProps } from "./ToolLayout";
+export { ToolLayout } from "./ToolLayout";
+export type { ToolLayoutProps } from "./ToolLayout";
 export { ToolJsonLd } from "./ToolJsonLd";
 
 // ─── Inputs ─────────────────────────────────────────────────────────

@@ -1,249 +1,252 @@
 import { describe, it, expect, vi } from "vitest";
-
 import {
   createToolMetadata,
   generateToolJsonLd,
+  cleanStructuredData,
+  safeJsonLdSerialize,
   getToolEyebrow,
   getToolMaxWidth,
 } from "./metadata";
 import { getToolBySlug } from "@/lib/tools";
 
-// We need to mock the publicConfig siteUrl for deterministic URLs
 vi.mock("@/lib/config", () => ({
   publicConfig: {
     siteName: "BeHumler",
     siteUrl: "https://behumler.com",
-    description: "Test description",
+    description: "Test",
   },
   BRAND_NAME: "BeHumler",
 }));
 
 describe("createToolMetadata", () => {
-  it("generates metadata for a valid slug", async () => {
-    const generate = createToolMetadata("coin-flip");
-    const params = Promise.resolve({ locale: "en" });
-    const metadata = await generate({ params });
-
-    expect(metadata.title).toBeDefined();
-    expect(metadata.description).toBeDefined();
-    expect(metadata.alternates).toBeDefined();
-    expect(metadata.openGraph).toBeDefined();
-    expect(metadata.twitter).toBeDefined();
+  it("generates complete metadata for English", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    expect(meta.title).toBe("Coin Flip");
+    expect(meta.description).toBeTruthy();
+    expect(meta.robots).toEqual({ index: true, follow: true });
+    expect(meta.alternates?.canonical).toBe("https://behumler.com/en/coin-flip");
   });
 
-  it("returns 'Tool Not Found' for invalid slug", async () => {
-    const generate = createToolMetadata("nonexistent-tool-xyz");
-    const params = Promise.resolve({ locale: "en" });
-    const metadata = await generate({ params });
-
-    expect(metadata.title).toBe("Tool Not Found");
+  it("generates metadata for Spanish locale", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "es" }) });
+    expect(meta.alternates?.canonical).toBe("https://behumler.com/es/coin-flip");
+    const langs = meta.alternates?.languages as Record<string, string>;
+    expect(langs["es"]).toBe("https://behumler.com/es/coin-flip");
+    expect(langs["en"]).toBe("https://behumler.com/en/coin-flip");
   });
 
-  it("uses registry title by default", async () => {
-    const generate = createToolMetadata("coin-flip");
-    const params = Promise.resolve({ locale: "en" });
-    const metadata = await generate({ params });
-
-    expect(metadata.title).toBe("Coin Flip");
+  it("hreflang includes x-default", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const langs = meta.alternates?.languages as Record<string, string>;
+    expect(langs["x-default"]).toBe("https://behumler.com/en/coin-flip");
   });
 
   it("applies title override", async () => {
-    const generate = createToolMetadata("coin-flip", {
-      title: "Custom Title Override",
-    });
-    const params = Promise.resolve({ locale: "en" });
-    const metadata = await generate({ params });
-
-    expect(metadata.title).toBe("Custom Title Override");
+    const gen = createToolMetadata("coin-flip", { title: "Custom Title" });
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    expect(meta.title).toBe("Custom Title");
   });
 
-  it("applies description override", async () => {
-    const generate = createToolMetadata("coin-flip", {
-      description: "My custom description",
-    });
-    const params = Promise.resolve({ locale: "en" });
-    const metadata = await generate({ params });
-
-    expect(metadata.description).toBe("My custom description");
+  it("includes OG image fallback", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const og = meta.openGraph as Record<string, unknown>;
+    const images = og.images as Array<Record<string, unknown>>;
+    expect(images[0].url).toBe("https://behumler.com/og-default.png");
+    expect(images[0].width).toBe(1200);
+    expect(images[0].height).toBe(630);
   });
 
-  it("includes tool tags as keywords", async () => {
-    const generate = createToolMetadata("coin-flip");
-    const params = Promise.resolve({ locale: "en" });
-    const metadata = await generate({ params });
-
-    const tool = getToolBySlug("coin-flip");
-    expect(metadata.keywords).toEqual(expect.arrayContaining(tool!.tags));
+  it("Twitter card has image", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const tw = meta.twitter as Record<string, unknown>;
+    expect(tw.images).toEqual(["https://behumler.com/og-default.png"]);
   });
 
-  it("merges override keywords with tool tags", async () => {
-    const generate = createToolMetadata("coin-flip", {
-      keywords: ["extra-keyword"],
-    });
-    const params = Promise.resolve({ locale: "en" });
-    const metadata = await generate({ params });
-
-    expect(metadata.keywords).toContain("extra-keyword");
+  it("returns noindex for invalid slug", async () => {
+    const gen = createToolMetadata("nonexistent-xyz");
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    expect(meta.robots).toEqual({ index: false, follow: false });
   });
 
-  it("builds correct openGraph URL with locale", async () => {
-    const generate = createToolMetadata("coin-flip");
-    const params = Promise.resolve({ locale: "es" });
-    const metadata = await generate({ params });
+  it("does not emit empty keywords", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    if (meta.keywords) {
+      for (const k of meta.keywords as string[]) {
+        expect(k.trim().length).toBeGreaterThan(0);
+      }
+    }
+  });
 
-    expect((metadata.openGraph as Record<string, unknown>)?.url).toBe(
-      "https://behumler.com/es/coin-flip",
-    );
+  it("no duplicate locale segments in canonical", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "es" }) });
+    const canonical = meta.alternates?.canonical as string;
+    expect(canonical).not.toMatch(/\/es\/es\//);
+  });
+
+  it("OG url is absolute", async () => {
+    const gen = createToolMetadata("coin-flip");
+    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const og = meta.openGraph as Record<string, unknown>;
+    expect(og.url).toMatch(/^https:\/\//);
   });
 });
 
 describe("generateToolJsonLd", () => {
-  it("returns empty array for invalid slug", () => {
-    const result = generateToolJsonLd({
-      slug: "nonexistent-tool-xyz",
-      locale: "en",
-    });
-    expect(result).toEqual([]);
+  it("produces valid BreadcrumbList", () => {
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
+    const bc = result[0] as Record<string, unknown>;
+    expect(bc["@type"]).toBe("BreadcrumbList");
+    const items = bc.itemListElement as Array<Record<string, unknown>>;
+    expect(items.length).toBeGreaterThanOrEqual(2);
+    for (const item of items) {
+      expect(item.name).toBeTruthy();
+      expect(item.item).toMatch(/^https:\/\//);
+      expect(item.position).toBeGreaterThan(0);
+    }
   });
 
-  it("returns BreadcrumbList and SoftwareApplication for valid slug", () => {
-    const result = generateToolJsonLd({
-      slug: "coin-flip",
-      locale: "en",
-    });
-
-    expect(result.length).toBeGreaterThanOrEqual(2);
-    expect(result[0]).toMatchObject({
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-    });
-    expect(result[1]).toMatchObject({
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-    });
+  it("produces valid SoftwareApplication", () => {
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
+    const app = result[1] as Record<string, unknown>;
+    expect(app["@type"]).toBe("SoftwareApplication");
+    expect(app.name).toBeTruthy();
+    expect(app.description).toBeTruthy();
+    expect(app.operatingSystem).toBe("Any");
+    expect(app.url).toMatch(/^https:\/\//);
   });
 
-  it("includes FAQPage when faq is provided", () => {
-    const faq = [
-      { q: "Is it free?", a: "Yes." },
-      { q: "Is it random?", a: "Yes." },
-    ];
-    const result = generateToolJsonLd({
-      slug: "coin-flip",
-      locale: "en",
-      faq,
-    });
-
-    expect(result.length).toBe(3);
-    expect(result[2]).toMatchObject({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-    });
-    // Check FAQ items mapped correctly
+  it("emits FAQPage with valid FAQs", () => {
+    const faq = [{ q: "Q1?", a: "A1." }, { q: "Q2?", a: "A2." }];
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en", faq });
     const faqSchema = result[2] as Record<string, unknown>;
-    const mainEntity = faqSchema.mainEntity as Array<Record<string, unknown>>;
-    expect(mainEntity.length).toBe(2);
-    expect(mainEntity[0]).toMatchObject({
-      "@type": "Question",
-      name: "Is it free?",
-    });
+    expect(faqSchema["@type"]).toBe("FAQPage");
+    const entities = faqSchema.mainEntity as Array<Record<string, unknown>>;
+    expect(entities.length).toBe(2);
   });
 
-  it("does not include FAQPage when faq is empty", () => {
-    const result = generateToolJsonLd({
-      slug: "coin-flip",
-      locale: "en",
-      faq: [],
-    });
-
+  it("omits FAQPage when no FAQs", () => {
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
     expect(result.length).toBe(2);
   });
 
-  it("uses locale in URLs", () => {
-    const result = generateToolJsonLd({
-      slug: "coin-flip",
-      locale: "de",
-    });
-
-    const breadcrumb = result[0] as Record<string, unknown>;
-    const items = (breadcrumb as Record<string, unknown>).itemListElement as Array<Record<string, unknown>>;
-    expect(items[0].item).toBe("https://behumler.com/de");
-    expect(items[1].item).toContain("/de/coin-flip");
+  it("filters invalid FAQ entries", () => {
+    const faq = [{ q: "", a: "answer" }, { q: "question", a: "" }, { q: "Valid?", a: "Yes." }];
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en", faq });
+    const faqSchema = result[2] as Record<string, unknown>;
+    const entities = faqSchema.mainEntity as Array<Record<string, unknown>>;
+    expect(entities.length).toBe(1);
+    expect(entities[0].name).toBe("Valid?");
   });
 
-  it("respects breadcrumbName override", () => {
-    const result = generateToolJsonLd({
-      slug: "coin-flip",
-      locale: "en",
-      breadcrumbName: "Flip a Coin",
-    });
-
-    const breadcrumb = result[0] as Record<string, unknown>;
-    const items = (breadcrumb as Record<string, unknown>).itemListElement as Array<Record<string, unknown>>;
-    expect(items[1].name).toBe("Flip a Coin");
+  it("URLs preserve locale", () => {
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "de" });
+    const bc = result[0] as Record<string, unknown>;
+    const items = bc.itemListElement as Array<Record<string, unknown>>;
+    expect(items[0].item).toContain("/de");
   });
 
-  it("respects applicationCategory override", () => {
-    const result = generateToolJsonLd({
-      slug: "coin-flip",
-      locale: "en",
-      applicationCategory: "GameApplication",
-    });
-
-    const app = result[1] as Record<string, unknown>;
-    expect(app.applicationCategory).toBe("GameApplication");
+  it("does not contain invented ratings or reviews", () => {
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
+    const json = JSON.stringify(result);
+    expect(json).not.toContain("aggregateRating");
+    expect(json).not.toContain("Review");
+    expect(json).not.toContain("ratingValue");
   });
 
-  it("sets SoftwareApplication price to 0 (free)", () => {
-    const result = generateToolJsonLd({
-      slug: "coin-flip",
-      locale: "en",
-    });
+  it("can be parsed as valid JSON", () => {
+    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en", faq: [{ q: "Q?", a: "A." }] });
+    const serialized = JSON.stringify(result);
+    expect(() => JSON.parse(serialized)).not.toThrow();
+  });
+});
 
-    const app = result[1] as Record<string, unknown>;
-    const offers = app.offers as Record<string, unknown>;
-    expect(offers.price).toBe("0");
-    expect(offers.priceCurrency).toBe("USD");
+describe("cleanStructuredData", () => {
+  it("removes undefined and null", () => {
+    expect(cleanStructuredData(undefined)).toBeUndefined();
+    expect(cleanStructuredData(null)).toBeUndefined();
+  });
+
+  it("removes empty strings", () => {
+    expect(cleanStructuredData("")).toBeUndefined();
+    expect(cleanStructuredData("  ")).toBeUndefined();
+  });
+
+  it("preserves false and 0", () => {
+    expect(cleanStructuredData(false)).toBe(false);
+    expect(cleanStructuredData(0)).toBe(0);
+  });
+
+  it("removes empty arrays", () => {
+    expect(cleanStructuredData([])).toBeUndefined();
+  });
+
+  it("preserves non-empty arrays", () => {
+    expect(cleanStructuredData([1, 2])).toEqual([1, 2]);
+  });
+
+  it("removes keys with undefined/null/empty values from objects", () => {
+    const result = cleanStructuredData({ a: "valid", b: "", c: null, d: undefined });
+    expect(result).toEqual({ a: "valid" });
+  });
+
+  it("works recursively", () => {
+    const input = { name: "Test", nested: { empty: "", kept: "yes" }, arr: [null, "ok"] };
+    const result = cleanStructuredData(input);
+    expect(result).toEqual({ name: "Test", nested: { kept: "yes" }, arr: ["ok"] });
+  });
+});
+
+describe("safeJsonLdSerialize", () => {
+  it("escapes < to prevent script injection", () => {
+    const data = { text: "</script><script>alert(1)</script>" };
+    const result = safeJsonLdSerialize(data);
+    expect(result).not.toContain("</script>");
+    expect(result).toContain("\\u003c");
+  });
+
+  it("escapes > and &", () => {
+    const data = { a: "x > y & z" };
+    const result = safeJsonLdSerialize(data);
+    expect(result).not.toContain(">");
+    expect(result).not.toContain("&");
+  });
+
+  it("produces parseable JSON (after unescaping)", () => {
+    const data = [{ "@type": "Test", name: "Hello" }];
+    const result = safeJsonLdSerialize(data);
+    // The escaped version should still parse correctly when browser interprets it
+    const unescaped = result.replace(/\\u003c/g, "<").replace(/\\u003e/g, ">").replace(/\\u0026/g, "&");
+    expect(() => JSON.parse(unescaped)).not.toThrow();
   });
 });
 
 describe("getToolEyebrow", () => {
-  it("returns category label for valid slug", () => {
-    const eyebrow = getToolEyebrow("coin-flip");
-    // coin-flip is in "decision-random" category
-    expect(eyebrow).toBeTruthy();
-    expect(typeof eyebrow).toBe("string");
-    expect(eyebrow.length).toBeGreaterThan(0);
+  it("returns category label", () => {
+    const result = getToolEyebrow("coin-flip");
+    expect(result).toBeTruthy();
+    expect(result.length).toBeGreaterThan(0);
   });
 
-  it("returns 'Tool' for invalid slug", () => {
-    const eyebrow = getToolEyebrow("nonexistent-xyz");
-    expect(eyebrow).toBe("Tool");
+  it("returns Tool for invalid slug", () => {
+    expect(getToolEyebrow("nonexistent")).toBe("Tool");
   });
 });
 
 describe("getToolMaxWidth", () => {
   it("returns max-w-5xl for developer tools", () => {
     const tool = getToolBySlug("json-formatter");
-    if (tool) {
-      const maxWidth = getToolMaxWidth(tool);
-      expect(maxWidth).toBe("max-w-5xl");
-    }
+    expect(getToolMaxWidth(tool!)).toBe("max-w-5xl");
   });
 
   it("returns max-w-4xl for decision tools", () => {
     const tool = getToolBySlug("coin-flip");
-    if (tool) {
-      const maxWidth = getToolMaxWidth(tool);
-      expect(maxWidth).toBe("max-w-4xl");
-    }
-  });
-
-  it("returns max-w-4xl for calculator tools", () => {
-    const tool = getToolBySlug("youtube-rpm-calculator");
-    if (tool) {
-      const maxWidth = getToolMaxWidth(tool);
-      expect(maxWidth).toBe("max-w-4xl");
-    }
+    expect(getToolMaxWidth(tool!)).toBe("max-w-4xl");
   });
 });

@@ -1,76 +1,149 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { generateUuids, formatUuid, validateUuid } from "@/lib/developer";
-import { CopyButton, DownloadButton, PrivacyBadge } from "@/components/developer";
+import { generateUuids } from "@/lib/developer";
 
-const QUANTITIES = [1, 5, 10, 25, 50, 100];
+const MAX_QUANTITY = 100;
 
 export function UuidGeneratorClient() {
-  const [count, setCount] = useState(5);
-  const [uppercase, setUppercase] = useState(false);
-  const [hyphens, setHyphens] = useState(true);
+  const [quantity, setQuantity] = useState(5);
   const [uuids, setUuids] = useState<string[]>([]);
-  const [validateInput, setValidateInput] = useState("");
+  const [copied, setCopied] = useState<string | null>(null);
+  const [copiedAll, setCopiedAll] = useState(false);
 
-  const generate = useCallback(() => {
+  const handleGenerate = useCallback(() => {
+    const count = Math.min(Math.max(1, quantity), MAX_QUANTITY);
     setUuids(generateUuids(count));
-  }, [count]);
+    setCopied(null);
+    setCopiedAll(false);
+  }, [quantity]);
 
-  const formatted = uuids.map((u) => formatUuid(u, uppercase, hyphens));
-  const allText = formatted.join("\n");
-  const validation = validateInput.trim() ? validateUuid(validateInput) : null;
+  const copyOne = useCallback(async (uuid: string) => {
+    try {
+      await navigator.clipboard.writeText(uuid);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = uuid;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopied(uuid);
+    setTimeout(() => setCopied(null), 1500);
+  }, []);
+
+  const copyAll = useCallback(async () => {
+    const text = uuids.join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopiedAll(true);
+    setTimeout(() => setCopiedAll(false), 2000);
+  }, [uuids]);
 
   return (
     <section className="space-y-6">
-      <PrivacyBadge />
       <div className="card p-6 sm:p-8 space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="label">Quantity</label>
-          <select value={count} onChange={(e) => setCount(Number(e.target.value))} className="input w-auto" aria-label="Quantity">
-            {QUANTITIES.map((q) => <option key={q} value={q}>{q}</option>)}
-          </select>
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="uuid-qty"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+            >
+              Quantity
+            </label>
+            <input
+              id="uuid-qty"
+              type="number"
+              min={1}
+              max={MAX_QUANTITY}
+              value={quantity}
+              onChange={(e) => setQuantity(
+                Math.min(MAX_QUANTITY, Math.max(1, parseInt(e.target.value) || 1))
+              )}
+              className="w-24 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleGenerate}
+            className="inline-flex items-center rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
+          >
+            Generate
+          </button>
+          {uuids.length > 0 && (
+            <button
+              type="button"
+              onClick={handleGenerate}
+              className="inline-flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            >
+              Regenerate
+            </button>
+          )}
         </div>
-        <div className="flex flex-wrap items-center gap-4">
-          <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-            <input type="checkbox" checked={uppercase} onChange={(e) => setUppercase(e.target.checked)} className="rounded" /> Uppercase
-          </label>
-          <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-            <input type="checkbox" checked={hyphens} onChange={(e) => setHyphens(e.target.checked)} className="rounded" /> Hyphens
-          </label>
-        </div>
-        <button type="button" onClick={generate} className="btn-primary text-xs">Generate UUIDs</button>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          UUID v4 • Cryptographically secure • Max {MAX_QUANTITY} per batch
+        </p>
       </div>
 
-      {formatted.length > 0 && (
+      {uuids.length > 0 && (
         <div className="card p-6 sm:p-8 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Generated UUIDs</h2>
-            <div className="flex gap-2">
-              <CopyButton text={allText} label="Copy All" />
-              <DownloadButton content={allText} filename="uuids.txt" mimeType="text/plain" />
-            </div>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Generated UUIDs ({uuids.length})
+            </h2>
+            <button
+              type="button"
+              onClick={copyAll}
+              className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                copiedAll
+                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+              }`}
+              aria-label={copiedAll ? "All copied" : "Copy all UUIDs"}
+            >
+              {copiedAll ? "All Copied!" : "Copy All"}
+            </button>
           </div>
-          <ul className="space-y-1 max-h-72 overflow-auto">
-            {formatted.map((u, i) => (
-              <li key={i} className="flex items-center justify-between gap-2 py-1 border-b border-slate-100 dark:border-slate-800 last:border-0">
-                <code className="font-mono text-xs text-slate-900 dark:text-slate-100 truncate">{u}</code>
-                <CopyButton text={u} label="Copy" />
+
+          <ul className="space-y-1" aria-live="polite">
+            {uuids.map((uuid) => (
+              <li
+                key={uuid}
+                className="flex items-center justify-between rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2 group"
+              >
+                <code className="font-mono text-xs text-slate-900 dark:text-slate-100 select-all">
+                  {uuid}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => copyOne(uuid)}
+                  className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-medium transition-all ${
+                    copied === uuid
+                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+                      : "opacity-0 group-hover:opacity-100 bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                  }`}
+                  aria-label={`Copy ${uuid}`}
+                >
+                  {copied === uuid ? "✓" : "Copy"}
+                </button>
               </li>
             ))}
           </ul>
         </div>
       )}
-
-      <div className="card p-6 sm:p-8 space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">UUID Validator</h2>
-        <input type="text" value={validateInput} onChange={(e) => setValidateInput(e.target.value)} placeholder="Paste a UUID to validate..." className="input font-mono text-xs" />
-        {validation && (
-          <p className={`text-xs font-medium ${validation.valid ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-            {validation.valid ? `✓ Valid UUID v${validation.version}` : "✗ Invalid UUID"}
-          </p>
-        )}
-      </div>
     </section>
   );
 }

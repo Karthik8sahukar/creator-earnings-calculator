@@ -6,8 +6,8 @@ import { getToolBySlug, getCategoryDef, type ToolEntry } from "@/lib/tools";
 import { getRelatedTools } from "@/lib/tools/collections";
 import { ToolPageActions } from "@/components/ui/ToolPageActions";
 import { CategoryIcon } from "@/components/ui/Icon";
-import type { FaqItem } from "@/lib/engine/metadata";
-import { getToolMaxWidth, getToolEyebrow } from "@/lib/engine/metadata";
+import type { FaqItem, ToolMaxWidth } from "@/lib/engine/metadata";
+import { getToolMaxWidth as getDefaultMaxWidth, getToolEyebrow } from "@/lib/engine/metadata";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -16,18 +16,58 @@ export interface ToolLayoutProps {
   slug: string;
   /** The interactive tool component (business logic). */
   children: React.ReactNode;
-  /** FAQ items rendered below the tool and in JSON-LD. */
-  faq?: FaqItem[];
+
+  // ─── Content overrides ──────────────────────────────────────────
   /** Override the page title (default: registry title). */
   title?: string;
   /** Override the intro paragraph (default: registry description). */
   intro?: string;
   /** Override the eyebrow badge text (default: category label). */
   eyebrow?: string;
+
+  // ─── Optional sections ──────────────────────────────────────────
+  /** FAQ items rendered below the tool. */
+  faq?: FaqItem[];
+  /** Explicit related tools override (bypasses registry computation). */
+  relatedTools?: ToolEntry[];
   /** Number of related tools to show (default: 6). */
-  relatedCount?: number;
-  /** Hide related tools section entirely. */
-  hideRelated?: boolean;
+  relatedLimit?: number;
+
+  // ─── Content slots ──────────────────────────────────────────────
+  /** Rendered above the children (tool content). */
+  beforeTool?: React.ReactNode;
+  /** Rendered below the children (tool content). */
+  afterTool?: React.ReactNode;
+  /** Rendered before the Related Tools section. */
+  beforeRelated?: React.ReactNode;
+  /** Rendered after the Related Tools section. */
+  afterRelated?: React.ReactNode;
+  /** Formula or explanation section (rendered after the tool). */
+  formula?: React.ReactNode;
+  /** Notes section (rendered after formula). */
+  notes?: React.ReactNode;
+  /** Examples section (rendered after notes). */
+  examples?: React.ReactNode;
+
+  // ─── Visibility toggles ─────────────────────────────────────────
+  /** Show breadcrumbs. Default: true. */
+  showBreadcrumbs?: boolean;
+  /** Show page header (eyebrow, H1, intro). Default: true. */
+  showHeader?: boolean;
+  /** Show ToolPageActions (favorite, share, tracking). Default: true. */
+  showActions?: boolean;
+  /** Show Related Tools section. Default: true. */
+  showRelatedTools?: boolean;
+  /** Show FAQ section. Default: true (only renders if faq has items). */
+  showFaq?: boolean;
+
+  // ─── Layout customization ───────────────────────────────────────
+  /** Override max-width (default: derived from category). */
+  maxWidth?: ToolMaxWidth;
+  /** Additional className on the tool content wrapper. */
+  contentClassName?: string;
+  /** Additional className on the outer container. */
+  toolClassName?: string;
   /** Additional breadcrumb items (inserted between Home and tool). */
   breadcrumbMiddle?: Array<{ label: string; href: string }>;
 }
@@ -38,32 +78,41 @@ export interface ToolLayoutProps {
  * ToolLayout — The universal layout for all tool pages.
  *
  * Automatically provides:
- *   - Breadcrumbs (Home → [optional middle] → Tool Name)
+ *   - Breadcrumbs (Home → [middle] → Tool Name)
  *   - Header with eyebrow badge, H1, intro paragraph
  *   - ToolPageActions (FavoriteButton + ShareButton + VisitTracker)
  *   - Children slot for the interactive tool (business logic)
- *   - Related Tools grid (computed from registry via tag/category scoring)
- *   - FAQ accordion section
+ *   - Optional formula/notes/examples sections
+ *   - Related Tools grid (registry-computed or explicit override)
+ *   - FAQ section
  *
- * Usage (minimal — a tool page only provides slug + children):
- *   <ToolLayout slug="coin-flip" faq={FAQ}>
- *     <CoinFlipClient />
- *   </ToolLayout>
- *
- * Usage (with overrides):
- *   <ToolLayout slug="coin-flip" title={t("title")} intro={t("intro")} faq={FAQ}>
- *     <CoinFlipClient />
- *   </ToolLayout>
+ * All sections are optional and don't render empty wrappers.
+ * Backward-compatible: existing usage with just slug + children + faq works unchanged.
  */
 export function ToolLayout({
   slug,
   children,
-  faq,
   title: titleOverride,
   intro: introOverride,
   eyebrow: eyebrowOverride,
-  relatedCount = 6,
-  hideRelated = false,
+  faq,
+  relatedTools: explicitRelated,
+  relatedLimit = 6,
+  beforeTool,
+  afterTool,
+  beforeRelated,
+  afterRelated,
+  formula,
+  notes,
+  examples,
+  showBreadcrumbs = true,
+  showHeader = true,
+  showActions = true,
+  showRelatedTools = true,
+  showFaq = true,
+  maxWidth: maxWidthOverride,
+  contentClassName,
+  toolClassName,
   breadcrumbMiddle,
 }: ToolLayoutProps) {
   const t = useTranslations();
@@ -80,76 +129,138 @@ export function ToolLayout({
   const pageTitle = titleOverride ?? tool.title;
   const pageIntro = introOverride ?? tool.description;
   const pageEyebrow = eyebrowOverride ?? getToolEyebrow(slug);
-  const maxWidth = getToolMaxWidth(tool);
+  const maxWidth = maxWidthOverride ?? getDefaultMaxWidth(tool);
   const categoryDef = getCategoryDef(tool.category);
   const eyebrowColor = getEyebrowColor(tool.category);
 
-  // Compute related tools from registry
-  const relatedTools = hideRelated ? [] : getRelatedTools(slug, relatedCount);
+  // Compute related tools: explicit override OR registry computation
+  const relatedTools = showRelatedTools
+    ? (explicitRelated ?? getRelatedTools(slug, relatedLimit))
+    : [];
+
+  // Filter valid FAQs
+  const validFaqs = showFaq
+    ? (faq ?? []).filter((item) => item.q.trim().length > 0 && item.a.trim().length > 0)
+    : [];
 
   return (
-    <div className={`mx-auto ${maxWidth} space-y-10`}>
+    <div className={`mx-auto ${maxWidth} space-y-10 ${toolClassName ?? ""}`}>
       {/* Breadcrumbs */}
-      <nav
-        aria-label={t("channelPage.breadcrumbAria")}
-        className="text-xs text-slate-500 dark:text-slate-400"
-      >
-        <ol className="flex flex-wrap items-center gap-1">
-          <li>
-            <Link href="/" className="hover:text-slate-900 dark:hover:text-slate-100">
-              {t("common.breadcrumbs.home")}
-            </Link>
-          </li>
-          {breadcrumbMiddle?.map((b) => (
-            <li key={b.href} className="flex items-center gap-1">
-              <span aria-hidden>&rsaquo;</span>
-              <Link
-                href={b.href as never}
-                className="hover:text-slate-900 dark:hover:text-slate-100"
-              >
-                {b.label}
+      {showBreadcrumbs && (
+        <nav
+          aria-label={t("channelPage.breadcrumbAria")}
+          className="text-xs text-slate-500 dark:text-slate-400"
+        >
+          <ol className="flex flex-wrap items-center gap-1">
+            <li>
+              <Link href="/" className="hover:text-slate-900 dark:hover:text-slate-100">
+                {t("common.breadcrumbs.home")}
               </Link>
             </li>
-          ))}
-          <li className="flex items-center gap-1">
-            <span aria-hidden>&rsaquo;</span>
-            <span className="text-slate-700 dark:text-slate-300">{pageTitle}</span>
-          </li>
-        </ol>
-      </nav>
+            {breadcrumbMiddle?.map((b) => (
+              <li key={b.href} className="flex items-center gap-1">
+                <span aria-hidden>&rsaquo;</span>
+                <Link
+                  href={b.href as never}
+                  className="hover:text-slate-900 dark:hover:text-slate-100"
+                >
+                  {b.label}
+                </Link>
+              </li>
+            ))}
+            <li className="flex items-center gap-1">
+              <span aria-hidden>&rsaquo;</span>
+              <span className="text-slate-700 dark:text-slate-300">{pageTitle}</span>
+            </li>
+          </ol>
+        </nav>
+      )}
 
       {/* Header */}
-      <header className="space-y-3 text-center sm:text-left">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-3">
-            <p className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${eyebrowColor}`}>
-              {pageEyebrow}
-            </p>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-              {pageTitle}
-            </h1>
+      {showHeader && (
+        <header className="space-y-3 text-center sm:text-left">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-3">
+              <p className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${eyebrowColor}`}>
+                {pageEyebrow}
+              </p>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+                {pageTitle}
+              </h1>
+            </div>
+            {showActions && <ToolPageActions slug={slug} title={pageTitle} />}
           </div>
+          <p className="text-slate-600 dark:text-slate-300 max-w-2xl">{pageIntro}</p>
+        </header>
+      )}
+
+      {/* Actions without header (edge case) */}
+      {!showHeader && showActions && (
+        <div className="flex justify-end">
           <ToolPageActions slug={slug} title={pageTitle} />
         </div>
-        <p className="text-slate-600 dark:text-slate-300 max-w-2xl">{pageIntro}</p>
-      </header>
+      )}
+
+      {/* Before Tool slot */}
+      {beforeTool}
 
       {/* Tool Content (business logic) */}
-      {children}
+      <div className={contentClassName}>
+        {children}
+      </div>
+
+      {/* After Tool slot */}
+      {afterTool}
+
+      {/* Formula section */}
+      {formula && (
+        <section aria-labelledby="formula-title" className="space-y-3">
+          <h2 id="formula-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            How it works
+          </h2>
+          {formula}
+        </section>
+      )}
+
+      {/* Notes section */}
+      {notes && (
+        <section aria-labelledby="notes-title" className="space-y-3">
+          <h2 id="notes-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Notes
+          </h2>
+          {notes}
+        </section>
+      )}
+
+      {/* Examples section */}
+      {examples && (
+        <section aria-labelledby="examples-title" className="space-y-3">
+          <h2 id="examples-title" className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            Examples
+          </h2>
+          {examples}
+        </section>
+      )}
+
+      {/* Before Related slot */}
+      {beforeRelated}
 
       {/* Related Tools */}
       {relatedTools.length > 0 && (
         <RelatedToolsSection tools={relatedTools} categoryLabel={categoryDef?.label} />
       )}
 
+      {/* After Related slot */}
+      {afterRelated}
+
       {/* FAQ */}
-      {faq && faq.length > 0 && (
+      {validFaqs.length > 0 && (
         <section aria-labelledby="faq-title" className="card p-6 sm:p-8 space-y-4">
           <h2 id="faq-title" className="text-xl font-semibold text-slate-900 dark:text-slate-100">
             Frequently Asked Questions
           </h2>
           <dl className="space-y-4">
-            {faq.map((item) => (
+            {validFaqs.map((item) => (
               <div key={item.q}>
                 <dt className="font-medium text-slate-900 dark:text-slate-100">{item.q}</dt>
                 <dd className="mt-1 text-sm text-slate-600 dark:text-slate-400">{item.a}</dd>

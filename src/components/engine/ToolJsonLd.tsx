@@ -1,4 +1,4 @@
-import { generateToolJsonLd, type FaqItem } from "@/lib/engine/metadata";
+import { generateToolJsonLd, safeJsonLdSerialize, type FaqItem } from "@/lib/engine/metadata";
 
 interface Props {
   /** Tool slug from the registry. */
@@ -11,18 +11,19 @@ interface Props {
   breadcrumbName?: string;
   /** Application category for SoftwareApplication schema. */
   applicationCategory?: string;
+  /** Optional category breadcrumb. */
+  categoryBreadcrumb?: { name: string; url: string };
 }
 
 /**
  * ToolJsonLd — Server component that emits JSON-LD structured data.
  *
  * Automatically generates:
- *   - BreadcrumbList (Home → Tool)
+ *   - BreadcrumbList (Home → Category → Tool)
  *   - SoftwareApplication (free web tool metadata)
- *   - FAQPage (if FAQ items provided)
+ *   - FAQPage (only when valid FAQs exist)
  *
- * Usage:
- *   <ToolJsonLd slug="coin-flip" locale={locale} faq={FAQ} />
+ * Uses safe serialization to prevent script tag injection.
  */
 export function ToolJsonLd({
   slug,
@@ -30,6 +31,7 @@ export function ToolJsonLd({
   faq,
   breadcrumbName,
   applicationCategory,
+  categoryBreadcrumb,
 }: Props) {
   const jsonLd = generateToolJsonLd({
     slug,
@@ -37,6 +39,7 @@ export function ToolJsonLd({
     faq,
     breadcrumbName,
     applicationCategory,
+    categoryBreadcrumb,
   });
 
   if (jsonLd.length === 0) return null;
@@ -44,7 +47,7 @@ export function ToolJsonLd({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLdSerialize(jsonLd) }}
     />
   );
 }
