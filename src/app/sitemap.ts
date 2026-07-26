@@ -4,9 +4,7 @@ import { listCategorySlugs, listCountrySlugs } from "@/data/creators";
 import { listLeaderboardSlugs } from "@/data/creators/leaderboards";
 import { HREFLANG_MAP, routing } from "@/i18n/routing";
 import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
-import { getAllCategorySlugs } from "@/lib/categoryData";
 import { publicConfig } from "@/lib/config";
-import { getAllCountrySlugs } from "@/lib/countryData";
 import { listCreators } from "@/lib/creators";
 import { getAllRankingFilterSlugs } from "@/lib/rankings";
 
@@ -159,19 +157,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
   }
 
-  // Standalone country pages: /country/[slug]
-  for (const slug of getAllCountrySlugs()) {
-    entries.push(
-      ...perLocaleWithAlternates(`/country/${slug}`, 0.6, "weekly"),
-    );
-  }
-
-  // Standalone category pages: /category/[slug]
-  for (const slug of getAllCategorySlugs()) {
-    entries.push(
-      ...perLocaleWithAlternates(`/category/${slug}`, 0.6, "weekly"),
-    );
-  }
+  // NOTE: /country/[slug] and /category/[slug] are intentionally excluded.
+  // They duplicate /creators/country/[country] and /creators/[category]
+  // respectively. The /creators/* variants are the preferred canonicals.
 
   // 3: blog article pages — English canonical only.
   try {

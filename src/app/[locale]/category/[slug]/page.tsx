@@ -6,6 +6,7 @@ import { CreatorCard } from "@/components/creator/CreatorCard";
 import { Money } from "@/components/currency";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { getCategoryBySlug as getCuratedCategory } from "@/data/creators";
 import { publicConfig } from "@/lib/config";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { listCreators } from "@/lib/creators";
@@ -67,7 +68,15 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: buildAlternates({ locale, pathSuffix: `/category/${slug}` }),
+    alternates: (() => {
+      // If a curated /creators/[category] page exists for the same slug,
+      // point canonical there to avoid duplicate indexing.
+      const curatedCat = getCuratedCategory(slug);
+      if (curatedCat) {
+        return buildAlternates({ locale, pathSuffix: `/creators/${curatedCat.slug}` });
+      }
+      return buildAlternates({ locale, pathSuffix: `/category/${slug}` });
+    })(),
     openGraph: {
       title,
       description,
