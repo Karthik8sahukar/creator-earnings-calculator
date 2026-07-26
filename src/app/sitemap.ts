@@ -4,8 +4,11 @@ import { listCategorySlugs, listCountrySlugs } from "@/data/creators";
 import { listLeaderboardSlugs } from "@/data/creators/leaderboards";
 import { HREFLANG_MAP, routing } from "@/i18n/routing";
 import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
+import { getAllCategorySlugs } from "@/lib/categoryData";
 import { publicConfig } from "@/lib/config";
+import { getAllCountrySlugs } from "@/lib/countryData";
 import { listCreators } from "@/lib/creators";
+import { getAllRankingFilterSlugs } from "@/lib/rankings";
 
 /**
  * Sitemap.
@@ -48,6 +51,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/youtube-engagement-calculator",
     "/youtube-adsense-calculator",
     "/youtube-channel-valuation-calculator",
+    "/youtube-affiliate-calculator",
+    "/youtube-membership-calculator",
+    "/youtube-merch-calculator",
     "/instagram-money-calculator",
     "/twitch-bits-calculator",
     "/yes-no-picker-wheel",
@@ -74,6 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/csv-to-json-converter",
     "/blog",
     "/creators",
+    "/top-creators",
   ];
 
   const blogCategoryRoutes = BLOG_CATEGORIES.map((c) => `/blog/category/${c.slug}`);
@@ -142,6 +149,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of listLeaderboardSlugs()) {
     entries.push(
       ...perLocaleWithAlternates(`/leaderboard/${slug}`, 0.6, "weekly"),
+    );
+  }
+
+  // Ranking filter pages: /top-creators/[filter] (country + category slugs)
+  for (const filter of getAllRankingFilterSlugs()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/top-creators/${filter}`, 0.5, "weekly"),
+    );
+  }
+
+  // Standalone country pages: /country/[slug]
+  for (const slug of getAllCountrySlugs()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/country/${slug}`, 0.6, "weekly"),
+    );
+  }
+
+  // Standalone category pages: /category/[slug]
+  for (const slug of getAllCategorySlugs()) {
+    entries.push(
+      ...perLocaleWithAlternates(`/category/${slug}`, 0.6, "weekly"),
     );
   }
 
