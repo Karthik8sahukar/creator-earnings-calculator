@@ -1,30 +1,30 @@
-import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { SimpleCalcLayout } from "@/components/SimpleCalcLayout";
-import { buildAlternates } from "@/lib/i18nMetadata";
+import { ToolLayout, ToolJsonLd } from "@/components/engine";
+import { createToolMetadata } from "@/lib/engine";
 import { RpmCalcClient } from "./RpmCalcClient";
 
+const SLUG = "youtube-rpm-calculator";
+
+/**
+ * Metadata — uses the engine's createToolMetadata factory.
+ * Overrides title/description with i18n translations.
+ */
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+}) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "calculators.rpm.meta" });
-  return {
+
+  // Use the engine factory with i18n overrides
+  const generate = createToolMetadata(SLUG, {
     title: t("title"),
     description: t("description"),
-    alternates: buildAlternates({
-      locale,
-      pathSuffix: "/youtube-rpm-calculator",
-    }),
-    openGraph: {
-      title: t("title"),
-      description: t("ogDescription"),
-      url: `/${locale}/youtube-rpm-calculator`,
-    },
-  };
+  });
+
+  return generate({ params });
 }
 
 export default async function Page({
@@ -36,21 +36,24 @@ export default async function Page({
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "calculators.rpm" });
 
+  const faq = [
+    { q: t("faq.q1"), a: t("faq.a1") },
+    { q: t("faq.q2"), a: t("faq.a2") },
+    { q: t("faq.q3"), a: t("faq.a3") },
+  ];
+
   return (
-    <SimpleCalcLayout
-      eyebrow={t("eyebrow")}
-      title={t("title")}
-      intro={t("intro")}
-      breadcrumbs={[
-        { label: t("breadcrumb"), href: "/youtube-rpm-calculator" },
-      ]}
-      faq={[
-        { q: t("faq.q1"), a: t("faq.a1") },
-        { q: t("faq.q2"), a: t("faq.a2") },
-        { q: t("faq.q3"), a: t("faq.a3") },
-      ]}
-    >
-      <RpmCalcClient />
-    </SimpleCalcLayout>
+    <>
+      <ToolLayout
+        slug={SLUG}
+        title={t("title")}
+        intro={t("intro")}
+        eyebrow={t("eyebrow")}
+        faq={faq}
+      >
+        <RpmCalcClient />
+      </ToolLayout>
+      <ToolJsonLd slug={SLUG} locale={locale} faq={faq} />
+    </>
   );
 }
