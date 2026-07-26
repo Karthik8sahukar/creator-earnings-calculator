@@ -3,7 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import type { ToolEntry } from "@/lib/tools/registry";
 import { getCategoryDef } from "@/lib/tools/categories";
-import { CategoryIcon, categoryEmoji } from "./Icon";
+import { CategoryIcon } from "./Icon";
 import { card, typography, badge as badgeTokens, animation } from "@/lib/design-tokens";
 
 // ─── Variants ───────────────────────────────────────────────────────
