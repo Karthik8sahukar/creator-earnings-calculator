@@ -116,7 +116,7 @@ export function searchTools(query: string, limit = 12): SearchResult[] {
         score += 50;
         if (!matchedOn.includes("tags")) matchedOn.push("tags");
         break; // one tag match is enough
-      } else if (tagLower.includes(q) || q.includes(tagLower)) {
+      } else if (tagLower.includes(q) || (tagLower.length >= 3 && q.includes(tagLower))) {
         score += 25;
         if (!matchedOn.includes("tags")) matchedOn.push("tags");
         break;
