@@ -155,7 +155,7 @@ test.describe("Search Modal — Recent Searches", () => {
     // Open search again
     await page.keyboard.press("Control+k");
     // Should show "Recent searches" section with "dice roller"
-    await expect(page.getByText(/recent searches/i)).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Recent searches", { exact: true })).toBeVisible();
     await expect(page.getByRole("dialog").getByText("dice roller")).toBeVisible();
   });
 
@@ -168,7 +168,7 @@ test.describe("Search Modal — Recent Searches", () => {
     await page.reload();
 
     await page.keyboard.press("Control+k");
-    await expect(page.getByText(/recent searches/i)).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Recent searches", { exact: true })).toBeVisible();
     // Click "coin flip" in recent
     const recentItem = page.getByRole("dialog").getByText("coin flip").first();
     await recentItem.click();
@@ -207,14 +207,14 @@ test.describe("Search Modal — Recent Searches", () => {
     await page.reload();
 
     await page.keyboard.press("Control+k");
-    await expect(page.getByText(/recent searches/i)).toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Recent searches", { exact: true })).toBeVisible();
 
     // Click "Clear all"
     const clearBtn = page.getByRole("dialog").getByText(/clear all/i);
     await clearBtn.click();
 
     // Recent searches section should disappear
-    await expect(page.getByText(/recent searches/i)).not.toBeVisible();
+    await expect(page.getByRole("dialog").getByText("Recent searches", { exact: true })).not.toBeVisible();
   });
 });
 
@@ -225,7 +225,7 @@ test.describe("Search Modal — Zero Results", () => {
     const input = page.getByRole("dialog").getByRole("textbox");
     await input.fill("xyznonexistent");
     // Should show "No tools found" message
-    await expect(page.getByText(/no tools found/i)).toBeVisible();
+    await expect(page.getByRole("dialog").getByText(/no tools found/i)).toBeVisible();
     // Should show category suggestion pills
     const suggestionPills = page.getByRole("dialog").locator("button").filter({ hasText: /calculator|random|json|text|converter/i });
     await expect(suggestionPills.first()).toBeVisible();
@@ -240,8 +240,9 @@ test.describe("Search Modal — Zero Results", () => {
     await input.fill("zznotool qwerty");
     // May show "You might be looking for" if zero-results suggestions find related tools
     // Or "No tools found" — the important thing is no crash
-    const noResults = page.getByText(/no tools found/i);
-    const suggestions = page.getByText(/you might be looking for/i);
+    const dialog = page.getByRole("dialog");
+    const noResults = dialog.getByText(/no tools found/i);
+    const suggestions = dialog.getByText(/you might be looking for/i);
     // At least one of these should appear
     await expect(noResults.or(suggestions).first()).toBeVisible();
   });

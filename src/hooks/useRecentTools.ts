@@ -60,17 +60,32 @@ export function useRecentTools() {
 
   const recordVisit = useCallback(
     (slug: string) => {
-      setRecentSlugs((prev) => {
-        // Move to front (dedup), cap at MAX_RECENT
-        const next = [slug, ...prev.filter((s) => s !== slug)].slice(0, MAX_RECENT);
-        try {
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-          window.dispatchEvent(new Event("recent-tools-updated"));
-        } catch {
-          // quota exceeded — state still updated in memory
+      // Read current state from localStorage to ensure consistency
+      let prev: string[] = [];
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            prev = parsed.filter((v): v is string => typeof v === "string");
+          }
         }
-        return next;
-      });
+      } catch {
+        // ignore
+      }
+
+      // Move to front (dedup), cap at MAX_RECENT
+      const next = [slug, ...prev.filter((s) => s !== slug)].slice(0, MAX_RECENT);
+
+      // Write to localStorage FIRST (before setState) to survive unmount
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        window.dispatchEvent(new Event("recent-tools-updated"));
+      } catch {
+        // quota exceeded — state still updated in memory
+      }
+
+      setRecentSlugs(next);
     },
     [],
   );

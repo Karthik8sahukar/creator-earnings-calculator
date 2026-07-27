@@ -33,7 +33,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
   return (
     <>
-      <DecisionLayout eyebrow="Decision Tool" title="Coin Flip" intro="Flip a virtual coin for a quick Heads or Tails decision. Support for multiple simultaneous flips with running statistics." breadcrumbs={[{ label: "Coin Flip", href: PATH }]} faq={FAQ} currentToolPath={PATH}>
+      <DecisionLayout eyebrow="Decision Tool" title="Coin Flip" intro="Flip a virtual coin for a quick Heads or Tails decision. Support for multiple simultaneous flips with running statistics." breadcrumbs={[{ label: "Coin Flip", href: PATH }]} faq={FAQ} currentToolPath={PATH} toolSlug="coin-flip">
         <CoinFlipClient />
       </DecisionLayout>
       <ToolSEO locale={locale} pathSuffix={PATH} toolName="Coin Flip" toolDescription="Virtual coin flip with multi-flip support and history tracking." faq={FAQ} breadcrumbName="Coin Flip" />
