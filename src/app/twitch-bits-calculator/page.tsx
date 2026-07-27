@@ -8,9 +8,6 @@ import { TwitchBitsClient } from "./TwitchBitsClient";
 
 const PATH_SUFFIX = "/twitch-bits-calculator";
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({
   params,

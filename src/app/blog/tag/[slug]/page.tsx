@@ -21,10 +21,7 @@ export async function generateStaticParams() {
   const posts = await loadPosts();
   const tags = new Set<string>();
   for (const p of posts) for (const t of p.tags) tags.add(tagToSlug(t));
-  const params: { slug: string }[] = [];
-    for (const slug of tags) params.push({ slug });
-  }
-  return params;
+  return Array.from(tags).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({

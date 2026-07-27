@@ -8,9 +8,6 @@ import { TeamGeneratorClient } from "./TeamGeneratorClient";
 
 const PATH_SUFFIX = "/random-team-generator";
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({
   params,

@@ -13,9 +13,6 @@ const FAQ = [
   { q: "What categories are available?", a: "Friends, Family, Kids, Couples, Party, Office, School, Funny, and Clean. Each question can belong to multiple categories." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
   return {

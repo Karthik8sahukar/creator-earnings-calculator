@@ -13,9 +13,6 @@ const FAQ = [
   { q: "Can I lock a color?", a: "Yes. Click Lock Color to keep the current color while generating palettes and gradients based on it." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
   return {

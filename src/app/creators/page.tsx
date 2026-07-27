@@ -35,9 +35,6 @@ import type { CreatorCountryCode } from "@/data/creators/schema";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({
   params,

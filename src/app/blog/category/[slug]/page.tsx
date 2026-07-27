@@ -9,12 +9,7 @@ import { BLOG_CATEGORIES, findCategory, loadPosts } from "@/lib/blog";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 export async function generateStaticParams() {
-  const params: { slug: string }[] = [];
-    for (const c of BLOG_CATEGORIES) {
-      params.push({ slug: c.slug });
-    }
-  }
-  return params;
+  return BLOG_CATEGORIES.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({

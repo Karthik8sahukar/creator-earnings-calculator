@@ -40,13 +40,7 @@ interface RouteParams {
 }
 
 export function generateStaticParams() {
-  const slugs = getAllCountrySlugs();
-  const params: RouteParams[] = [];
-    for (const slug of slugs) {
-      params.push({ slug });
-    }
-  }
-  return params;
+  return getAllCountrySlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({

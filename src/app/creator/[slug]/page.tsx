@@ -70,7 +70,6 @@ export const dynamic = "force-dynamic";
 export const dynamicParams = false;
 
 interface RouteParams {
-  
   slug: string;
 }
 
@@ -84,12 +83,7 @@ interface PageProps {
  * still fetches at request time because of `dynamic = "force-dynamic"`.
  */
 export function generateStaticParams() {
-  const params: RouteParams[] = [];
-    for (const c of listCreators()) {
-      params.push({ slug: c.slug });
-    }
-  }
-  return params;
+  return listCreators().map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({

@@ -8,9 +8,6 @@ import { YesNoWheelClient } from "./YesNoWheelClient";
 
 const PATH_SUFFIX = "/yes-no-picker-wheel";
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({
   params,

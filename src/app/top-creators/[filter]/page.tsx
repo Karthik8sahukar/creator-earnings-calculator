@@ -29,13 +29,7 @@ interface RouteParams {
 }
 
 export function generateStaticParams() {
-  const filters = getAllRankingFilterSlugs();
-  const params: RouteParams[] = [];
-    for (const filter of filters) {
-      params.push({ filter });
-    }
-  }
-  return params;
+  return getAllRankingFilterSlugs().map((filter) => ({ filter }));
 }
 
 export async function generateMetadata({

@@ -26,12 +26,7 @@ interface RouteParams {
 }
 
 export function generateStaticParams() {
-  const params: RouteParams[] = [];
-    for (const cat of TOOL_CATEGORIES) {
-      params.push({ category: cat.id });
-    }
-  }
-  return params;
+  return TOOL_CATEGORIES.map((cat) => ({ category: cat.id }));
 }
 
 export async function generateMetadata({

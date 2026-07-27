@@ -12,9 +12,6 @@ const FAQ = [
   { q: "Is the generator biased?", a: "No. The tool uses Math.random() and floor arithmetic to ensure uniform distribution across the range." },
 ];
 
-export function generateStaticParams() {
-  return [];
-}
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
   return {

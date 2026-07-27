@@ -10,9 +10,6 @@ const FAQ = [
   { q: "What happens with invalid JSON?", a: "The validator shows the error message with approximate line and column position to help you find the issue." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export const generateMetadata = createToolMetadata(SLUG, {
   title: "JSON Formatter & Validator Online",

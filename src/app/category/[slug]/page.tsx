@@ -41,13 +41,7 @@ interface RouteParams {
 }
 
 export function generateStaticParams() {
-  const slugs = getAllCategorySlugs();
-  const params: RouteParams[] = [];
-    for (const slug of slugs) {
-      params.push({ slug });
-    }
-  }
-  return params;
+  return getAllCategorySlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({

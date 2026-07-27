@@ -10,9 +10,6 @@ const FAQ = [
   { q: "Is my data sent anywhere?", a: "No. All processing happens locally in your browser. Your data never leaves your device." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export const generateMetadata = createToolMetadata(SLUG, {
   title: "JSON Minifier — Compress JSON Online",

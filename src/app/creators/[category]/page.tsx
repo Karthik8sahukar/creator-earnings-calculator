@@ -19,10 +19,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  const slugs = listCategorySlugs();
-  return .map(
-    category => ({ category }),
-  );
+  return listCategorySlugs().map((category) => ({ category }));
 }
 
 export async function generateMetadata({

@@ -11,9 +11,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  return .map(
-    country => ({ country }),
-  );
+  return listCountrySlugs().map((country) => ({ country }));
 }
 
 export async function generateMetadata({

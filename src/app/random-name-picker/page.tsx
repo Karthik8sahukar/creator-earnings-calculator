@@ -13,9 +13,6 @@ const FAQ = [
   { q: "Is it fair?", a: "Yes. The selection uses a Fisher-Yates shuffle which gives every name an equal probability of being picked." },
 ];
 
-export function generateStaticParams() {
-  return [];
-}
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
   return {

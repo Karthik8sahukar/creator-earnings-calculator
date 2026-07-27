@@ -27,9 +27,6 @@ const FAQ = [
   { q: "What data do you collect?", a: "None. We do not store search queries, channel data, or earnings estimates. Every calculation happens in real-time and is discarded after you leave the page." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({
   params,

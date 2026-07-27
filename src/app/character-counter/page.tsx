@@ -13,9 +13,6 @@ const FAQ = [
   { q: "How is reading time calculated?", a: "Reading time is estimated at 238 words per minute, which is the average adult reading speed for online content." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
   return {

@@ -10,9 +10,6 @@ const FAQ = [
   { q: "Is my data sent to a server?", a: "No. All encoding and decoding happens locally in your browser. Your data never leaves your device." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export const generateMetadata = createToolMetadata(SLUG, {
   title: "Base64 Encoder/Decoder — Encode & Decode Online",

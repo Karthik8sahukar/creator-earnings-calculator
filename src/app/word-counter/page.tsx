@@ -13,9 +13,6 @@ const FAQ = [
   { q: "Can I export my text?", a: "Yes. You can export as plain TXT or Markdown (.md) format using the export buttons above the text area." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
   return {

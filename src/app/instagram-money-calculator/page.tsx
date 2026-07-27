@@ -37,9 +37,6 @@ const FAQ_KEYS = [
   "reachVsFollowers",
 ] as const;
 
-export async function generateStaticParams() {
-  return [{}];
-}
 
 export async function generateMetadata({
   params,

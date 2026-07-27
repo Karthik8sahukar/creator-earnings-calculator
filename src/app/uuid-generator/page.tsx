@@ -10,9 +10,6 @@ const FAQ = [
   { q: "What is the maximum quantity?", a: "You can generate up to 100 UUIDs at once. For larger batches, generate multiple times." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export const generateMetadata = createToolMetadata(SLUG, {
   title: "UUID Generator — Generate UUID v4 Online",

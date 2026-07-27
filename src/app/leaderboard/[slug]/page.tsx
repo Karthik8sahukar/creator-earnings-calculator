@@ -19,10 +19,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  const slugs = listLeaderboardSlugs();
-  return .map(
-    slug => ({ slug }),
-  );
+  return listLeaderboardSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({

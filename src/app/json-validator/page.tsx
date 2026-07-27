@@ -10,9 +10,6 @@ const FAQ = [
   { q: "Can it validate JSON Schema?", a: "No. This is a JSON syntax validator only. For JSON Schema validation, use a dedicated schema validation tool." },
 ];
 
-export function generateStaticParams() {
-  return [{}];
-}
 
 export const generateMetadata = createToolMetadata(SLUG, {
   title: "JSON Validator — Check JSON Syntax Online",

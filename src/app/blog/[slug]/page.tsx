@@ -29,12 +29,7 @@ import { buildAlternates } from "@/lib/i18nMetadata";
 // static HTML with rich metadata already resolved.
 export async function generateStaticParams() {
   const posts = await loadPosts();
-  const params: { slug: string }[] = [];
-    for (const post of posts) {
-      params.push({ slug: post.slug });
-    }
-  }
-  return params;
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({

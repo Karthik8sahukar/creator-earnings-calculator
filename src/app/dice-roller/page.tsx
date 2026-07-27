@@ -12,9 +12,6 @@ const FAQ = [
   { q: "Can I use this for tabletop RPGs?", a: "Absolutely. Common D&D dice (d4, d6, d8, d10, d12, d20) are available as presets." },
 ];
 
-export function generateStaticParams() {
-  return [];
-}
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
   return {
