@@ -48,14 +48,35 @@ describe("useFavorites", () => {
   });
 
   it("respects max 50 favorites", () => {
-    const { result } = renderHook(() => useFavorites());
+    // Pre-seed localStorage with 55 unique slugs to test the cap on hydration.
+    // The hook reads localStorage on mount and slices to MAX_FAVORITES (50).
     const slugs = Array.from({ length: 55 }, (_, i) => `tool-${i}`);
-    act(() => {
-      for (const slug of slugs) {
-        result.current.addFavorite(slug);
-      }
-    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(slugs));
+
+    const { result } = renderHook(() => useFavorites());
     expect(result.current.favorites.length).toBe(50);
+    // Entries beyond the limit are not stored in state
+    expect(result.current.favorites).not.toContain("tool-54");
+    expect(result.current.favorites).not.toContain("tool-53");
+    expect(result.current.favorites).not.toContain("tool-52");
+    expect(result.current.favorites).not.toContain("tool-51");
+    expect(result.current.favorites).not.toContain("tool-50");
+  });
+
+  it("addFavorite caps at 50 when adding one beyond the limit", () => {
+    // Start with exactly 50 favorites
+    const slugs = Array.from({ length: 50 }, (_, i) => `tool-${i}`);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(slugs));
+
+    const { result } = renderHook(() => useFavorites());
+    expect(result.current.favorites.length).toBe(50);
+
+    // Adding one more should keep the list at 50 (oldest dropped)
+    act(() => result.current.addFavorite("tool-new"));
+    expect(result.current.favorites.length).toBe(50);
+    expect(result.current.favorites[0]).toBe("tool-new");
+    // The last entry from the original list is dropped
+    expect(result.current.favorites).not.toContain("tool-49");
   });
 
   it("persists to localStorage", () => {
