@@ -22,7 +22,7 @@ export async function generateStaticParams() {
   const tags = new Set<string>();
   for (const p of posts) for (const t of p.tags) tags.add(tagToSlug(t));
   const params: { slug: string }[] = [];
-    for (const slug of tags) params.push({ locale, slug });
+    for (const slug of tags) params.push({ slug });
   }
   return params;
 }
@@ -43,7 +43,6 @@ export async function generateMetadata({
     title: t("pageTitle", { tag }),
     description: t("pageDescription", { tag }),
     alternates: buildAlternates({
-      locale,
       pathSuffix: `/blog/tag/${slug}`,
     }),
     openGraph: {

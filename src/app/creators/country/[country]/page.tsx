@@ -11,8 +11,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  return .flatMap((locale) =>
-    listCountrySlugs().map((country) => ({ locale, country })),
+  return .map(
+    country => ({ country }),
   );
 }
 

@@ -1,3 +1,4 @@
+import { getT } from "@/lib/t";
 
 import Link from "next/link";
 
@@ -58,7 +59,7 @@ const BLOG_PREVIEWS: BlogPreview[] = [
 ];
 
 export async function LatestBlogs() {
-  const t = await getTranslations("home.latestBlogs");
+  const t = getT("home.latestBlogs");
 
   return (
     <section aria-labelledby="latest-blogs-title">

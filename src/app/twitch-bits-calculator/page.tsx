@@ -38,7 +38,6 @@ export async function generateMetadata({
       description,
       url: `${PATH_SUFFIX}`,
       siteName: publicConfig.siteName,
-      locale,
     },
     twitter: { card: "summary_large_image", title, description },
   };

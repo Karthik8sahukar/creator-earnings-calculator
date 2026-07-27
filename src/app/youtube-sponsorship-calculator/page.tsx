@@ -15,7 +15,6 @@ export async function generateMetadata({
     title: t("title"),
     description: t("description"),
     alternates: buildAlternates({
-      locale,
       pathSuffix: "/youtube-sponsorship-calculator",
     }),
     openGraph: {

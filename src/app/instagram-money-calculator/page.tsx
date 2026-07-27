@@ -46,10 +46,7 @@ export async function generateMetadata({
 }: {
   /* no params */;
 }): Promise<Metadata> {
-  const t = await getTranslations({
-    locale,
-    namespace: "instagramCalculator.meta",
-  });
+  const t = getT("instagramCalculator.meta");
 
   return {
     title: t("title"),
@@ -70,7 +67,6 @@ export async function generateMetadata({
       description: t("ogDescription"),
       url: `${PATH_SUFFIX}`,
       siteName: publicConfig.siteName,
-      locale,
     },
     twitter: {
       card: "summary_large_image",
@@ -86,10 +82,7 @@ export default async function InstagramCalculatorPage({
   /* no params */;
 }) {
 
-  const t = await getTranslations({
-    locale,
-    namespace: "instagramCalculator",
-  });
+  const t = getT("instagramCalculator.meta");
   const tCommon = getT();
 
   const pageUrl = `${publicConfig.siteUrl}${PATH_SUFFIX}`;

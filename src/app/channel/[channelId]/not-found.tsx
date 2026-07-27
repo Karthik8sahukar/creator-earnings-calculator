@@ -1,9 +1,10 @@
+import { getT } from "@/lib/t";
 
 import Link from "next/link";
 
 export default async function ChannelNotFound() {
-  const t = await getTranslations("channelPage");
-  const tCommon = await getTranslations("common.actions");
+  const t = getT("channelPage");
+  const tCommon = getT("common.actions");
   return (
     <div className="text-center py-24">
       <p className="text-sm font-medium text-brand-600">{t("notFoundCode")}</p>

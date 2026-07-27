@@ -1,3 +1,4 @@
+import { getT } from "@/lib/t";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
 import Link from "next/link";
@@ -19,7 +20,7 @@ const TRENDING_SLUGS = [
 ] as const;
 
 export async function TrendingCreators() {
-  const t = await getTranslations("home.trending");
+  const t = getT("home.trending");
 
   const creators = TRENDING_SLUGS.map((slug) => getCreatorBySlug(slug)).filter(
     (c): c is NonNullable<typeof c> => Boolean(c),

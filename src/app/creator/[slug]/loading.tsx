@@ -1,3 +1,4 @@
+import { getT } from "@/lib/t";
 
 /**
  * Loading skeleton for `/creator/[slug]`. Mirrors the pattern in
@@ -6,7 +7,7 @@
  * transition.
  */
 export default async function CreatorLoading() {
-  const t = await getTranslations("creator.loading");
+  const t = getT("creator.loading");
   return (
     <div className="space-y-8" aria-live="polite" aria-busy="true">
       <span className="sr-only">{t("srLabel")}</span>

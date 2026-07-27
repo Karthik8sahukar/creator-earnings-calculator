@@ -1,3 +1,4 @@
+import { getT } from "@/lib/t";
 
 import Link from "next/link";
 
@@ -17,8 +18,8 @@ import Link from "next/link";
  * a matched page calling `notFound()` directly.
  */
 export default async function NotFound() {
-  const t = await getTranslations("notFound");
-  const tCommon = await getTranslations("common.actions");
+  const t = getT("notFound");
+  const tCommon = getT("common.actions");
   return (
     <div className="text-center py-24">
       <p className="text-sm font-medium text-brand-600">{t("code")}</p>

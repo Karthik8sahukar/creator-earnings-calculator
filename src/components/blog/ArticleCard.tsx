@@ -109,7 +109,6 @@ function formatDateShort(iso: string): string {
   // Uses en-US month names because the underlying date is not
   // locale-negotiated — the source content is English. When we
   // ship non-EN article translations we'll swap this for
-  // `useFormatter().dateTime(...)`.
   const [y, m, d] = iso.split("-").map(Number);
   if (!y || !m || !d) return iso;
   const months = [

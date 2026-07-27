@@ -22,7 +22,6 @@ import { grid } from "@/lib/design-tokens";
 export const runtime = "nodejs";
 
 interface RouteParams {
-  locale: string;
   category: string;
 }
 

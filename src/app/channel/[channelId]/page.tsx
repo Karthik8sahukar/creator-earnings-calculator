@@ -25,7 +25,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 interface RouteParams {
-  locale: string;
   channelId: string;
 }
 

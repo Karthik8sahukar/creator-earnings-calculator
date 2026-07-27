@@ -70,7 +70,7 @@ export const dynamic = "force-dynamic";
 export const dynamicParams = false;
 
 interface RouteParams {
-  locale: string;
+  
   slug: string;
 }
 
@@ -139,7 +139,7 @@ export async function generateMetadata({
       "creator revenue",
       creator.category,
     ],
-    alternates: buildAlternates({ locale, pathSuffix }),
+    alternates: buildAlternates({ pathSuffix }),
     openGraph: {
       type: "profile",
       url: `${publicConfig.siteUrl}${pathSuffix}`,
@@ -171,10 +171,7 @@ export default async function CreatorPage({ params }: PageProps) {
   const faqEntries = buildCreatorFaq(profile);
 
   const t = getT("creator");
-  const tCommon = await getTranslations({
-    locale,
-    namespace: "common.breadcrumbs",
-  });
+  const tCommon = getT("common.actions");
 
   // ── Build JSON-LD payloads ──────────────────────────────────────
   //

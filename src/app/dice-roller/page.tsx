@@ -13,7 +13,7 @@ const FAQ = [
 ];
 
 export function generateStaticParams() {
-  return .map(locale => ({ locale }));
+  return [];
 }
 
 export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {

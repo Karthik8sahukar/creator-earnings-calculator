@@ -1,3 +1,4 @@
+import { getT } from "@/lib/t";
 import messages from "../../messages/en.json";
 
 type Messages = typeof messages;

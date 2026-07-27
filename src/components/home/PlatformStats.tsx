@@ -1,3 +1,4 @@
+import { getT } from "@/lib/t";
 
 import { SparklesIcon } from "../icons";
 import { CREATORS_DATASET } from "@/data/creators/dataset";
@@ -27,7 +28,7 @@ import { COUNTRIES, NICHES } from "@/lib/rpmData";
  *                             engine's country tier table)
  */
 export async function PlatformStats() {
-  const t = await getTranslations("home.stats");
+  const t = getT("home.stats");
 
   const totalCreators = CREATORS_DATASET.length;
   const verifiedCreators = CREATORS_DATASET.filter((c) => c.verified).length;

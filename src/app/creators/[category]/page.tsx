@@ -20,8 +20,8 @@ export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   const slugs = listCategorySlugs();
-  return .flatMap((locale) =>
-    slugs.map((category) => ({ locale, category })),
+  return .map(
+    category => ({ category }),
   );
 }
 

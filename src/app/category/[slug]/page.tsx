@@ -37,7 +37,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 interface RouteParams {
-  locale: string;
   slug: string;
 }
 
@@ -45,7 +44,7 @@ export function generateStaticParams() {
   const slugs = getAllCategorySlugs();
   const params: RouteParams[] = [];
     for (const slug of slugs) {
-      params.push({ locale, slug });
+      params.push({ slug });
     }
   }
   return params;

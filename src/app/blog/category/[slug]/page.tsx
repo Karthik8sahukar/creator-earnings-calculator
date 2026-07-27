@@ -34,7 +34,6 @@ export async function generateMetadata({
     title: label,
     description,
     alternates: buildAlternates({
-      locale,
       pathSuffix: `/blog/category/${category.slug}`,
     }),
     openGraph: {

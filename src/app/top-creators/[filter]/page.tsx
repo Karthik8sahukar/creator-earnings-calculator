@@ -25,7 +25,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 interface RouteParams {
-  locale: string;
   filter: string;
 }
 
@@ -33,7 +32,7 @@ export function generateStaticParams() {
   const filters = getAllRankingFilterSlugs();
   const params: RouteParams[] = [];
     for (const filter of filters) {
-      params.push({ locale, filter });
+      params.push({ filter });
     }
   }
   return params;

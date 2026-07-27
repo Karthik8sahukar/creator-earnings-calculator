@@ -1,3 +1,4 @@
+import { getT } from "@/lib/t";
 
 import { Money } from "@/components/currency";
 import Link from "next/link";
@@ -11,7 +12,7 @@ import { findCountry } from "@/lib/rpmData";
  * Shows country cards with creator counts and average RPM.
  */
 export async function TopByCountry() {
-  const t = await getTranslations("home.byCountry");
+  const t = getT("home.byCountry");
   const countryStats = getCountryStats();
 
   return (

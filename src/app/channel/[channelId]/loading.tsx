@@ -1,6 +1,7 @@
+import { getT } from "@/lib/t";
 
 export default async function ChannelLoading() {
-  const t = await getTranslations("channelPage");
+  const t = getT("channelPage");
   return (
     <div className="space-y-8" aria-live="polite" aria-busy="true">
       <span className="sr-only">{t("loadingSr")}</span>
