@@ -9,11 +9,7 @@ import { NewsletterCta } from "@/components/blog/NewsletterCta";
 import { buildSearchIndex, loadPosts } from "@/lib/blog";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT("blog.meta");
   return {
     title: t("title"),
@@ -50,9 +46,6 @@ export async function generateMetadata({
  * `<TranslationPending />` notice at the article level.
  */
 export default async function BlogHomePage({
-  params,
-}: {
-  /* no params */;
 }) {
 
   const posts = await loadPosts();

@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "JWT Decoder – Decode JWT Tokens Locally",
     description: "Decode JWT tokens locally in your browser. View header, payload, claims, expiry status. No data sent to any server. Free and private.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolLayout title="JWT Decoder" intro="Decode JSON Web Tokens locally in your browser. View header, payload, claims, and expiry status without sending data anywhere." breadcrumbs={[{ label: "JWT Decoder", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

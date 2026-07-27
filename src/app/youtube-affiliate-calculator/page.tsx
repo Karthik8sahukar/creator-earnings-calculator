@@ -12,11 +12,7 @@ const FAQ = [
   { q: "How can I increase affiliate revenue?", a: "Focus on purchase-intent content (reviews, comparisons, tutorials), place links prominently in descriptions and pinned comments, and choose products with recurring commissions or high average order values." },
 ];
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "YouTube Affiliate Revenue Calculator — Free Tool";
   const description = "Estimate your potential YouTube affiliate marketing revenue based on views, click-through rate, conversion rate, average order value, and commission percentage.";
   return {
@@ -27,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <SimpleCalcLayout

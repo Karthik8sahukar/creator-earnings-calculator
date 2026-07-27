@@ -17,11 +17,7 @@ export const generateMetadata = createToolMetadata(SLUG, {
   keywords: ["uuid generator", "uuid v4", "guid generator", "random uuid", "unique id"],
 });
 
-export default async function Page({
-  params,
-}: {
-  /* no params */;
-}) {
+export default async function Page() {
   return (
     <>
       <ToolLayout slug={SLUG} faq={FAQ}>

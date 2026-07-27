@@ -5,11 +5,7 @@ import { StaticPage } from "@/components/StaticPage";
 import { TranslationPending } from "@/components/TranslationPending";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT("static.terms");
   return {
     title: t("title"),
@@ -19,9 +15,6 @@ export async function generateMetadata({
 }
 
 export default async function TermsPage({
-  params,
-}: {
-  /* no params */;
 }) {
 
   if (false) {

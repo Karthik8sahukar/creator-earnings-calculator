@@ -13,7 +13,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Coin Flip — Free Online Heads or Tails",
     description: "Flip a virtual coin for instant Heads or Tails results. Flip multiple coins, track history, and see running statistics. Free, no login.",
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DecisionLayout eyebrow="Decision Tool" title="Coin Flip" intro="Flip a virtual coin for a quick Heads or Tails decision. Support for multiple simultaneous flips with running statistics." breadcrumbs={[{ label: "Coin Flip", href: PATH }]} faq={FAQ} currentToolPath={PATH} toolSlug="coin-flip">

@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Truth or Dare Generator — Free Party Game Questions",
     description: "Generate truth or dare questions for parties, friends, couples, and families. 60+ questions across 9 categories and 4 difficulty levels. Free, no login.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DecisionLayout

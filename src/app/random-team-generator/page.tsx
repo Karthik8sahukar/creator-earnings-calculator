@@ -9,11 +9,7 @@ import { TeamGeneratorClient } from "./TeamGeneratorClient";
 const PATH_SUFFIX = "/random-team-generator";
 
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "Random Team Generator — Split Names Into Groups Free";
   const description =
     "Randomly divide a list of names into balanced teams. Paste participants, choose the number of teams, and generate fair groups instantly. Copy or export as CSV.";
@@ -68,11 +64,7 @@ const FAQ = [
   },
 ];
 
-export default async function Page({
-  params,
-}: {
-  /* no params */;
-}) {
+export default async function Page() {
 
   const pageUrl = `${publicConfig.siteUrl}${PATH_SUFFIX}`;
 

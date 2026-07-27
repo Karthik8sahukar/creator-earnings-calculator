@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Random Color Generator — HEX, RGB, HSL Palette Tool",
     description: "Generate random colors with HEX, RGB, HSL, HSV, CMYK values. Create palettes, check WCAG contrast, and generate CSS gradients. Free online color tool.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DecisionLayout

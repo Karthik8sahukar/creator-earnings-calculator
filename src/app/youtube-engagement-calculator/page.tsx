@@ -12,11 +12,7 @@ const FAQ = [
   { q: "Does engagement rate affect earnings?", a: "Indirectly, yes. Higher engagement signals quality content to the algorithm, which drives more views. It also directly increases sponsorship rates — brands pay premiums for engaged audiences." },
 ];
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "YouTube Engagement Rate Calculator — Free Tool";
   const description = "Calculate your YouTube engagement rate from likes, comments, shares, and views. Understand how your audience interacts with your content.";
   return {
@@ -27,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <SimpleCalcLayout

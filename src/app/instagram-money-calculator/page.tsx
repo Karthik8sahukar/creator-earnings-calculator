@@ -38,11 +38,7 @@ const FAQ_KEYS = [
 ] as const;
 
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT("instagramCalculator.meta");
 
   return {
@@ -74,9 +70,6 @@ export async function generateMetadata({
 }
 
 export default async function InstagramCalculatorPage({
-  params,
-}: {
-  /* no params */;
 }) {
 
   const t = getT("instagramCalculator.meta");
@@ -362,7 +355,6 @@ function RelatedLink({
   href,
   title,
   description,
-}: {
   href:
     | "/youtube-money-calculator"
     | "/youtube-rpm-calculator"

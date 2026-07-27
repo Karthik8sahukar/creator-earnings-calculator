@@ -34,7 +34,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: {
+  }: {
   params: Promise<RouteParams>;
 }): Promise<Metadata> {
   const { filter } = await params;
@@ -58,7 +58,7 @@ export async function generateMetadata({
 
 export default async function FilteredRankingsPage({
   params,
-}: {
+  }: {
   params: Promise<RouteParams>;
 }) {
   const { filter } = await params;

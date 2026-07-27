@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Developer Tools – Free Browser-Based Utilities",
     description: "Free browser-based developer tools. JWT decoder, JSON formatter, Base64, UUID generator, regex tester, and more. All processing happens locally.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolsGrid />

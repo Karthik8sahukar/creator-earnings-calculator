@@ -13,7 +13,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Dice Roller — Roll Any Dice Online Free",
     description: "Roll virtual dice from d4 to d100. Support for multiple dice, running totals, and roll history. Perfect for tabletop RPGs and random decisions.",
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DecisionLayout eyebrow="Decision Tool" title="Dice Roller" intro="Roll any type of die from d4 to d100. Support for multiple dice, preset configurations, running totals, and complete roll history." breadcrumbs={[{ label: "Dice Roller", href: PATH }]} faq={FAQ} currentToolPath={PATH} toolSlug="dice-roller">

@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Unix Timestamp Converter",
     description: "Convert Unix timestamps to human-readable dates and vice versa. Auto-detects seconds vs milliseconds. Shows UTC, local time, ISO 8601, and relative time.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolLayout title="Unix Timestamp Converter" intro="Convert Unix timestamps to human-readable dates and back. Auto-detects seconds vs milliseconds, shows multiple formats including relative time." breadcrumbs={[{ label: "Unix Timestamp Converter", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

@@ -5,11 +5,7 @@ import { SimpleCalcLayout } from "@/components/SimpleCalcLayout";
 import { buildAlternates } from "@/lib/i18nMetadata";
 import { CpmCalcClient } from "./CpmCalcClient";
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT("calculators.cpm.meta");
   return {
     title: t("title"),
@@ -25,11 +21,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({
-  params,
-}: {
-  /* no params */;
-}) {
+export default async function Page() {
   const t = getT("calculators.cpm");
 
   return (

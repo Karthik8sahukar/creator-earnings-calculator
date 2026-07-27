@@ -10,11 +10,7 @@ const SLUG = "youtube-rpm-calculator";
  * Metadata — uses the engine's createToolMetadata factory.
  * Overrides title/description with i18n translations.
  */
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}) {
+export async function generateMetadata() {
   const t = getT("calculators.rpm.meta");
 
   // Use the engine factory with i18n overrides
@@ -26,11 +22,7 @@ export async function generateMetadata({
   return generate({ params });
 }
 
-export default async function Page({
-  params,
-}: {
-  /* no params */;
-}) {
+export default async function Page() {
   const t = getT("calculators.rpm");
 
   const faq = [

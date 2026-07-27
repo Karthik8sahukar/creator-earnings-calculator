@@ -28,11 +28,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
 
   const title = "YouTube Money Calculator — Estimate Channel Earnings Free";
   const description = "Estimate how much any YouTube channel earns per month. Enter a @handle or channel URL to see estimated revenue, RPM, CPM, and monetization analytics. Free, no login required.";
@@ -62,9 +58,6 @@ export async function generateMetadata({
 }
 
 export default async function YouTubeMoneyCalculatorPage({
-  params,
-}: {
-  /* no params */;
 }) {
 
   const pageUrl = `${publicConfig.siteUrl}${PATH}`;

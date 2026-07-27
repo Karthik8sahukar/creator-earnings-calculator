@@ -9,11 +9,7 @@ import { TwitchBitsClient } from "./TwitchBitsClient";
 const PATH_SUFFIX = "/twitch-bits-calculator";
 
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "Twitch Bits to USD Calculator — Free Converter Tool";
   const description =
     "Convert Twitch Bits to USD and USD to Bits instantly. See how much Bits are worth, what streamers earn per Bit, and common Bit package costs. Free, fast, no login.";
@@ -67,11 +63,7 @@ const FAQ = [
   },
 ];
 
-export default async function Page({
-  params,
-}: {
-  /* no params */;
-}) {
+export default async function Page() {
 
   const pageUrl = `${publicConfig.siteUrl}${PATH_SUFFIX}`;
 

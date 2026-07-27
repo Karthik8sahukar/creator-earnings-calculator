@@ -12,11 +12,7 @@ const FAQ = [
   { q: "Can you actually sell a YouTube channel?", a: "Yes. YouTube channels are bought and sold on marketplaces like Flippa, Empire Flippers, and through private brokers. Prices range from a few thousand to millions of dollars for large channels." },
 ];
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "YouTube Channel Valuation Calculator — Free Tool";
   const description = "Estimate the market value of a YouTube channel based on monthly revenue, subscriber count, views, and growth rate. Based on real marketplace multiples.";
   return {
@@ -27,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <SimpleCalcLayout

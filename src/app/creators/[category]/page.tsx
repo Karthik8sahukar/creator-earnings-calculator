@@ -24,7 +24,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: {
+  }: {
   params: Promise<{ category: string }>;
 }): Promise<Metadata> {
   const { category } = await params;
@@ -50,7 +50,7 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
-}: {
+  }: {
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;

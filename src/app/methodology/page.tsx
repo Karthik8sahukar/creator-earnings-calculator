@@ -6,11 +6,7 @@ import { TranslationPending } from "@/components/TranslationPending";
 import { legalLastUpdatedIso } from "@/lib/config";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT("static.methodology");
   return {
     title: t("title"),
@@ -20,9 +16,6 @@ export async function generateMetadata({
 }
 
 export default async function MethodologyPage({
-  params,
-}: {
-  /* no params */;
 }) {
 
   if (false) {

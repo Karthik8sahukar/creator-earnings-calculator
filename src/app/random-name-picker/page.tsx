@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Random Name Picker — Pick Names From a List Free",
     description: "Randomly pick one or more names from your list. Unbiased Fisher-Yates selection, history tracking, and instant results. Free, private, no login.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DecisionLayout eyebrow="Decision Tool" title="Random Name Picker" intro="Paste a list of names and randomly pick one or more winners. Uses an unbiased shuffle algorithm — every name has an equal chance." breadcrumbs={[{ label: "Random Name Picker", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

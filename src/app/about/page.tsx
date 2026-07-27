@@ -7,11 +7,7 @@ import Link from "next/link";
 import { publicConfig } from "@/lib/config";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const t = getT("static.about");
   return {
     title: t("title"),
@@ -21,9 +17,6 @@ export async function generateMetadata({
 }
 
 export default async function AboutPage({
-  params,
-}: {
-  /* no params */;
 }) {
 
   // Only the canonical (English) locale renders the full essay. Every

@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Regex Tester – Test JavaScript Regular Expressions",
     description: "Test JavaScript regular expressions with live match highlighting, capturing groups, and replacement preview. Free, private, runs locally.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolLayout title="Regex Tester" intro="Test JavaScript regular expressions with live match highlighting, capturing groups, and optional replacement preview. All processing happens locally in your browser." breadcrumbs={[{ label: "Regex Tester", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

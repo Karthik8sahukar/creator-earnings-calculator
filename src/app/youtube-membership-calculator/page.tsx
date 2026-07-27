@@ -12,11 +12,7 @@ const FAQ = [
   { q: "What's the best membership price?", a: "Most successful creators offer tiers between $2.99-$9.99. The most popular tier is usually $4.99. Having multiple tiers (e.g., $2.99, $4.99, $9.99) captures different willingness-to-pay segments." },
 ];
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "YouTube Membership Revenue Calculator — Free Tool";
   const description = "Estimate your potential YouTube channel membership revenue based on subscribers, membership conversion rate, and pricing tiers.";
   return {
@@ -27,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <SimpleCalcLayout

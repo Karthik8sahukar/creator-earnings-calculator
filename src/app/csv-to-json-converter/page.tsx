@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "CSV to JSON Converter",
     description: "Convert CSV data to JSON locally in your browser. Supports auto-detect delimiters, type inference, nested keys, and prototype pollution protection.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolLayout title="CSV to JSON Converter" intro="Parse CSV data into structured JSON with support for multiple delimiters, type inference, nested keys via dot notation, and prototype pollution protection." breadcrumbs={[{ label: "CSV to JSON", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

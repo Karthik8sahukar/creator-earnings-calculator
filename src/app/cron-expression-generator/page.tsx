@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Cron Expression Generator & Humanizer",
     description: "Generate, validate, and humanize cron expressions. See next run times, use presets, build visually. Free browser-based tool.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolLayout title="Cron Expression Generator" intro="Generate, validate, and humanize standard 5-field Unix cron expressions. Preview next run times and use common presets." breadcrumbs={[{ label: "Cron Expression Generator", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

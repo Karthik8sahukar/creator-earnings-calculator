@@ -17,7 +17,7 @@ export const generateMetadata = createToolMetadata(SLUG, {
   keywords: ["json minifier", "minify json", "compress json", "json compressor", "reduce json size"],
 });
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <ToolLayout slug={SLUG} faq={FAQ}>

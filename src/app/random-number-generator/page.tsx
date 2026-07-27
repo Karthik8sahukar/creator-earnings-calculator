@@ -13,7 +13,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Random Number Generator — Free Online Tool",
     description: "Generate random numbers in any range. Set min, max, and count. Supports negative numbers, multi-generation, and history tracking. Free, instant, no login.",
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DecisionLayout eyebrow="Decision Tool" title="Random Number Generator" intro="Generate random numbers within any range. Set your minimum, maximum, and how many numbers you need. Instant results with full history." breadcrumbs={[{ label: "Random Number Generator", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

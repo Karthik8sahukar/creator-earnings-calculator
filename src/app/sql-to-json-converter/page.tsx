@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "SQL INSERT to JSON Converter",
     description: "Convert SQL INSERT statements to structured JSON locally in your browser. Parse column names and values into downloadable JSON data.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolLayout title="SQL to JSON Converter" intro="Convert SQL INSERT statements to structured JSON data. Parse column names and literal values into downloadable JSON arrays." breadcrumbs={[{ label: "SQL to JSON", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

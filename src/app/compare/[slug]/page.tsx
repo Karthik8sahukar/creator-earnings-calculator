@@ -34,7 +34,7 @@ interface RouteParams {
 
 export async function generateMetadata({
   params,
-}: {
+  }: {
   params: Promise<RouteParams>;
 }): Promise<Metadata> {
   const { slug } = await params;
@@ -70,7 +70,7 @@ export async function generateMetadata({
 
 export default async function ComparisonPage({
   params,
-}: {
+  }: {
   params: Promise<RouteParams>;
 }) {
   const { slug } = await params;
@@ -244,7 +244,6 @@ export default async function ComparisonPage({
 function ComparisonCard({
   creator,
   avatarUrl,
-}: {
   creator: ComparisonCreatorData;
   avatarUrl: string | null;
 }) {
@@ -292,7 +291,6 @@ function CompRow({
   v1,
   v2,
   highlight,
-}: {
   label: string;
   v1: React.ReactNode;
   v2: React.ReactNode;

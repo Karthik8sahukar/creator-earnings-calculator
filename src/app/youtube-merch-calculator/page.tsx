@@ -12,11 +12,7 @@ const FAQ = [
   { q: "When should I launch merch?", a: "Most creators find success launching merch after 50,000-100,000 subscribers when they have a strong enough brand identity. Start with 2-3 core products rather than a large catalog." },
 ];
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "YouTube Merch Revenue Calculator — Free Tool";
   const description = "Estimate your potential YouTube merchandise revenue based on monthly views, conversion rate, average order value, and profit margin.";
   return {
@@ -27,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <SimpleCalcLayout

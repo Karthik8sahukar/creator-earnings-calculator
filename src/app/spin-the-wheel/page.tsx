@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Spin the Wheel — Free Random Picker Tool",
     description: "Customizable spinning wheel to randomly pick from your options. Add items, spin, and get a random result. Free, fast, no login required.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DecisionLayout eyebrow="Decision Tool" title="Spin the Wheel" intro="Add your options, spin the wheel, and let randomness decide. Customize segments, track history, and use keyboard shortcuts." breadcrumbs={[{ label: "Spin the Wheel", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

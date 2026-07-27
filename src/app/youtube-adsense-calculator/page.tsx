@@ -12,11 +12,7 @@ const FAQ = [
   { q: "What is a good YouTube RPM?", a: "RPM varies widely by country and niche. US finance channels can see $10-25 RPM. General US content sees $3-8. India and Southeast Asia typically see $0.5-2. The global average is approximately $2-4." },
 ];
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "YouTube AdSense Revenue Calculator — Free Tool";
   const description = "Estimate your YouTube AdSense revenue from monthly views, RPM, and monetization percentage. See daily, weekly, monthly, and yearly earnings projections.";
   return {
@@ -27,7 +23,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <SimpleCalcLayout

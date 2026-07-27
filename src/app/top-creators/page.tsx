@@ -25,11 +25,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
 
   const title = "Top YouTube Creators 2026 — Ranked by Subscribers & Earnings";
   const description = "The definitive ranking of YouTube's top creators by estimated subscribers, earnings potential, and influence. Browse the top 50 creators worldwide.";
@@ -44,9 +40,6 @@ export async function generateMetadata({
 }
 
 export default async function TopCreatorsPage({
-  params,
-}: {
-  /* no params */;
 }) {
 
   const ranked = buildRankings({ criteria: "subscribers", limit: 50 });

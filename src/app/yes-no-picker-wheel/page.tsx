@@ -9,11 +9,7 @@ import { YesNoWheelClient } from "./YesNoWheelClient";
 const PATH_SUFFIX = "/yes-no-picker-wheel";
 
 
-export async function generateMetadata({
-  params,
-}: {
-  /* no params */;
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "Yes or No Picker Wheel — Free Decision Maker";
   const description =
     "Spin the wheel to get a random Yes or No answer. Configurable odds, keyboard support, and spin history. Make quick decisions with our free picker wheel.";
@@ -63,11 +59,7 @@ const FAQ = [
   },
 ];
 
-export default async function Page({
-  params,
-}: {
-  /* no params */;
-}) {
+export default async function Page() {
 
   const pageUrl = `${publicConfig.siteUrl}${PATH_SUFFIX}`;
 

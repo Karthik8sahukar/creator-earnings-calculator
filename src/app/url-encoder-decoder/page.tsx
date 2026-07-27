@@ -14,7 +14,7 @@ const FAQ = [
 ];
 
 
-export async function generateMetadata({ params }: { /* no params */ }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "URL Encoder and Decoder Online",
     description: "Encode and decode URLs and URI components locally in your browser. Supports full URI and component modes with a common encodings reference table.",
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { /* no params */ }): Promise
   };
 }
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <DeveloperToolLayout title="URL Encoder/Decoder" intro="Encode and decode URLs and URI components locally in your browser. Choose between full URI mode and component mode." breadcrumbs={[{ label: "URL Encoder/Decoder", href: PATH }]} faq={FAQ} currentToolPath={PATH}>

@@ -17,7 +17,7 @@ export const generateMetadata = createToolMetadata(SLUG, {
   keywords: ["base64 encode", "base64 decode", "base64 converter", "text to base64", "base64 to text"],
 });
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <ToolLayout slug={SLUG} faq={FAQ}>

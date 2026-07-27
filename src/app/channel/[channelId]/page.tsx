@@ -45,7 +45,7 @@ async function resolveChannel(rawId: string) {
 
 export async function generateMetadata({
   params,
-}: {
+  }: {
   params: Promise<RouteParams>;
 }): Promise<Metadata> {
   const { channelId } = await params;

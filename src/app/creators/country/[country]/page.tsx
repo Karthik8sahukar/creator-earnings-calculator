@@ -16,7 +16,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: {
+  }: {
   params: Promise<{ country: string }>;
 }): Promise<Metadata> {
   const { country } = await params;
@@ -40,7 +40,7 @@ export async function generateMetadata({
 
 export default async function CountryPage({
   params,
-}: {
+  }: {
   params: Promise<{ country: string }>;
 }) {
   const { country } = await params;

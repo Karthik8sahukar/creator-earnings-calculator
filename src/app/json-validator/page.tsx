@@ -17,7 +17,7 @@ export const generateMetadata = createToolMetadata(SLUG, {
   keywords: ["json validator", "json syntax checker", "validate json online", "json parser"],
 });
 
-export default async function Page({ params }: { /* no params */ }) {
+export default async function Page() {
   return (
     <>
       <ToolLayout slug={SLUG} faq={FAQ}>

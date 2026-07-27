@@ -31,7 +31,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: {
+  }: {
   params: Promise<RouteParams>;
 }): Promise<Metadata> {
   const { category } = await params;
@@ -59,7 +59,7 @@ export async function generateMetadata({
 
 export default async function ToolCategoryPage({
   params,
-}: {
+  }: {
   params: Promise<RouteParams>;
 }) {
   const { category } = await params;

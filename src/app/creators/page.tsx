@@ -37,10 +37,8 @@ export const dynamic = "force-dynamic";
 
 
 export async function generateMetadata({
-  params,
   searchParams: searchParamsPromise,
 }: {
-  /* no params */;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
   const searchParams = await searchParamsPromise;
@@ -102,10 +100,8 @@ const COUNTRY_NAME_TO_CODE: Record<string, CreatorCountryCode> = {
 };
 
 export default async function CreatorsIndexPage({
-  params,
   searchParams: searchParamsPromise,
 }: {
-  /* no params */;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const searchParams = await searchParamsPromise;
