@@ -74,20 +74,35 @@ export function useSearchHistory() {
       const trimmed = query.trim();
       if (trimmed.length < 2) return;
 
-      setHistory((prev) => {
-        // Deduplicate case-insensitively but preserve the latest casing
-        const next = [
-          trimmed,
-          ...prev.filter((q) => q.toLowerCase() !== trimmed.toLowerCase()),
-        ].slice(0, MAX_HISTORY);
-        try {
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-          window.dispatchEvent(new Event("search-history-updated"));
-        } catch {
-          // ignore
+      // Read current state from localStorage to ensure consistency
+      let prev: string[] = [];
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            prev = parsed.filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+          }
         }
-        return next;
-      });
+      } catch {
+        // ignore
+      }
+
+      // Deduplicate case-insensitively but preserve the latest casing
+      const next = [
+        trimmed,
+        ...prev.filter((q) => q.toLowerCase() !== trimmed.toLowerCase()),
+      ].slice(0, MAX_HISTORY);
+
+      // Write to localStorage FIRST (before setState) to survive unmount
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        window.dispatchEvent(new Event("search-history-updated"));
+      } catch {
+        // ignore
+      }
+
+      setHistory(next);
     },
     [],
   );
@@ -95,16 +110,30 @@ export function useSearchHistory() {
   /** Remove a specific query from history. */
   const removeQuery = useCallback(
     (query: string) => {
-      setHistory((prev) => {
-        const next = prev.filter((q) => q !== query);
-        try {
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-          window.dispatchEvent(new Event("search-history-updated"));
-        } catch {
-          // ignore
+      // Read current state from localStorage
+      let prev: string[] = [];
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            prev = parsed.filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+          }
         }
-        return next;
-      });
+      } catch {
+        // ignore
+      }
+
+      const next = prev.filter((q) => q !== query);
+
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        window.dispatchEvent(new Event("search-history-updated"));
+      } catch {
+        // ignore
+      }
+
+      setHistory(next);
     },
     [],
   );

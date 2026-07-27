@@ -57,18 +57,22 @@ test.describe("Favorites from ToolCard", () => {
   test("favorited tool appears in homepage Favorites tab", async ({ page }) => {
     await page.goto("/");
 
-    // Favorite the first tool card — capture its title
+    // Scope to the QuickDiscovery section to avoid duplicate ToolCard matches
+    const discovery = page.locator("section").filter({ has: page.locator("#quick-discovery-title") });
+
+    // Favorite the first tool card on the page
+    const favBtn = page.getByRole("button", { name: /add to favorites/i }).first();
+    // Capture the tool title from the card containing this button
     const firstCard = page.locator('[class*="card"]').filter({ has: page.getByRole("button", { name: /add to favorites/i }) }).first();
     const toolTitle = await firstCard.getByRole("heading").first().textContent();
-    const favBtn = firstCard.getByRole("button", { name: /add to favorites/i });
     await favBtn.click();
 
-    // Click the "Favorites" tab
-    const favoritesTab = page.getByRole("tab", { name: /favorites/i });
+    // Click the "Favorites" tab (within QuickDiscovery)
+    const favoritesTab = discovery.getByRole("tab", { name: /favorites/i });
     await favoritesTab.click();
 
-    // The tool should appear in the favorites section
-    await expect(page.getByRole("heading", { name: toolTitle! })).toBeVisible();
+    // The tool should appear in the QuickDiscovery favorites section
+    await expect(discovery.getByRole("heading", { name: toolTitle! }).first()).toBeVisible();
   });
 });
 
@@ -80,11 +84,12 @@ test.describe("Recent Tools", () => {
 
     // Go to homepage and check Recent tab
     await page.goto("/");
-    const recentTab = page.getByRole("tab", { name: /recent/i }).last();
+    const discovery = page.locator("section").filter({ has: page.locator("#quick-discovery-title") });
+    const recentTab = discovery.getByRole("tab", { name: /recent/i }).last();
     await recentTab.click();
 
-    // "Coin Flip" should appear
-    await expect(page.getByRole("heading", { name: /coin flip/i })).toBeVisible();
+    // "Coin Flip" should appear in the QuickDiscovery recent section
+    await expect(discovery.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
   });
 
   test("recent tool survives reload", async ({ page }) => {
@@ -96,9 +101,10 @@ test.describe("Recent Tools", () => {
     // Reload the homepage
     await page.reload();
 
-    const recentTab = page.getByRole("tab", { name: /recent/i }).last();
+    const discovery = page.locator("section").filter({ has: page.locator("#quick-discovery-title") });
+    const recentTab = discovery.getByRole("tab", { name: /recent/i }).last();
     await recentTab.click();
-    await expect(page.getByRole("heading", { name: /coin flip/i })).toBeVisible();
+    await expect(discovery.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
   });
 
   test("reopening a tool moves it to the top", async ({ page }) => {
@@ -114,11 +120,12 @@ test.describe("Recent Tools", () => {
 
     // Go to homepage and check Recent tab
     await page.goto("/");
-    const recentTab = page.getByRole("tab", { name: /recent/i }).last();
+    const discovery = page.locator("section").filter({ has: page.locator("#quick-discovery-title") });
+    const recentTab = discovery.getByRole("tab", { name: /recent/i }).last();
     await recentTab.click();
 
     // First card in recent should be Coin Flip (most recent visit)
-    const recentCards = page.locator('[class*="card"]').filter({ has: page.getByRole("heading") });
+    const recentCards = discovery.locator('[class*="card"]').filter({ has: page.getByRole("heading") });
     const firstTitle = await recentCards.first().getByRole("heading").first().textContent();
     expect(firstTitle).toMatch(/coin flip/i);
   });
@@ -128,11 +135,12 @@ test.describe("Recent Tools", () => {
     await expect(page.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
     await page.goto("/");
 
-    const recentTab = page.getByRole("tab", { name: /recent/i }).last();
+    const discovery = page.locator("section").filter({ has: page.locator("#quick-discovery-title") });
+    const recentTab = discovery.getByRole("tab", { name: /recent/i }).last();
     await recentTab.click();
 
-    // Click the Coin Flip card link
-    const cardLink = page.getByRole("link", { name: /coin flip/i }).first();
+    // Click the Coin Flip card link within QuickDiscovery
+    const cardLink = discovery.getByRole("link", { name: /coin flip/i }).first();
     await cardLink.click();
 
     // Should navigate to the coin-flip page
@@ -165,11 +173,12 @@ test.describe("Locale Behavior", () => {
 
     // Go to Spanish homepage and check Recent tab
     await page.goto("/es");
-    const recentTab = page.getByRole("tab", { name: /recent/i }).last();
+    const discovery = page.locator("section").filter({ has: page.locator("#quick-discovery-title") });
+    const recentTab = discovery.getByRole("tab", { name: /recent/i }).last();
     await recentTab.click();
 
-    // Click the card — should navigate to Spanish locale
-    const cardLink = page.getByRole("link", { name: /coin flip/i }).first();
+    // Click the card within QuickDiscovery — should navigate to Spanish locale
+    const cardLink = discovery.getByRole("link", { name: /coin flip/i }).first();
     await cardLink.click();
     await expect(page).toHaveURL(/\/es\/coin-flip/);
   });
