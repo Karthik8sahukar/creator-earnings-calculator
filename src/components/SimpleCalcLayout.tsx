@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 
 import { Link } from "@/i18n/navigation";
+import { ToolPageActions } from "@/components/ui/ToolPageActions";
 
 interface Props {
   eyebrow: string;
@@ -9,6 +10,8 @@ interface Props {
   children: React.ReactNode;
   faq?: { q: string; a: string }[];
   breadcrumbs?: { label: string; href: string }[];
+  /** Tool slug for visit tracking and favorites. */
+  toolSlug?: string;
 }
 
 export function SimpleCalcLayout({
@@ -18,6 +21,7 @@ export function SimpleCalcLayout({
   children,
   faq,
   breadcrumbs,
+  toolSlug,
 }: Props) {
   const t = useTranslations();
   return (
@@ -50,12 +54,17 @@ export function SimpleCalcLayout({
       )}
 
       <header className="space-y-3 text-center sm:text-left">
-        <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
-          {eyebrow}
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-          {title}
-        </h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-3">
+            <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium">
+              {eyebrow}
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+              {title}
+            </h1>
+          </div>
+          {toolSlug && <ToolPageActions slug={toolSlug} title={title} />}
+        </div>
         <p className="text-slate-600 max-w-2xl">{intro}</p>
       </header>
 

@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
   return (
     <>
-      <DecisionLayout eyebrow="Decision Tool" title="Dice Roller" intro="Roll any type of die from d4 to d100. Support for multiple dice, preset configurations, running totals, and complete roll history." breadcrumbs={[{ label: "Dice Roller", href: PATH }]} faq={FAQ} currentToolPath={PATH}>
+      <DecisionLayout eyebrow="Decision Tool" title="Dice Roller" intro="Roll any type of die from d4 to d100. Support for multiple dice, preset configurations, running totals, and complete roll history." breadcrumbs={[{ label: "Dice Roller", href: PATH }]} faq={FAQ} currentToolPath={PATH} toolSlug="dice-roller">
         <DiceRollerClient />
       </DecisionLayout>
       <ToolSEO locale={locale} pathSuffix={PATH} toolName="Dice Roller" toolDescription="Virtual dice roller supporting d4 through d100 with multi-roll and history." faq={FAQ} breadcrumbName="Dice Roller" />

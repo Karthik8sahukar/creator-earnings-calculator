@@ -6,20 +6,44 @@ import { ToolCard } from "@/components/ui/ToolCard";
 import { HorizontalScroll, ScrollItem } from "@/components/ui/HorizontalScroll";
 import { Star, Sparkles, Trophy } from "@/components/ui/Icon";
 import { SectionHeader } from "@/components/AppShell";
-import { getPopularTools, getFeaturedTools, TOOL_REGISTRY, type ToolEntry } from "@/lib/tools";
+import { getPopularTools, getFeaturedTools, getToolBySlug, TOOL_REGISTRY, type ToolEntry } from "@/lib/tools";
+import { useFavorites } from "@/hooks/useFavorites";
+import { useRecentTools } from "@/hooks/useRecentTools";
+
+// ─── Inline Icons for new tabs ──────────────────────────────────────
+
+function HeartIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
+
+function ClockIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
 
 // ─── Tab Definitions ────────────────────────────────────────────────
 
-type TabId = "popular" | "featured" | "recent" | "recommended";
+type TabId = "popular" | "featured" | "recent" | "recommended" | "favorites" | "recent-used";
 
 interface TabDef {
   id: TabId;
   label: string;
   icon: React.ReactNode;
-  getTools: () => ToolEntry[];
+  /** Static tabs return tools directly. Dynamic tabs are handled separately. */
+  getTools?: () => ToolEntry[];
+  /** Whether this tab depends on client-side hooks (favorites/recent). */
+  dynamic?: boolean;
 }
 
-const TABS: TabDef[] = [
+const STATIC_TABS: TabDef[] = [
   {
     id: "popular",
     label: "Popular",
@@ -37,7 +61,6 @@ const TABS: TabDef[] = [
     label: "Recently Added",
     icon: <Sparkles size={14} />,
     getTools: () => {
-      // Tools with analytics.launchDate, or fallback to last items in registry
       const withDate = TOOL_REGISTRY.filter((t) => t.analytics?.launchDate);
       if (withDate.length >= 4) {
         return [...withDate]
@@ -46,7 +69,6 @@ const TABS: TabDef[] = [
           )
           .slice(0, 12);
       }
-      // Fallback: last 12 tools in registry order (newest additions are appended)
       return TOOL_REGISTRY.slice(-12).reverse();
     },
   },
@@ -55,7 +77,6 @@ const TABS: TabDef[] = [
     label: "Recommended",
     icon: <Trophy size={14} />,
     getTools: () => {
-      // Mix of popular + featured, deduped, diversity across categories
       const seen = new Set<string>();
       const result: ToolEntry[] = [];
       const sources = [...getPopularTools(), ...getFeaturedTools()];
@@ -71,27 +92,67 @@ const TABS: TabDef[] = [
   },
 ];
 
+const DYNAMIC_TABS: TabDef[] = [
+  {
+    id: "favorites",
+    label: "Favorites",
+    icon: <HeartIcon size={14} />,
+    dynamic: true,
+  },
+  {
+    id: "recent-used",
+    label: "Recent",
+    icon: <ClockIcon size={14} />,
+    dynamic: true,
+  },
+];
+
+const ALL_TABS: TabDef[] = [...STATIC_TABS, ...DYNAMIC_TABS];
+
 // ─── Component ──────────────────────────────────────────────────────
 
 /**
  * QuickDiscovery — Tabbed horizontal scroll section showing tool cards.
  *
- * Tabs: Popular | Featured | Recently Added | Recommended
+ * Tabs: Popular | Featured | Recently Added | Recommended | Favorites | Recent
  *
- * Each tab pulls data from the tool registry using real flags
- * (popular, featured) rather than fake "trending" labels.
+ * Static tabs pull data from the tool registry using real flags.
+ * Dynamic tabs (Favorites, Recent) use localStorage hooks and resolve
+ * slugs through the registry, ignoring stale/invalid slugs.
  *
- * Design:
- *   - Pill-shaped tab switcher
- *   - Horizontal scrollable tool cards (scroll-snap)
- *   - Smooth tab transitions
- *   - Mobile: swipeable cards
- *   - Desktop: visible overflow with fade edge
+ * Empty states shown when Favorites/Recent have no items.
  */
 export function QuickDiscovery() {
   const [activeTab, setActiveTab] = useState<TabId>("popular");
-  const activeDef = TABS.find((t) => t.id === activeTab) ?? TABS[0];
-  const tools = activeDef.getTools();
+  const { favorites } = useFavorites();
+  const { recentSlugs } = useRecentTools();
+
+  // Resolve tools based on active tab
+  const getActiveTools = (): ToolEntry[] => {
+    if (activeTab === "favorites") {
+      // Resolve slugs to ToolEntry objects, skipping stale slugs
+      return favorites
+        .map((slug) => getToolBySlug(slug))
+        .filter((t): t is ToolEntry => t !== undefined)
+        .slice(0, 12);
+    }
+
+    if (activeTab === "recent-used") {
+      return recentSlugs
+        .map((slug) => getToolBySlug(slug))
+        .filter((t): t is ToolEntry => t !== undefined)
+        .slice(0, 12);
+    }
+
+    const tabDef = STATIC_TABS.find((t) => t.id === activeTab) ?? STATIC_TABS[0];
+    return tabDef.getTools?.() ?? [];
+  };
+
+  const tools = getActiveTools();
+  const activeDef = ALL_TABS.find((t) => t.id === activeTab) ?? ALL_TABS[0];
+
+  // Determine empty state
+  const isEmpty = tools.length === 0 && (activeTab === "favorites" || activeTab === "recent-used");
 
   return (
     <section aria-labelledby="quick-discovery-title" className="scroll-mt-20">
@@ -103,7 +164,7 @@ export function QuickDiscovery() {
 
       {/* Tab switcher */}
       <div role="tablist" aria-label="Discovery filter" className="flex items-center gap-1.5 mb-6 overflow-x-auto scrollbar-hide pb-1">
-        {TABS.map((tab) => (
+        {ALL_TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
@@ -122,8 +183,10 @@ export function QuickDiscovery() {
         ))}
       </div>
 
-      {/* Horizontal scroll of tool cards */}
-      {tools.length > 0 ? (
+      {/* Horizontal scroll of tool cards OR empty state */}
+      {isEmpty ? (
+        <EmptyState tab={activeTab} />
+      ) : tools.length > 0 ? (
         <HorizontalScroll label={`${activeDef.label} tools`}>
           {tools.map((tool) => (
             <ScrollItem key={tool.slug} className="w-[260px] sm:w-[280px]">
@@ -138,4 +201,38 @@ export function QuickDiscovery() {
       )}
     </section>
   );
+}
+
+// ─── Empty States ───────────────────────────────────────────────────
+
+function EmptyState({ tab }: { tab: TabId }) {
+  if (tab === "favorites") {
+    return (
+      <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-10 text-center space-y-2">
+        <div className="mx-auto w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
+          <HeartIcon size={20} />
+        </div>
+        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">No favorites yet</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Select the heart on any tool to keep it here.
+        </p>
+      </div>
+    );
+  }
+
+  if (tab === "recent-used") {
+    return (
+      <div className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-10 text-center space-y-2">
+        <div className="mx-auto w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
+          <ClockIcon size={20} />
+        </div>
+        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">No recently used tools</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Open a tool and it will appear here.
+        </p>
+      </div>
+    );
+  }
+
+  return null;
 }

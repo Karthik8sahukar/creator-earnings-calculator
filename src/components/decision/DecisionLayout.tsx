@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DecisionRelatedTools } from "./DecisionRelatedTools";
+import { ToolPageActions } from "@/components/ui/ToolPageActions";
 
 interface BreadcrumbItem {
   label: string;
@@ -21,6 +22,8 @@ interface Props {
   breadcrumbs?: BreadcrumbItem[];
   /** The path of the current tool (e.g. "/spin-the-wheel") for related tools exclusion. */
   currentToolPath: string;
+  /** Tool slug for visit tracking and favorites. */
+  toolSlug?: string;
 }
 
 /**
@@ -41,6 +44,7 @@ export function DecisionLayout({
   faq,
   breadcrumbs,
   currentToolPath,
+  toolSlug,
 }: Props) {
   const t = useTranslations();
   return (
@@ -72,12 +76,17 @@ export function DecisionLayout({
       )}
 
       <header className="space-y-3 text-center sm:text-left">
-        <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium dark:bg-brand-500/10 dark:text-brand-200">
-          {eyebrow}
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-          {title}
-        </h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-3">
+            <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium dark:bg-brand-500/10 dark:text-brand-200">
+              {eyebrow}
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+              {title}
+            </h1>
+          </div>
+          {toolSlug && <ToolPageActions slug={toolSlug} title={title} />}
+        </div>
         <p className="text-slate-600 dark:text-slate-300 max-w-2xl">{intro}</p>
       </header>
 

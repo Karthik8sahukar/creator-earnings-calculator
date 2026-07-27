@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
 import { ChannelWorkspace } from "@/components/ChannelWorkspace";
 import { Link } from "@/i18n/navigation";
+import { ToolPageActions } from "@/components/ui/ToolPageActions";
 import { routing } from "@/i18n/routing";
 import { publicConfig } from "@/lib/config";
 import { buildAlternates } from "@/lib/i18nMetadata";
@@ -130,12 +131,17 @@ export default async function YouTubeMoneyCalculatorPage({
 
       {/* Hero */}
       <header className="space-y-3 text-center sm:text-left">
-        <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium dark:bg-brand-500/10 dark:text-brand-200">
-          Creator Analytics
-        </p>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
-          YouTube Money Calculator
-        </h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-3">
+            <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium dark:bg-brand-500/10 dark:text-brand-200">
+              Creator Analytics
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+              YouTube Money Calculator
+            </h1>
+          </div>
+          <ToolPageActions slug="youtube-money-calculator" title="YouTube Money Calculator" />
+        </div>
         <p className="text-slate-600 dark:text-slate-300 max-w-2xl">
           Estimate how much any YouTube channel earns per month. Enter a @handle, channel URL, or channel ID to see estimated revenue, RPM, and monetization analytics.
         </p>

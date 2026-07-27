@@ -10,11 +10,21 @@ import {
 } from "react";
 
 import { useRouter } from "@/i18n/navigation";
-import { searchTools, type SearchResult } from "@/lib/tools/search";
+import {
+  searchTools,
+  highlightMatch,
+  getZeroResultsSuggestions,
+  getTrendingTools,
+  getSearchSuggestions,
+  getSearchPlaceholder,
+  type SearchResult,
+  type HighlightSegment,
+} from "@/lib/tools";
 import { getCategoryDef } from "@/lib/tools/categories";
-import { getSearchSuggestions, getSearchPlaceholder } from "@/lib/tools";
 import { CategoryIcon } from "@/components/ui/Icon";
 import { badge as badgeTokens } from "@/lib/design-tokens";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { useSearchAnalytics } from "@/hooks/useSearchAnalytics";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -41,7 +51,11 @@ interface Props {
  *   - Mobile: full-screen overlay with touch-friendly results
  *   - Desktop: centered modal with backdrop blur
  *   - Shows category badge and icon for each result
- *   - Empty state shows popular search suggestions
+ *   - Recent searches: shows previously searched queries
+ *   - Popular/trending searches: dynamic based on user analytics
+ *   - Highlighted matched text in results
+ *   - Zero-results suggestions: related tools when nothing matches
+ *   - Search analytics tracking
  *   - Focus trap while open
  *   - Accessible: role="dialog", aria-modal, aria-label, aria-activedescendant
  */
@@ -53,9 +67,40 @@ export function ToolSearchModal({ open, onClose }: Props) {
   const dialogId = useId();
   const router = useRouter();
 
+  // Hooks
+  const { history, addQuery, removeQuery, clearHistory } = useSearchHistory();
+  const { trackSearch, getPopularSearches, getTrendingSearches } = useSearchAnalytics();
+
   // Search results — instant, no debounce needed (synchronous)
   const results = useMemo(() => searchTools(query, 10), [query]);
-  const suggestions = useMemo(() => getSearchSuggestions(), []);
+
+  // Popular/trending searches (combine analytics with static fallbacks)
+  const popularSearches = useMemo(() => {
+    const fromAnalytics = getPopularSearches(6);
+    if (fromAnalytics.length >= 3) return fromAnalytics;
+    // Fall back to static suggestions, deduped
+    const fallback = getSearchSuggestions();
+    const combined = [...fromAnalytics];
+    for (const s of fallback) {
+      if (!combined.some((c) => c.toLowerCase() === s.toLowerCase())) {
+        combined.push(s);
+      }
+      if (combined.length >= 6) break;
+    }
+    return combined;
+  }, [getPopularSearches]);
+
+  // Trending searches
+  const trendingSearches = useMemo(() => getTrendingSearches(4), [getTrendingSearches]);
+
+  // Trending tools for empty state
+  const trendingTools = useMemo(() => getTrendingTools(4), []);
+
+  // Zero-results suggestions
+  const zeroSuggestions = useMemo(
+    () => (results.length === 0 && query.length >= 2 ? getZeroResultsSuggestions(query, 4) : []),
+    [query, results.length],
+  );
 
   // Reset state when opening/closing
   useEffect(() => {
@@ -100,11 +145,16 @@ export function ToolSearchModal({ open, onClose }: Props) {
 
   // Navigate to selected tool
   const navigateTo = useCallback(
-    (href: string) => {
+    (href: string, toolSlug?: string) => {
+      // Record search in history & analytics
+      if (query.trim().length >= 2) {
+        addQuery(query.trim());
+        trackSearch(query.trim(), toolSlug);
+      }
+
       onClose();
       // Use Next.js router for internal navigation (no page reload)
       if (href.startsWith("/#")) {
-        // Anchor link — navigate to homepage then scroll
         router.push("/" as never);
         requestAnimationFrame(() => {
           const anchor = href.replace("/", "");
@@ -115,7 +165,7 @@ export function ToolSearchModal({ open, onClose }: Props) {
         router.push(href as never);
       }
     },
-    [onClose, router],
+    [onClose, router, query, addQuery, trackSearch],
   );
 
   // Keyboard navigation
@@ -135,7 +185,7 @@ export function ToolSearchModal({ open, onClose }: Props) {
         case "Enter":
           e.preventDefault();
           if (results[activeIndex]) {
-            navigateTo(results[activeIndex].tool.href);
+            navigateTo(results[activeIndex].tool.href, results[activeIndex].tool.slug);
           }
           break;
         case "Home":
@@ -233,9 +283,23 @@ export function ToolSearchModal({ open, onClose }: Props) {
         {/* Results List */}
         <div className="flex-1 overflow-y-auto">
           {query.length === 0 ? (
-            <EmptyState suggestions={suggestions} onSelect={setQuery} />
+            <EmptyState
+              recentSearches={history}
+              popularSearches={popularSearches}
+              trendingSearches={trendingSearches}
+              trendingTools={trendingTools}
+              onSelect={setQuery}
+              onRemoveRecent={removeQuery}
+              onClearHistory={clearHistory}
+              onNavigate={(href, slug) => navigateTo(href, slug)}
+            />
           ) : results.length === 0 ? (
-            <NoResults query={query} />
+            <NoResults
+              query={query}
+              suggestions={zeroSuggestions}
+              onSelect={setQuery}
+              onNavigate={(href, slug) => navigateTo(href, slug)}
+            />
           ) : (
             <ul
               ref={listRef}
@@ -248,10 +312,11 @@ export function ToolSearchModal({ open, onClose }: Props) {
                 <ResultItem
                   key={result.tool.slug}
                   result={result}
+                  query={query}
                   index={idx}
                   isActive={idx === activeIndex}
                   id={`${dialogId}-item-${idx}`}
-                  onSelect={() => navigateTo(result.tool.href)}
+                  onSelect={() => navigateTo(result.tool.href, result.tool.slug)}
                   onHover={() => setActiveIndex(idx)}
                 />
               ))}
@@ -283,6 +348,7 @@ export function ToolSearchModal({ open, onClose }: Props) {
 
 function ResultItem({
   result,
+  query,
   index,
   isActive,
   id,
@@ -290,6 +356,7 @@ function ResultItem({
   onHover,
 }: {
   result: SearchResult;
+  query: string;
   index: number;
   isActive: boolean;
   id: string;
@@ -297,6 +364,8 @@ function ResultItem({
   onHover: () => void;
 }) {
   const categoryDef = getCategoryDef(result.tool.category);
+  const titleSegments = highlightMatch(result.tool.title, query);
+  const descSegments = highlightMatch(result.tool.description, query);
 
   return (
     <li
@@ -321,15 +390,15 @@ function ResultItem({
         <CategoryIcon category={result.tool.category} size={16} />
       </span>
 
-      {/* Tool info */}
+      {/* Tool info with highlighted text */}
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-medium truncate ${
           isActive ? "text-brand-900 dark:text-brand-100" : "text-slate-900 dark:text-slate-100"
         }`}>
-          {result.tool.title}
+          <HighlightedText segments={titleSegments} />
         </p>
         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-          {result.tool.description}
+          <HighlightedText segments={descSegments} />
         </p>
       </div>
 
@@ -350,27 +419,206 @@ function ResultItem({
   );
 }
 
+/** Renders text with highlighted segments. */
+function HighlightedText({ segments }: { segments: HighlightSegment[] }) {
+  return (
+    <>
+      {segments.map((seg, i) =>
+        seg.highlight ? (
+          <mark
+            key={i}
+            className="bg-brand-100 dark:bg-brand-500/20 text-inherit rounded-sm px-0.5 -mx-0.5"
+          >
+            {seg.text}
+          </mark>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 function EmptyState({
-  suggestions,
+  recentSearches,
+  popularSearches,
+  trendingSearches,
+  trendingTools,
   onSelect,
+  onRemoveRecent,
+  onClearHistory,
+  onNavigate,
 }: {
-  suggestions: string[];
+  recentSearches: string[];
+  popularSearches: string[];
+  trendingSearches: string[];
+  trendingTools: ReturnType<typeof getTrendingTools>;
   onSelect: (query: string) => void;
+  onRemoveRecent: (query: string) => void;
+  onClearHistory: () => void;
+  onNavigate: (href: string, slug: string) => void;
 }) {
   return (
-    <div className="px-5 py-6 space-y-4">
-      <p className="text-sm text-slate-500 dark:text-slate-400">
-        Popular searches
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {suggestions.map((s) => (
+    <div className="px-5 py-4 space-y-5">
+      {/* Recent Searches */}
+      {recentSearches.length > 0 && (
+        <div data-testid="recent-searches">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              Recent searches
+            </p>
+            <button
+              type="button"
+              onClick={onClearHistory}
+              className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+            >
+              Clear all
+            </button>
+          </div>
+          <div className="space-y-0.5">
+            {recentSearches.slice(0, 5).map((q) => (
+              <div
+                key={q}
+                className="group flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+              >
+                <ClockIcon />
+                <button
+                  type="button"
+                  onClick={() => onSelect(q)}
+                  className="flex-1 text-left text-sm text-slate-700 dark:text-slate-300 truncate"
+                >
+                  {q}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRemoveRecent(q)}
+                  aria-label={`Remove "${q}" from history`}
+                  className="opacity-0 group-hover:opacity-100 shrink-0 p-0.5 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-opacity"
+                >
+                  <XIcon />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Popular / Trending Searches */}
+      <div>
+        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+          {trendingSearches.length >= 3 ? "Trending" : "Popular searches"}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(trendingSearches.length >= 3 ? trendingSearches : popularSearches).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => onSelect(s)}
+              className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Trending Tools */}
+      {trendingTools.length > 0 && (
+        <div>
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+            Trending tools
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {trendingTools.map((tool) => {
+              const catDef = getCategoryDef(tool.category);
+              return (
+                <button
+                  key={tool.slug}
+                  type="button"
+                  onClick={() => onNavigate(tool.href, tool.slug)}
+                  className="flex items-center gap-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 p-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                >
+                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500/10 to-accent-500/10 text-brand-600 dark:text-brand-300">
+                    <CategoryIcon category={tool.category} size={14} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-slate-900 dark:text-slate-100 truncate">
+                      {tool.title}
+                    </p>
+                    {catDef && (
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                        {catDef.label}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NoResults({
+  query,
+  suggestions,
+  onSelect,
+  onNavigate,
+}: {
+  query: string;
+  suggestions: ReturnType<typeof getZeroResultsSuggestions>;
+  onSelect: (query: string) => void;
+  onNavigate: (href: string, slug: string) => void;
+}) {
+  return (
+    <div className="px-5 py-8 text-center space-y-5" data-testid="no-results">
+      <div>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          No tools found for &ldquo;<span className="font-medium text-slate-700 dark:text-slate-300">{query}</span>&rdquo;
+        </p>
+        <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+          Try a different spelling or browse by category
+        </p>
+      </div>
+
+      {/* Zero-results suggestions */}
+      {suggestions.length > 0 && (
+        <div className="text-left">
+          <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+            You might be looking for
+          </p>
+          <div className="space-y-1">
+            {suggestions.map((tool) => (
+              <button
+                key={tool.slug}
+                type="button"
+                onClick={() => onNavigate(tool.href, tool.slug)}
+                className="flex items-center gap-2.5 w-full rounded-lg px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+              >
+                <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-brand-500/10 to-accent-500/10 text-brand-600 dark:text-brand-300">
+                  <CategoryIcon category={tool.category} size={13} />
+                </span>
+                <span className="text-sm text-slate-700 dark:text-slate-300 truncate">
+                  {tool.title}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Quick category suggestions */}
+      <div className="flex flex-wrap justify-center gap-2">
+        {["calculator", "random", "json", "text", "converter"].map((term) => (
           <button
-            key={s}
+            key={term}
             type="button"
-            onClick={() => onSelect(s)}
-            className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            onClick={() => onSelect(term)}
+            className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-1 text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
-            {s}
+            {term}
           </button>
         ))}
       </div>
@@ -378,16 +626,23 @@ function EmptyState({
   );
 }
 
-function NoResults({ query }: { query: string }) {
+// ─── Small Icons ────────────────────────────────────────────────────
+
+function ClockIcon() {
   return (
-    <div className="px-5 py-10 text-center">
-      <p className="text-sm text-slate-500 dark:text-slate-400">
-        No tools found for &ldquo;<span className="font-medium text-slate-700 dark:text-slate-300">{query}</span>&rdquo;
-      </p>
-      <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-        Try searching for &ldquo;json&rdquo;, &ldquo;random&rdquo;, or &ldquo;calculator&rdquo;
-      </p>
-    </div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-slate-400" aria-hidden>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
   );
 }
 

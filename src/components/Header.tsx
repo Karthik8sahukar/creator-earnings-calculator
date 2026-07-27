@@ -12,7 +12,6 @@ import { Search, Command, CategoryIcon } from "./ui/Icon";
 import { getToolsByCategory, getPopularTools, getTotalToolCount } from "@/lib/tools";
 import { TOOL_CATEGORIES } from "@/lib/tools/categories";
 import type { ToolCategoryId } from "@/lib/tools/registry";
-import { card } from "@/lib/design-tokens";
 
 // ─── Constants ──────────────────────────────────────────────────────
 

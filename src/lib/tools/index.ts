@@ -26,8 +26,14 @@ export {
   getTotalToolCount,
 } from "./categories";
 
-export type { SearchResult } from "./search";
-export { searchTools, getSearchSuggestions } from "./search";
+export type { SearchResult, HighlightSegment } from "./search";
+export {
+  searchTools,
+  getSearchSuggestions,
+  highlightMatch,
+  getZeroResultsSuggestions,
+  getTrendingTools,
+} from "./search";
 
 export type { ToolCollection } from "./collections";
 export {
