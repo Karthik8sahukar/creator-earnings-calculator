@@ -36,13 +36,33 @@ export function useSearchHistory() {
     }
   }, []);
 
-  const persist = useCallback((next: string[]) => {
-    setHistory(next);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      // quota exceeded — state still updated in memory
-    }
+  // Sync across hook instances and tabs
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            const valid = parsed
+              .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+              .slice(0, MAX_HISTORY);
+            setHistory(valid);
+          }
+        } else {
+          setHistory([]);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener("storage", sync);
+    window.addEventListener("search-history-updated", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("search-history-updated", sync);
+    };
   }, []);
 
   /**
@@ -62,6 +82,7 @@ export function useSearchHistory() {
         ].slice(0, MAX_HISTORY);
         try {
           window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          window.dispatchEvent(new Event("search-history-updated"));
         } catch {
           // ignore
         }
@@ -78,6 +99,7 @@ export function useSearchHistory() {
         const next = prev.filter((q) => q !== query);
         try {
           window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          window.dispatchEvent(new Event("search-history-updated"));
         } catch {
           // ignore
         }
@@ -89,13 +111,14 @@ export function useSearchHistory() {
 
   /** Clear all search history. */
   const clearHistory = useCallback(() => {
-    persist([]);
+    setHistory([]);
     try {
       window.localStorage.removeItem(STORAGE_KEY);
+      window.dispatchEvent(new Event("search-history-updated"));
     } catch {
       // ignore
     }
-  }, [persist]);
+  }, []);
 
   return {
     /** Recent search queries (newest first, max 20). */

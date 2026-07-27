@@ -235,8 +235,9 @@ test.describe("Search Modal — Zero Results", () => {
     await page.goto("/");
     await page.keyboard.press("Control+k");
     const input = page.getByRole("dialog").getByRole("textbox");
-    // A query that won't match title/alias exactly but has tag overlap
-    await input.fill("flipcoin randomtool");
+    // Use a query that won't match any title/tag/alias but has words
+    // that partially overlap with category names for zero-result suggestions
+    await input.fill("zznotool qwerty");
     // May show "You might be looking for" if zero-results suggestions find related tools
     // Or "No tools found" — the important thing is no crash
     const noResults = page.getByText(/no tools found/i);

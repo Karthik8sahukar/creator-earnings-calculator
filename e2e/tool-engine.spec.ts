@@ -47,7 +47,8 @@ test.describe("Tool Engine — RPM Calculator (engine-powered)", () => {
     // Fill in views
     await page.getByLabel(/views/i).fill("100000");
     // Result should show $5.00 (500/100000*1000)
-    await expect(page.locator("[aria-live='polite']").first()).toContainText(
+    // Use the visible aria-live region (not the sr-only one from ShareButton)
+    await expect(page.locator("p[aria-live='polite']").first()).toContainText(
       /\$5\.00/,
     );
   });
