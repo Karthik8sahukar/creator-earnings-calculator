@@ -32,6 +32,32 @@ export function useRecentTools() {
     }
   }, []);
 
+  // Sync across hook instances and tabs
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            setRecentSlugs(parsed.slice(0, MAX_RECENT));
+          }
+        } else {
+          setRecentSlugs([]);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener("storage", sync);
+    window.addEventListener("recent-tools-updated", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("recent-tools-updated", sync);
+    };
+  }, []);
+
   const recordVisit = useCallback(
     (slug: string) => {
       setRecentSlugs((prev) => {
@@ -39,6 +65,7 @@ export function useRecentTools() {
         const next = [slug, ...prev.filter((s) => s !== slug)].slice(0, MAX_RECENT);
         try {
           window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+          window.dispatchEvent(new Event("recent-tools-updated"));
         } catch {
           // quota exceeded — state still updated in memory
         }
@@ -52,6 +79,7 @@ export function useRecentTools() {
     setRecentSlugs([]);
     try {
       window.localStorage.removeItem(STORAGE_KEY);
+      window.dispatchEvent(new Event("recent-tools-updated"));
     } catch {
       // ignore
     }

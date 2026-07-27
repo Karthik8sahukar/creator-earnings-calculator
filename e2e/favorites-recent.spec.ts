@@ -23,8 +23,9 @@ test.describe("Favorites from ToolCard", () => {
     const favBtn = page.getByRole("button", { name: /add to favorites/i }).first();
     await expect(favBtn).toBeVisible();
     await favBtn.click();
-    // Button should now show "Remove from favorites"
-    await expect(favBtn).toHaveAttribute("aria-pressed", "true");
+    // Button should now show "Remove from favorites" with aria-pressed="true"
+    const pressedBtn = page.getByRole("button", { name: /remove from favorites/i }).first();
+    await expect(pressedBtn).toHaveAttribute("aria-pressed", "true");
   });
 
   test("clicking the favorite button does not navigate", async ({ page }) => {
@@ -32,7 +33,7 @@ test.describe("Favorites from ToolCard", () => {
     const url = page.url();
     const favBtn = page.getByRole("button", { name: /add to favorites/i }).first();
     await favBtn.click();
-    // URL should not change
+    // URL should not change (button click should not trigger card navigation)
     expect(page.url()).toBe(url);
   });
 
@@ -40,15 +41,17 @@ test.describe("Favorites from ToolCard", () => {
     await page.goto("/");
     const favBtn = page.getByRole("button", { name: /add to favorites/i }).first();
     await favBtn.click();
-    await expect(favBtn).toHaveAttribute("aria-pressed", "true");
+    // After click, button should be in pressed state
+    const pressedBtn = page.getByRole("button", { name: /remove from favorites/i }).first();
+    await expect(pressedBtn).toHaveAttribute("aria-pressed", "true");
 
     // Reload
     await page.reload();
 
-    // Find the button that is now pressed (favorited)
-    const pressedBtn = page.getByRole("button", { name: /remove from favorites/i }).first();
-    await expect(pressedBtn).toBeVisible();
-    await expect(pressedBtn).toHaveAttribute("aria-pressed", "true");
+    // Find the button that is now pressed (favorited) — should persist
+    const reloadedBtn = page.getByRole("button", { name: /remove from favorites/i }).first();
+    await expect(reloadedBtn).toBeVisible();
+    await expect(reloadedBtn).toHaveAttribute("aria-pressed", "true");
   });
 
   test("favorited tool appears in homepage Favorites tab", async ({ page }) => {
@@ -86,6 +89,8 @@ test.describe("Recent Tools", () => {
 
   test("recent tool survives reload", async ({ page }) => {
     await page.goto("/coin-flip");
+    // Ensure the page fully renders (ToolVisitTracker fires on mount)
+    await expect(page.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
     await page.goto("/");
 
     // Reload the homepage
@@ -97,12 +102,15 @@ test.describe("Recent Tools", () => {
   });
 
   test("reopening a tool moves it to the top", async ({ page }) => {
-    // Visit two tools in order
+    // Visit two tools in order, ensuring each fully renders
     await page.goto("/coin-flip");
+    await expect(page.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
     await page.goto("/dice-roller");
+    await expect(page.getByRole("heading", { name: /dice roller/i }).first()).toBeVisible();
 
     // Now revisit coin-flip
     await page.goto("/coin-flip");
+    await expect(page.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
 
     // Go to homepage and check Recent tab
     await page.goto("/");
@@ -117,6 +125,7 @@ test.describe("Recent Tools", () => {
 
   test("clicking a Recent card opens the correct localized route", async ({ page }) => {
     await page.goto("/coin-flip");
+    await expect(page.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
     await page.goto("/");
 
     const recentTab = page.getByRole("tab", { name: /recent/i }).last();
@@ -150,7 +159,7 @@ test.describe("Share Button", () => {
 
 test.describe("Locale Behavior", () => {
   test("non-English locale preserves navigation correctly", async ({ page }) => {
-    // Visit a tool in Spanish locale
+    // Visit a tool in Spanish locale, ensure it renders
     await page.goto("/es/coin-flip");
     await expect(page.getByRole("heading").first()).toBeVisible();
 

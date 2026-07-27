@@ -149,6 +149,7 @@ export function ToolLayout({
       {showBreadcrumbs && (
         <nav
           aria-label={t("channelPage.breadcrumbAria")}
+          data-testid="breadcrumb-nav"
           className="text-xs text-slate-500 dark:text-slate-400"
         >
           <ol className="flex flex-wrap items-center gap-1">

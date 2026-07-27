@@ -97,8 +97,8 @@ test.describe("Tool Engine — RPM Calculator (engine-powered)", () => {
     // Page should load without error
     const heading = page.getByRole("heading", { level: 1 });
     await expect(heading).toBeVisible();
-    // Breadcrumbs should be visible
-    const nav = page.getByRole("navigation", { name: /breadcrumb/i });
+    // Breadcrumbs should be visible (aria-label is translated, use testid)
+    const nav = page.getByTestId("breadcrumb-nav");
     await expect(nav).toBeVisible();
   });
 });

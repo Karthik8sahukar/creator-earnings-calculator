@@ -32,11 +32,43 @@ export function useFavorites() {
     }
   }, []);
 
-  // Persist to localStorage on change
+  // Sync across hook instances: listen for localStorage changes
+  // triggered by other instances on the same page (via custom event)
+  // or from other tabs (via native storage event).
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            setFavorites(parsed.slice(0, MAX_FAVORITES));
+          }
+        } else {
+          setFavorites([]);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    // Cross-tab sync (native storage event)
+    window.addEventListener("storage", sync);
+    // Same-page cross-instance sync (custom event)
+    window.addEventListener("favorites-updated", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("favorites-updated", sync);
+    };
+  }, []);
+
+  // Persist to localStorage on change and notify other hook instances
   const persist = useCallback((next: string[]) => {
     setFavorites(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      // Notify other hook instances on the same page
+      window.dispatchEvent(new Event("favorites-updated"));
     } catch {
       // quota exceeded or unavailable — state still updated in memory
     }

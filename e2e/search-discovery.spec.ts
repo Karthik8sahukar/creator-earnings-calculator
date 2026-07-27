@@ -150,6 +150,8 @@ test.describe("Search Modal — Recent Searches", () => {
     // Wait for navigation
     await expect(page).toHaveURL(/\/dice-roller/);
 
+    // Navigate back to homepage where the search modal lives
+    await page.goto("/");
     // Open search again
     await page.keyboard.press("Control+k");
     // Should show "Recent searches" section with "dice roller"
