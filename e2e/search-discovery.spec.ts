@@ -156,7 +156,9 @@ test.describe("Search Modal — Recent Searches", () => {
     await page.keyboard.press("Control+k");
     // Should show "Recent searches" section with "dice roller"
     await expect(page.getByRole("dialog").getByText("Recent searches", { exact: true })).toBeVisible();
-    await expect(page.getByRole("dialog").getByText("dice roller")).toBeVisible();
+    await expect(
+      page.getByRole("dialog").getByTestId("recent-searches").getByRole("button", { name: "dice roller", exact: true })
+    ).toBeVisible();
   });
 
   test("clicking a recent search fills input", async ({ page }) => {
@@ -225,9 +227,11 @@ test.describe("Search Modal — Zero Results", () => {
     const input = page.getByRole("dialog").getByRole("textbox");
     await input.fill("xyznonexistent");
     // Should show "No tools found" message
-    await expect(page.getByRole("dialog").getByText(/no tools found/i)).toBeVisible();
+    const noResultsSection = page.getByRole("dialog").getByTestId("no-results");
+    await expect(noResultsSection).toBeVisible();
+    await expect(noResultsSection.getByText(/no tools found/i)).toBeVisible();
     // Should show category suggestion pills
-    const suggestionPills = page.getByRole("dialog").locator("button").filter({ hasText: /calculator|random|json|text|converter/i });
+    const suggestionPills = noResultsSection.locator("button").filter({ hasText: /calculator|random|json|text|converter/i });
     await expect(suggestionPills.first()).toBeVisible();
   });
 
@@ -238,13 +242,10 @@ test.describe("Search Modal — Zero Results", () => {
     // Use a query that won't match any title/tag/alias but has words
     // that partially overlap with category names for zero-result suggestions
     await input.fill("zznotool qwerty");
-    // May show "You might be looking for" if zero-results suggestions find related tools
-    // Or "No tools found" — the important thing is no crash
+    // Should show no-results state: "No tools found" or suggestions
     const dialog = page.getByRole("dialog");
-    const noResults = dialog.getByText(/no tools found/i);
-    const suggestions = dialog.getByText(/you might be looking for/i);
-    // At least one of these should appear
-    await expect(noResults.or(suggestions).first()).toBeVisible();
+    const noResultsSection = dialog.getByTestId("no-results");
+    await expect(noResultsSection).toBeVisible();
   });
 });
 

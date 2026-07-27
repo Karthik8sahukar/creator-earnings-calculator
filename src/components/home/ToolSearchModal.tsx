@@ -462,7 +462,7 @@ function EmptyState({
     <div className="px-5 py-4 space-y-5">
       {/* Recent Searches */}
       {recentSearches.length > 0 && (
-        <div>
+        <div data-testid="recent-searches">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Recent searches
@@ -573,7 +573,7 @@ function NoResults({
   onNavigate: (href: string, slug: string) => void;
 }) {
   return (
-    <div className="px-5 py-8 text-center space-y-5">
+    <div className="px-5 py-8 text-center space-y-5" data-testid="no-results">
       <div>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           No tools found for &ldquo;<span className="font-medium text-slate-700 dark:text-slate-300">{query}</span>&rdquo;
