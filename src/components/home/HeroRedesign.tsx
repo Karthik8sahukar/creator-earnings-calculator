@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import type { ReactNode } from "react";
 
 /**
@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
  * Stripe/Linear/Vercel-inspired with generous whitespace.
  */
 export function HeroRedesign({ children }: { children: ReactNode }) {
-  const t = useTranslations();
+  const t = useT();
 
   return (
     <section aria-labelledby="hero-title" className="relative pt-12 sm:pt-20 pb-8">

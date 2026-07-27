@@ -1,9 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import {
   ChartIcon,
   ChevronDownIcon,
@@ -140,7 +140,7 @@ export function CalculatorsMenu({ className = "" }: { className?: string }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const menuId = useId();
 
-  const t = useTranslations();
+  const t = useT();
 
   useEffect(() => {
     if (!open) return;

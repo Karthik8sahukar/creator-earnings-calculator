@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import type { BlogPost } from "@/lib/blog";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
  * (renders left), `next` is the newer one (renders right).
  */
 export function PrevNextNav({ prev, next }: Props) {
-  const t = useTranslations("blog.article");
+  const t = useT("blog.article");
   if (!prev && !next) return null;
 
   return (

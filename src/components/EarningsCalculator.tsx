@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useEffect, useMemo, useState } from "react";
 
 import { CopyShareLink } from "./CopyShareLink";
@@ -73,7 +73,7 @@ export function EarningsCalculator({
   sharePathname = "/",
   channelId = null,
 }: Props) {
-  const t = useTranslations("earnings");
+  const t = useT("earnings");
   const initialViews = analysis.monthlyViewEstimate.expected || 0;
 
   const [state, setState] = useState<CalculatorState>(() =>
@@ -433,7 +433,7 @@ function clampPct(v: number): number {
 
 /** Small helper so we can use `useTranslations` for a nested string. */
 function ResetLabel() {
-  const t = useTranslations("common.actions");
+  const t = useT("common.actions");
   return <>{t("reset")}</>;
 }
 

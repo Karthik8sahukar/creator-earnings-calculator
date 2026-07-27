@@ -3,7 +3,7 @@ import {
   getCountryBySlug,
   listCreatorsByCategory,
 } from "@/data/creators";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 interface Props {
   creatorSlug: string;

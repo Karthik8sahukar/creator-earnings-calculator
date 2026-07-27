@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import {
   ChartIcon,
   DollarIcon,
@@ -52,7 +52,7 @@ const OTHER_TOOLS: readonly Tool[] = [
  * No decision/utility tools here (those are in DecisionTools section below).
  */
 export function FeaturedTools() {
-  const t = useTranslations();
+  const t = useT();
 
   return (
     <section id="creator-analytics" aria-labelledby="featured-tools-title" className="scroll-mt-20">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -29,7 +29,7 @@ type CopyState = "idle" | "copied" | "error";
  * channel page but scoped to the blog voice.
  */
 export function ShareButtons({ url, title }: Props) {
-  const t = useTranslations("blog.article.share");
+  const t = useT("blog.article.share");
   const tCommon = useTranslations("common.actions");
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const [supportsWebShare, setSupportsWebShare] = useState(false);

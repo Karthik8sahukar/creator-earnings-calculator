@@ -1,7 +1,6 @@
-import { getTranslations } from "next-intl/server";
 
 import { Money } from "@/components/currency";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { ChartIcon } from "../icons";
 import { getCategoryStats } from "@/lib/creatorDirectory";
 import { findNiche } from "@/lib/rpmData";

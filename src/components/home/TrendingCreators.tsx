@@ -1,7 +1,6 @@
-import { getTranslations } from "next-intl/server";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
 import { TrendingUpIcon } from "../icons";

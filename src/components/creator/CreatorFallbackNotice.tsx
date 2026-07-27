@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import type { CreatorFallbackReason } from "@/lib/creatorProfile";
 
@@ -17,7 +17,7 @@ interface Props {
  * a generic "something went wrong".
  */
 export function CreatorFallbackNotice({ reason }: Props) {
-  const t = useTranslations("creator.fallback");
+  const t = useT("creator.fallback");
   return (
     <div
       role="note"

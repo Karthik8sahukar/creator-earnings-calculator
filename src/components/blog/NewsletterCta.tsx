@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useState } from "react";
 
 /**
@@ -12,7 +12,7 @@ import { useState } from "react";
  * ConvertKit…), only the `onSubmit` handler needs to change.
  */
 export function NewsletterCta() {
-  const t = useTranslations("blog.newsletter");
+  const t = useT("blog.newsletter");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 

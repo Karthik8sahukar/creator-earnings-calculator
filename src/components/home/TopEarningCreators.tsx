@@ -1,8 +1,7 @@
-import { getTranslations } from "next-intl/server";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
 import { Money } from "@/components/currency";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { DollarIcon } from "../icons";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";

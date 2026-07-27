@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useEffect, useState } from "react";
 
 import type { BlogTocEntry } from "@/lib/blog";
@@ -17,7 +17,7 @@ import type { BlogTocEntry } from "@/lib/blog";
  * a fully-functional set of anchor links.
  */
 export function TableOfContents({ entries }: { entries: BlogTocEntry[] }) {
-  const t = useTranslations("blog.article");
+  const t = useT("blog.article");
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {

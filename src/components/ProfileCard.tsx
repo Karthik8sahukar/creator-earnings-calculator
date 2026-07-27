@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import {
   CalendarIcon,
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export function ProfileCard({ channel }: Props) {
-  const t = useTranslations("profile");
+  const t = useT("profile");
   return (
     <section aria-labelledby="channel-title" className="card overflow-hidden">
       <div className="bg-gradient-to-br from-brand-100 via-white to-accent-400/20 h-24 sm:h-32" />

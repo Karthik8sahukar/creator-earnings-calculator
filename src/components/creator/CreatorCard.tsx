@@ -1,7 +1,7 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { CreatorAvatar } from "./CreatorAvatar";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { GlobeIcon } from "@/components/icons";
 import type { Creator } from "@/lib/creators";
 
@@ -32,7 +32,7 @@ interface Props {
  * that component for the rules.
  */
 export function CreatorCard({ creator, avatarUrl, testId }: Props) {
-  const t = useTranslations("creators.card");
+  const t = useT("creators.card");
 
   return (
     <Link

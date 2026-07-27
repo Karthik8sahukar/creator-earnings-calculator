@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useCallback, useEffect, useId, useRef, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
@@ -49,7 +49,7 @@ export function CreatorsDirectoryClient({
   totalResults,
   totalPages,
 }: Props) {
-  const t = useTranslations("creators");
+  const t = useT("creators");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

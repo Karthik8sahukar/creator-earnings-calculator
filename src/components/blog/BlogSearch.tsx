@@ -1,9 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { SearchIcon, XIcon } from "../icons";
 import type { BlogSearchDoc } from "@/lib/blog";
 import { searchIndex } from "@/lib/blog/search";
@@ -19,7 +19,7 @@ import { searchIndex } from "@/lib/blog/search";
  * component is pure UX around that pure function.
  */
 export function BlogSearch({ index }: { index: BlogSearchDoc[] }) {
-  const t = useTranslations("blog.search");
+  const t = useT("blog.search");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);

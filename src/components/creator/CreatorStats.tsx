@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import type { CreatorProfile } from "@/lib/creatorProfile";
 import { formatCompact } from "@/lib/format";
@@ -25,7 +25,7 @@ interface Props {
  * the section stays visible so the layout doesn't reflow.
  */
 export function CreatorStats({ profile }: Props) {
-  const t = useTranslations("creator.stats");
+  const t = useT("creator.stats");
   const { creator, analysis, videos } = profile;
 
   const hasVideos = videos.length > 0;

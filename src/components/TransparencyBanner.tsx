@@ -1,9 +1,9 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { InfoIcon } from "./icons";
 
 export function TransparencyBanner() {
-  const t = useTranslations("transparency");
+  const t = useT("transparency");
   return (
     <div
       role="note"

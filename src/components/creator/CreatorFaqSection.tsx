@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import type { CreatorFaqEntry } from "@/lib/creatorFaq";
 
@@ -14,7 +14,7 @@ interface Props {
  * so we render each Q + A eagerly rather than in a details/summary.
  */
 export function CreatorFaqSection({ entries }: Props) {
-  const t = useTranslations("creator.faq");
+  const t = useT("creator.faq");
   if (entries.length === 0) return null;
 
   return (

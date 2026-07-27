@@ -1,4 +1,3 @@
-import { getTranslations } from "next-intl/server";
 
 import { SparklesIcon } from "../icons";
 import { CREATORS_DATASET } from "@/data/creators/dataset";

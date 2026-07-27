@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { useT } from "@/lib/t";
+import Link from "next/link";
 import { DecisionRelatedTools } from "./DecisionRelatedTools";
 import { ToolPageActions } from "@/components/ui/ToolPageActions";
 
@@ -46,7 +46,7 @@ export function DecisionLayout({
   currentToolPath,
   toolSlug,
 }: Props) {
-  const t = useTranslations();
+  const t = useT();
   return (
     <div className="mx-auto max-w-4xl space-y-10">
       {breadcrumbs && (

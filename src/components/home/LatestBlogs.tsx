@@ -1,6 +1,5 @@
-import { getTranslations } from "next-intl/server";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 /**
  * Latest blog posts section on the homepage.

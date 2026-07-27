@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { BLOG_CATEGORIES } from "@/lib/blog";
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
  * plain `<Link>`, no client-side state.
  */
 export function CategoryFilters({ activeSlug }: Props) {
-  const t = useTranslations();
+  const t = useT();
   return (
     <nav
       aria-label={t("blog.categories.navLabel")}

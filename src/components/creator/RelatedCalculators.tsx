@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import {
   ChartIcon,
   DollarIcon,
@@ -61,7 +61,7 @@ const CARDS: readonly CalcCard[] = [
 ];
 
 export function RelatedCalculators() {
-  const t = useTranslations("creator.relatedCalculators");
+  const t = useT("creator.relatedCalculators");
 
   return (
     <section aria-labelledby="creator-related-calcs" className="space-y-4">

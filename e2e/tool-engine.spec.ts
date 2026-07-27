@@ -93,8 +93,8 @@ test.describe("Tool Engine — RPM Calculator (engine-powered)", () => {
     expect(parsed[1]["@type"]).toBe("SoftwareApplication");
   });
 
-  test("works in non-English locale", async ({ page }) => {
-    await page.goto("/es/youtube-rpm-calculator");
+  test("breadcrumbs render correctly", async ({ page }) => {
+    await page.goto("/youtube-rpm-calculator");
     // Page should load without error
     const heading = page.getByRole("heading", { level: 1 });
     await expect(heading).toBeVisible();

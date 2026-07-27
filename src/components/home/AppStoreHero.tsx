@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { Search, Command } from "@/components/ui/Icon";
 import { getSearchPlaceholder, getSearchSuggestions, getTotalToolCount } from "@/lib/tools";
@@ -27,7 +27,7 @@ interface Props {
  * Design inspired by Apple App Store / Product Hunt / Linear hero sections.
  */
 export function AppStoreHero({ onSearchOpen }: Props) {
-  const t = useTranslations();
+  const t = useT();
   const toolCount = getTotalToolCount();
   const suggestions = getSearchSuggestions();
 

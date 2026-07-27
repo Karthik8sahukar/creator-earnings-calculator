@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { ToolPageActions } from "@/components/ui/ToolPageActions";
 
 interface Props {
@@ -23,7 +23,7 @@ export function SimpleCalcLayout({
   breadcrumbs,
   toolSlug,
 }: Props) {
-  const t = useTranslations();
+  const t = useT();
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       {breadcrumbs && (

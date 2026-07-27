@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { track } from "@/lib/analytics";
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function CopyShareLink({ url, label }: Props) {
-  const t = useTranslations("copyShare");
+  const t = useT("copyShare");
   const [state, setState] = useState<"idle" | "copied" | "error">("idle");
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 

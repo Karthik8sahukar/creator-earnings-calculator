@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { useFormatMoney } from "@/components/currency";
 import type { CreatorProfile } from "@/lib/creatorProfile";
@@ -18,7 +18,7 @@ interface Props {
  * conversion happens via the `useFormatMoney` hook.
  */
 export function CreatorEarnings({ profile }: Props) {
-  const t = useTranslations("creator.earnings");
+  const t = useT("creator.earnings");
   const { formatMoney } = useFormatMoney();
   const { earnings } = profile;
   const hasData = earnings.monthlyViews > 0;

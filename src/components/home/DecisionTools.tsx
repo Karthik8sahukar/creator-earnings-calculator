@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { ChartIcon, DollarIcon, FilmIcon, ShareIcon, TrendingUpIcon } from "../icons";
 
 // ─── Decision Tools (no creator analytics here) ─────────────────────
@@ -33,7 +33,7 @@ const TOOLS: readonly Tool[] = [
  * Only randomness/decision utilities — no creator analytics.
  */
 export function DecisionTools() {
-  const t = useTranslations();
+  const t = useT();
 
   return (
     <section id="decision-tools" aria-labelledby="decision-tools-title" className="scroll-mt-20">

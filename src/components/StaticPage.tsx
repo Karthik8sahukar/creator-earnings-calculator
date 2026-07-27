@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { legalLastUpdatedIso } from "@/lib/config";
 
 interface Props {
@@ -41,7 +41,7 @@ export function StaticPage({
   lastUpdated = legalLastUpdatedIso,
   children,
 }: Props) {
-  const t = useTranslations("static");
+  const t = useT("static");
   return (
     <article className="prose prose-slate max-w-3xl mx-auto">
       <p className="text-xs text-slate-500 not-prose">

@@ -14,7 +14,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("Creator Analytics Section", () => {
   test("shows empty state when no historical data exists", async ({ page }) => {
-    await page.goto("/en/creator/mrbeast");
+    await page.goto("/creator/mrbeast");
 
     // The analytics section should exist
     const section = page.locator('[data-testid="analytics-empty"], [data-testid="analytics-section"]');
@@ -32,7 +32,7 @@ test.describe("Creator Analytics Section", () => {
   });
 
   test("analytics section has heading and accessible structure", async ({ page }) => {
-    await page.goto("/en/creator/mrbeast");
+    await page.goto("/creator/mrbeast");
 
     // The heading "Historical Analytics" should appear
     await expect(
@@ -41,7 +41,7 @@ test.describe("Creator Analytics Section", () => {
   });
 
   test("time-range controls are present when data exists", async ({ page }) => {
-    await page.goto("/en/creator/mrbeast");
+    await page.goto("/creator/mrbeast");
 
     // If the populated section renders, check for range buttons
     const section = page.getByTestId("analytics-section");
@@ -56,7 +56,7 @@ test.describe("Creator Analytics Section", () => {
   });
 
   test("clicking time-range buttons does not crash", async ({ page }) => {
-    await page.goto("/en/creator/mrbeast");
+    await page.goto("/creator/mrbeast");
 
     const section = page.getByTestId("analytics-section");
     const visible = await section.isVisible().catch(() => false);

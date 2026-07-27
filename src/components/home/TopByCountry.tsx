@@ -1,7 +1,6 @@
-import { getTranslations } from "next-intl/server";
 
 import { Money } from "@/components/currency";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { GlobeIcon } from "../icons";
 import { getCountryStats } from "@/lib/creatorDirectory";
 import { COUNTRY_CODE_TO_SLUG } from "@/lib/countryData";

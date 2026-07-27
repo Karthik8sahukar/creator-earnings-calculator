@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { publicConfig } from "@/lib/config";
 import { Logo } from "./Logo";
 // Blog is now a real destination (previously rendered as a disabled
@@ -22,7 +22,7 @@ import { Logo } from "./Logo";
  * name used in metadata and JSON-LD.
  */
 export function Footer() {
-  const t = useTranslations("footer");
+  const t = useT("footer");
   const year = new Date().getFullYear();
 
   return (

@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import type { ReactNode } from "react";
 
 /**
@@ -17,7 +17,7 @@ import type { ReactNode } from "react";
  *   - Search box (children slot, still labeled as "Featured Tool")
  */
 export function Hero({ children }: { children: ReactNode }) {
-  const t = useTranslations();
+  const t = useT();
 
   return (
     <section aria-labelledby="hero-title" className="pt-6 sm:pt-12">

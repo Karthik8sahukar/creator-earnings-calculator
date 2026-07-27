@@ -2,7 +2,7 @@
  * Tool Engine — Metadata & Structured Data Helpers
  *
  * Generates Next.js Metadata and JSON-LD structured data from a tool slug.
- * All URLs are absolute, locale-aware, and use the production site origin.
+ * All URLs are absolute and use the production site origin.
  *
  * Usage:
  *   export const generateMetadata = createToolMetadata("coin-flip");
@@ -10,7 +10,6 @@
 
 import type { Metadata } from "next";
 import { publicConfig } from "@/lib/config";
-import { buildAlternates } from "@/lib/i18nMetadata";
 import { getToolBySlug, getCategoryDef, type ToolEntry } from "@/lib/tools";
 
 // ─── Constants ──────────────────────────────────────────────────────
@@ -42,7 +41,6 @@ export interface ToolMetadataOverrides {
 }
 
 export interface ToolJsonLdOptions {
-  locale: string;
   /** Tool slug from the registry. */
   slug: string;
   /** FAQ items for FAQPage schema. */
@@ -66,9 +64,8 @@ export type ToolMaxWidth = "max-w-4xl" | "max-w-5xl" | "max-w-6xl" | "max-w-7xl"
  * Produces:
  *   - title, description, keywords (never empty/undefined)
  *   - robots: index true, follow true
- *   - canonical URL (absolute, locale-aware)
- *   - hreflang alternates for all supported locales + x-default
- *   - Open Graph with absolute URL, image fallback, siteName, locale
+ *   - canonical URL (absolute)
+ *   - Open Graph with absolute URL, image fallback, siteName
  *   - Twitter card with image fallback
  *   - No empty strings or undefined values emitted
  */
@@ -76,12 +73,7 @@ export function createToolMetadata(
   slug: string,
   overrides?: ToolMetadataOverrides,
 ) {
-  return async function generateMetadata({
-    params,
-  }: {
-    params: Promise<{ locale: string }>;
-  }): Promise<Metadata> {
-    const { locale } = await params;
+  return async function generateMetadata(): Promise<Metadata> {
     const tool = getToolBySlug(slug);
 
     if (!tool) {
@@ -99,7 +91,7 @@ export function createToolMetadata(
       ...tool.tags,
     ]);
 
-    const pageUrl = `${publicConfig.siteUrl}/${locale}${tool.href}`;
+    const pageUrl = `${publicConfig.siteUrl}${tool.href}`;
     const ogImage = nonEmpty(overrides?.ogImage) ?? DEFAULT_OG_IMAGE;
 
     return {
@@ -107,14 +99,15 @@ export function createToolMetadata(
       description,
       keywords: keywords.length > 0 ? keywords : undefined,
       robots: { index: true, follow: true },
-      alternates: buildAlternates({ locale, pathSuffix: tool.href }),
+      alternates: {
+        canonical: pageUrl,
+      },
       openGraph: {
         type: "website",
         title,
         description,
         url: pageUrl,
         siteName: publicConfig.siteName,
-        locale,
         images: [
           {
             url: ogImage,
@@ -151,8 +144,8 @@ export function generateToolJsonLd(options: ToolJsonLdOptions): object[] {
   const tool = getToolBySlug(options.slug);
   if (!tool) return [];
 
-  const pageUrl = `${publicConfig.siteUrl}/${options.locale}${tool.href}`;
-  const homeUrl = `${publicConfig.siteUrl}/${options.locale}`;
+  const pageUrl = `${publicConfig.siteUrl}${tool.href}`;
+  const homeUrl = `${publicConfig.siteUrl}/`;
   const breadcrumbName = nonEmpty(options.breadcrumbName) ?? tool.title;
   const applicationCategory =
     nonEmpty(options.applicationCategory) ?? "UtilitiesApplication";
@@ -179,7 +172,7 @@ export function generateToolJsonLd(options: ToolJsonLdOptions): object[] {
     // Try to add category from registry
     const catDef = getCategoryDef(tool.category);
     if (catDef) {
-      const categoryUrl = `${publicConfig.siteUrl}/${options.locale}/tools/${tool.category}`;
+      const categoryUrl = `${publicConfig.siteUrl}/tools/${tool.category}`;
       breadcrumbItems.push({
         "@type": "ListItem",
         position: 2,

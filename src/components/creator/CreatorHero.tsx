@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import {
   CalendarIcon,
@@ -33,7 +33,7 @@ interface Props {
  *     the channel is a placeholder (they simply show "—").
  */
 export function CreatorHero({ creator, channel, isFallback = false }: Props) {
-  const t = useTranslations("creator.hero");
+  const t = useT("creator.hero");
   const tProfile = useTranslations("profile");
 
   const canShowSubs =

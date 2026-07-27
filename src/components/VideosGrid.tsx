@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import Image from "next/image";
 
 import { ChatIcon, ClockIcon, EyeIcon, ThumbsUpIcon } from "./icons";
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function VideosGrid({ videos }: Props) {
-  const t = useTranslations("videos");
+  const t = useT("videos");
   const tCommon = useTranslations("common.actions");
 
   if (videos.length === 0) {

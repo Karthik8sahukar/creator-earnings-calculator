@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-import { useRouter } from "@/i18n/navigation";
+import { useRouter } from "next/link";
 import {
   searchTools,
   highlightMatch,

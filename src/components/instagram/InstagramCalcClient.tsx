@@ -27,7 +27,7 @@
  *     here are (a) URL sync, and (b) analytics tracking.
  */
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { track } from "@/lib/analytics";
@@ -57,7 +57,7 @@ import { InstagramBreakdownChart } from "./InstagramBreakdownChart";
 const CALCULATOR_CURRENCIES = ["USD", "INR", "EUR", "GBP", "AUD", "CAD", "JPY", "BRL"];
 
 export function InstagramCalcClient() {
-  const t = useTranslations("instagramCalculator");
+  const t = useT("instagramCalculator");
   const tCommon = useTranslations("common");
   const [state, setState] = useState<InstagramCalculatorState>(
     INSTAGRAM_DEFAULT_STATE,

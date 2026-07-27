@@ -6,8 +6,8 @@ import { expect, test } from "@playwright/test";
  * The Playwright config runs Next with `E2E_MOCK_MODE=1`, so the
  * YouTube resolver returns fixture channels for any handle lookup.
  * That means:
- *   - `/en/creators` renders the full catalog with no live API.
- *   - `/en/creator/mrbeast` resolves via `searchChannels("@MrBeast")`
+ *   - `/creators` renders the full catalog with no live API.
+ *   - `/creator/mrbeast` resolves via `searchChannels("@MrBeast")`
  *     which returns the fixture channels — the page renders with
  *     the creator's catalog metadata plus fixture stats.
  *
@@ -18,7 +18,7 @@ import { expect, test } from "@playwright/test";
 
 test.describe("Creators directory", () => {
   test("index page loads and displays creator cards", async ({ page }) => {
-    await page.goto("/en/creators");
+    await page.goto("/creators");
     await expect(
       page.getByRole("heading", { level: 1, name: /YouTube Creators/i }),
     ).toBeVisible();
@@ -28,7 +28,7 @@ test.describe("Creators directory", () => {
   });
 
   test("search filters the creator grid", async ({ page }) => {
-    await page.goto("/en/creators");
+    await page.goto("/creators");
 
     // Search for a specific creator.
     await page.getByTestId("creators-search").fill("markiplier");
@@ -41,7 +41,7 @@ test.describe("Creators directory", () => {
     page,
   }) => {
     // Visit with a clean slate — no search state.
-    await page.goto("/en/creators");
+    await page.goto("/creators");
 
     // Apply country = Japan via the filter select.
     await page.getByTestId("creators-filter-country").selectOption("Japan");
@@ -54,7 +54,7 @@ test.describe("Creators directory", () => {
 
   test("clear filters restores the full grid", async ({ page }) => {
     // Start with a filter active.
-    await page.goto("/en/creators?country=Japan");
+    await page.goto("/creators?country=Japan");
     await expect(page.getByTestId("creator-card-hikakintv")).toBeVisible();
     await expect(page.getByTestId("creator-card-mrbeast")).toHaveCount(0);
 
@@ -68,7 +68,7 @@ test.describe("Creators directory", () => {
   test("search then filter independently without interference", async ({
     page,
   }) => {
-    await page.goto("/en/creators");
+    await page.goto("/creators");
 
     // First: search for Markiplier specifically.
     await page.getByTestId("creators-search").fill("Markiplier");
@@ -90,7 +90,7 @@ test.describe("Creators directory", () => {
   test("directory emits BreadcrumbList + ItemList JSON-LD", async ({
     page,
   }) => {
-    await page.goto("/en/creators");
+    await page.goto("/creators");
     const script = page.getByTestId("creators-index-jsonld");
     await expect(script).toBeAttached();
     const raw = await script.textContent();
@@ -108,7 +108,7 @@ test.describe("Creator profile page", () => {
   test("renders the hero, earnings section, and JSON-LD for MrBeast", async ({
     page,
   }) => {
-    await page.goto("/en/creator/mrbeast");
+    await page.goto("/creator/mrbeast");
 
     // Hero shows the display name from the catalog.
     await expect(
@@ -149,7 +149,7 @@ test.describe("Creator profile page", () => {
   test("clicking a related creator card navigates to another profile", async ({
     page,
   }) => {
-    await page.goto("/en/creator/mrbeast");
+    await page.goto("/creator/mrbeast");
     // MrBeast's relatedCreators includes ishowspeed — pick that one.
     const link = page.getByTestId("related-creator-ishowspeed");
     await expect(link).toBeVisible();
@@ -161,7 +161,7 @@ test.describe("Creator profile page", () => {
   });
 
   test("unknown slug returns HTTP 404", async ({ page }) => {
-    const response = await page.goto("/en/creator/no-such-creator-slug");
+    const response = await page.goto("/creator/no-such-creator-slug");
     // `dynamicParams = false` on `[locale]/creator/[slug]` limits the
     // route to the catalog in `src/lib/creators.ts`. Any slug outside
     // that set is rejected by the router before the page component
@@ -190,7 +190,7 @@ test.describe("Navigation", () => {
   test("Creators is accessible from header dropdown and footer link", async ({
     page,
   }) => {
-    await page.goto("/en");
+    await page.goto("/");
 
     // Header nav (desktop) — Creators is a dropdown button in the new navigation.
     await expect(
@@ -201,10 +201,10 @@ test.describe("Navigation", () => {
     await expect(page.getByTestId("footer-creators-link")).toBeVisible();
   });
 
-  test("Creators dropdown navigates to /en/creators", async ({
+  test("Creators dropdown navigates to /creators", async ({
     page,
   }) => {
-    await page.goto("/en");
+    await page.goto("/");
 
     // Open Creators dropdown
     await page.getByRole("button", { name: /^Creators$/i }).click();

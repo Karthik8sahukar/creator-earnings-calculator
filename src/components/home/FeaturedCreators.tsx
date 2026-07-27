@@ -1,7 +1,6 @@
-import { getTranslations } from "next-intl/server";
 
 import { CreatorCard } from "@/components/creator/CreatorCard";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
 

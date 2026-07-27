@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { findCategory } from "@/lib/blog";
 import type { BlogPost } from "@/lib/blog";
 
@@ -23,8 +23,8 @@ export function ArticleCard({ post, featured = false }: Props) {
   // (`blog.categories.<id>.label`), so they need a root-scoped
   // translator — otherwise the lookup double-prefixes to
   // `blog.blog.categories.<id>.label` and rings a MISSING_MESSAGE.
-  const t = useTranslations("blog");
-  const tRoot = useTranslations();
+  const t = useT("blog");
+  const tRoot = useT();
   const category = findCategory(post.categoryId);
 
   return (

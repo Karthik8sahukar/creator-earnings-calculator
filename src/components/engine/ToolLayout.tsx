@@ -1,7 +1,7 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useT } from "@/lib/t";
 import { getToolBySlug, getCategoryDef, type ToolEntry } from "@/lib/tools";
 import { getRelatedTools } from "@/lib/tools/collections";
 import { ToolPageActions } from "@/components/ui/ToolPageActions";
@@ -115,7 +115,7 @@ export function ToolLayout({
   toolClassName,
   breadcrumbMiddle,
 }: ToolLayoutProps) {
-  const t = useTranslations();
+  const t = useT();
   const tool = getToolBySlug(slug);
 
   if (!tool) {

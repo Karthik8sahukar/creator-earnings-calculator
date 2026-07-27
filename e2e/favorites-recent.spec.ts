@@ -165,21 +165,11 @@ test.describe("Share Button", () => {
   });
 });
 
-test.describe("Locale Behavior", () => {
-  test("non-English locale preserves navigation correctly", async ({ page }) => {
-    // Visit a tool in Spanish locale, ensure it renders
-    await page.goto("/es/coin-flip");
-    await expect(page.getByRole("heading").first()).toBeVisible();
-
-    // Go to Spanish homepage and check Recent tab
-    await page.goto("/es");
-    const discovery = page.locator("section").filter({ has: page.locator("#quick-discovery-title") });
-    const recentTab = discovery.getByRole("tab", { name: /recent/i }).last();
-    await recentTab.click();
-
-    // Click the card within QuickDiscovery — should navigate to Spanish locale
-    const cardLink = discovery.getByRole("link", { name: /coin flip/i }).first();
-    await cardLink.click();
-    await expect(page).toHaveURL(/\/es\/coin-flip/);
+test.describe("Locale Redirects", () => {
+  test("old locale URLs permanently redirect to non-locale equivalents", async ({ page }) => {
+    // /en/coin-flip should redirect to /coin-flip
+    const response = await page.goto("/en/coin-flip");
+    await expect(page).toHaveURL(/\/coin-flip$/);
+    await expect(page.getByRole("heading", { name: /coin flip/i }).first()).toBeVisible();
   });
 });

@@ -1,5 +1,5 @@
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { useT } from "@/lib/t";
+import Link from "next/link";
 import { DeveloperRelatedTools } from "./DeveloperRelatedTools";
 import { ToolPageActions } from "@/components/ui/ToolPageActions";
 
@@ -28,7 +28,7 @@ export function DeveloperToolLayout({
   currentToolPath,
   toolSlug,
 }: Props) {
-  const t = useTranslations();
+  const t = useT();
   return (
     <div className="mx-auto max-w-5xl space-y-10">
       {breadcrumbs && (
