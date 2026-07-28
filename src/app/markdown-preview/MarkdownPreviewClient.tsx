@@ -8,7 +8,7 @@ const tool = getNewToolBySlug("markdown-preview")!;
 
 function markdownToHtml(md: string): string {
   // Sanitize: strip script tags and event handlers before processing
-  let safe = md
+  const safe = md
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
     .replace(/javascript:/gi, "");

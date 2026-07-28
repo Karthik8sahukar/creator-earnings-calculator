@@ -183,7 +183,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
                   const tools = getToolsByCategory(cat.id);
                   if (tools.length === 0) return null;
                   return (
-                    <AccordionCategory key={cat.id} category={cat.id as ToolCategoryId} label={cat.label} onLinkClick={close}>
+                    <AccordionCategory key={cat.id} category={cat.id as ToolCategoryId} label={cat.label}>
                       {tools.slice(0, 8).map((tool) => (
                         <li key={tool.slug}>
                           <Link href={tool.href as never} onClick={close} className="block rounded-md px-3 py-1.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
@@ -260,7 +260,7 @@ function NavSection({ title, children }: { title: string; children: React.ReactN
   );
 }
 
-function AccordionCategory({ category, label, children, onLinkClick: _onLinkClick }: { category: ToolCategoryId; label: string; children: React.ReactNode; onLinkClick: () => void }) {
+function AccordionCategory({ category, label, children }: { category: ToolCategoryId; label: string; children: React.ReactNode }) {
   const [expanded, setExpanded] = useState(false);
 
   return (

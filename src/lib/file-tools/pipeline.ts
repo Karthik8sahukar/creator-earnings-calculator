@@ -10,7 +10,6 @@
 import { useCallback, useReducer } from "react";
 import type {
   FileEntry,
-  FileStatus,
   OutputFile,
   PipelineState,
   PipelineAction,
