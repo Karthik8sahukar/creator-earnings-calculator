@@ -355,6 +355,7 @@ function RelatedLink({
   href,
   title,
   description,
+}: {
   href:
     | "/youtube-money-calculator"
     | "/youtube-rpm-calculator"

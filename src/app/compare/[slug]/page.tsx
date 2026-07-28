@@ -244,6 +244,7 @@ export default async function ComparisonPage({
 function ComparisonCard({
   creator,
   avatarUrl,
+}: {
   creator: ComparisonCreatorData;
   avatarUrl: string | null;
 }) {
@@ -291,6 +292,7 @@ function CompRow({
   v1,
   v2,
   highlight,
+}: {
   label: string;
   v1: React.ReactNode;
   v2: React.ReactNode;
