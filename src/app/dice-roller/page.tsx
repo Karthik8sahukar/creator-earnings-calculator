@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Roll virtual dice from d4 to d100. Support for multiple dice, running totals, and roll history. Perfect for tabletop RPGs and random decisions.",
     keywords: ["dice roller", "roll dice online", "d20 roller", "virtual dice", "D&D dice roller", "random dice"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Dice Roller — Roll Any Dice Online Free", description: "Roll virtual dice from d4 to d100.", url: `${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Dice Roller — Roll Any Dice Online Free", description: "Roll virtual dice from d4 to d100.", url: `${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Dice Roller — Roll Any Dice Online Free", description: "Roll virtual dice from d4 to d100." },
   };
 }

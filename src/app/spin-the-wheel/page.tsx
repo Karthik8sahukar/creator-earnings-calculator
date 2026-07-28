@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Customizable spinning wheel to randomly pick from your options. Add items, spin, and get a random result. Free, fast, no login required.",
     keywords: ["spin the wheel", "random wheel", "wheel picker", "random choice wheel", "spinner wheel"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Spin the Wheel — Free Random Picker Tool", description: "Customizable spinning wheel to randomly pick from your options.", url: `${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Spin the Wheel — Free Random Picker Tool", description: "Customizable spinning wheel to randomly pick from your options.", url: `${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Spin the Wheel — Free Random Picker Tool", description: "Customizable spinning wheel to randomly pick from your options." },
   };
 }

@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Encode and decode URLs and URI components locally in your browser. Supports full URI and component modes with a common encodings reference table.",
     keywords: ["url encoder", "url decoder", "encodeURIComponent", "percent encoding", "uri encoder"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "URL Encoder and Decoder Online", description: "Encode and decode URLs locally. Free and private.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "URL Encoder and Decoder Online", description: "Encode and decode URLs locally. Free and private.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "URL Encoder and Decoder Online", description: "Encode and decode URLs locally. Free and private." },
   };
 }

@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Generate random numbers in any range. Set min, max, and count. Supports negative numbers, multi-generation, and history tracking. Free, instant, no login.",
     keywords: ["random number generator", "RNG", "random number", "number picker", "random integer generator"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Random Number Generator — Free Online Tool", description: "Generate random numbers in any range.", url: `${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Random Number Generator — Free Online Tool", description: "Generate random numbers in any range.", url: `${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Random Number Generator — Free Online Tool", description: "Generate random numbers in any range." },
   };
 }

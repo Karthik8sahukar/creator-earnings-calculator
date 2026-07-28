@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Generate truth or dare questions for parties, friends, couples, and families. 60+ questions across 9 categories and 4 difficulty levels. Free, no login.",
     keywords: ["truth or dare", "truth or dare generator", "party game", "dare questions", "truth questions", "game generator", "party questions"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Truth or Dare Generator — Free Party Game Questions", description: "Generate truth or dare questions for any occasion. 9 categories, 4 difficulty levels.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Truth or Dare Generator — Free Party Game Questions", description: "Generate truth or dare questions for any occasion. 9 categories, 4 difficulty levels.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Truth or Dare Generator — Free Party Game Questions", description: "Generate truth or dare questions for any occasion." },
   };
 }

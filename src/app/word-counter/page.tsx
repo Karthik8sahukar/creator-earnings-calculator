@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Count words, unique words, sentences, paragraphs. Analyze keyword density, reading time, and page estimates. Free, private, works offline.",
     keywords: ["word counter", "word count", "keyword density", "reading time calculator", "page count", "text analyzer", "word frequency"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Word Counter — Free Online Word & Keyword Density Tool", description: "Count words, analyze keyword density, and estimate reading time.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Word Counter — Free Online Word & Keyword Density Tool", description: "Count words, analyze keyword density, and estimate reading time.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Word Counter — Free Online Word & Keyword Density Tool", description: "Count words, analyze keyword density, and estimate reading time." },
   };
 }

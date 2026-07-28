@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Convert CSV data to JSON locally in your browser. Supports auto-detect delimiters, type inference, nested keys, and prototype pollution protection.",
     keywords: ["csv to json", "csv converter", "csv parser", "data converter", "csv json online"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "CSV to JSON Converter", description: "Convert CSV to JSON locally with delimiter auto-detection.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "CSV to JSON Converter", description: "Convert CSV to JSON locally with delimiter auto-detection.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "CSV to JSON Converter", description: "Convert CSV to JSON locally with delimiter auto-detection." },
   };
 }

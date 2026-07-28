@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Randomly pick one or more names from your list. Unbiased Fisher-Yates selection, history tracking, and instant results. Free, private, no login.",
     keywords: ["random name picker", "name picker", "random name generator", "pick a name", "name randomizer", "random selector"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Random Name Picker — Pick Names From a List Free", description: "Randomly pick one or more names from your list.", url: `${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Random Name Picker — Pick Names From a List Free", description: "Randomly pick one or more names from your list.", url: `${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Random Name Picker — Pick Names From a List Free", description: "Randomly pick one or more names from your list." },
   };
 }

@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Convert SQL INSERT statements to structured JSON locally in your browser. Parse column names and values into downloadable JSON data.",
     keywords: ["sql to json", "insert to json", "sql converter", "sql parser", "data converter"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "SQL INSERT to JSON Converter", description: "Convert SQL INSERT to JSON locally. Free and private.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "SQL INSERT to JSON Converter", description: "Convert SQL INSERT to JSON locally. Free and private.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "SQL INSERT to JSON Converter", description: "Convert SQL INSERT to JSON locally. Free and private." },
   };
 }

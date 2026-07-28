@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Test JavaScript regular expressions with live match highlighting, capturing groups, and replacement preview. Free, private, runs locally.",
     keywords: ["regex tester", "regular expression", "javascript regex", "regex matcher", "regex replace"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Regex Tester – Test JavaScript Regular Expressions", description: "Test regex patterns locally with live highlights.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Regex Tester – Test JavaScript Regular Expressions", description: "Test regex patterns locally with live highlights.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Regex Tester – Test JavaScript Regular Expressions", description: "Test regex patterns locally with live highlights." },
   };
 }

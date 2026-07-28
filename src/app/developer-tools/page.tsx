@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Free browser-based developer tools. JWT decoder, JSON formatter, Base64, UUID generator, regex tester, and more. All processing happens locally.",
     keywords: ["developer tools", "online tools", "free dev tools", "browser tools", "json formatter", "jwt decoder"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Developer Tools – Free Browser-Based Utilities", description: "Free browser-based developer tools. No data leaves your device.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Developer Tools – Free Browser-Based Utilities", description: "Free browser-based developer tools. No data leaves your device.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Developer Tools – Free Browser-Based Utilities", description: "Free browser-based developer tools. No data leaves your device." },
   };
 }

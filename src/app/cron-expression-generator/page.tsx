@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Generate, validate, and humanize cron expressions. See next run times, use presets, build visually. Free browser-based tool.",
     keywords: ["cron expression generator", "cron parser", "cron humanizer", "crontab", "cron schedule"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Cron Expression Generator & Humanizer", description: "Generate and validate cron expressions. See next run times.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Cron Expression Generator & Humanizer", description: "Generate and validate cron expressions. See next run times.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Cron Expression Generator & Humanizer", description: "Generate and validate cron expressions. See next run times." },
   };
 }

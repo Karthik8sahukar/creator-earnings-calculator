@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Convert Unix timestamps to human-readable dates and vice versa. Auto-detects seconds vs milliseconds. Shows UTC, local time, ISO 8601, and relative time.",
     keywords: ["unix timestamp converter", "epoch converter", "timestamp to date", "date to timestamp", "unix time"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Unix Timestamp Converter", description: "Convert Unix timestamps to dates. Auto-detects seconds vs milliseconds.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Unix Timestamp Converter", description: "Convert Unix timestamps to dates. Auto-detects seconds vs milliseconds.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Unix Timestamp Converter", description: "Convert Unix timestamps to dates. Auto-detects seconds vs milliseconds." },
   };
 }

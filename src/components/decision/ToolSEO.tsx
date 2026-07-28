@@ -7,7 +7,6 @@ interface FaqItem {
 }
 
 interface Props {
-  locale: string;
   pathSuffix: string;
   toolName: string;
   toolDescription: string;
@@ -21,7 +20,6 @@ interface Props {
  * Emits BreadcrumbList + SoftwareApplication + FAQPage schemas.
  */
 export function ToolSEO({
-  locale,
   pathSuffix,
   toolName,
   toolDescription,
@@ -29,14 +27,14 @@ export function ToolSEO({
   faq,
   breadcrumbName,
 }: Props) {
-  const pageUrl = `${publicConfig.siteUrl}/${locale}${pathSuffix}`;
+  const pageUrl = `${publicConfig.siteUrl}${pathSuffix}`;
 
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${publicConfig.siteUrl}/${locale}` },
+        { "@type": "ListItem", position: 1, name: "Home", item: `${publicConfig.siteUrl}` },
         { "@type": "ListItem", position: 2, name: breadcrumbName, item: pageUrl },
       ],
     },

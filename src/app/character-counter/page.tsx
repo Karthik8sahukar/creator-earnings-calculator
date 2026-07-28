@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Count characters, words, sentences, and paragraphs in real time. Check platform limits for Twitter, Instagram, LinkedIn, and more. Free, private, no login.",
     keywords: ["character counter", "word counter", "character count", "letter count", "text length", "Twitter character limit", "Instagram character limit"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Character Counter — Free Online Character & Word Counter", description: "Count characters, words, sentences in real time. Check platform limits.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Character Counter — Free Online Character & Word Counter", description: "Count characters, words, sentences in real time. Check platform limits.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Character Counter — Free Online Character & Word Counter", description: "Count characters, words, sentences in real time." },
   };
 }

@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Flip a virtual coin for instant Heads or Tails results. Flip multiple coins, track history, and see running statistics. Free, no login.",
     keywords: ["coin flip", "flip a coin", "heads or tails", "coin toss", "online coin flip", "virtual coin"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Coin Flip — Free Online Heads or Tails", description: "Flip a virtual coin for instant Heads or Tails results.", url: `${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Coin Flip — Free Online Heads or Tails", description: "Flip a virtual coin for instant Heads or Tails results.", url: `${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Coin Flip — Free Online Heads or Tails", description: "Flip a virtual coin for instant Heads or Tails results." },
   };
 }

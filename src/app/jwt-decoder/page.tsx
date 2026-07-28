@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Decode JWT tokens locally in your browser. View header, payload, claims, expiry status. No data sent to any server. Free and private.",
     keywords: ["jwt decoder", "jwt token", "decode jwt", "jwt viewer", "json web token"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "JWT Decoder – Decode JWT Tokens Locally", description: "Decode JWT tokens locally. View claims and expiry.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "JWT Decoder – Decode JWT Tokens Locally", description: "Decode JWT tokens locally. View claims and expiry.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "JWT Decoder – Decode JWT Tokens Locally", description: "Decode JWT tokens locally. View claims and expiry." },
   };
 }

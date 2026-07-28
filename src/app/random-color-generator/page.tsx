@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Generate random colors with HEX, RGB, HSL, HSV, CMYK values. Create palettes, check WCAG contrast, and generate CSS gradients. Free online color tool.",
     keywords: ["random color generator", "color palette generator", "hex color", "rgb color", "color picker", "WCAG contrast", "CSS gradient generator"],
     alternates: buildAlternates({ pathSuffix: PATH }),
-    openGraph: { type: "website", title: "Random Color Generator — HEX, RGB, HSL Palette Tool", description: "Generate random colors and palettes with WCAG contrast checking.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale },
+    openGraph: { type: "website", title: "Random Color Generator — HEX, RGB, HSL Palette Tool", description: "Generate random colors and palettes with WCAG contrast checking.", url: `${publicConfig.siteUrl}${PATH}`, siteName: publicConfig.siteName, locale: "en_US" },
     twitter: { card: "summary_large_image", title: "Random Color Generator — HEX, RGB, HSL Palette Tool", description: "Generate random colors and palettes with WCAG contrast checking." },
   };
 }
