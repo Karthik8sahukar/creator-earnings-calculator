@@ -173,7 +173,7 @@ test.describe("Creator profile page", () => {
     expect(headingText).toMatch(/404|not found/i);
 
     // A link to navigate away should be present
-    await expect(page.getByRole("link", { name: /home|back/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /home|back/i }).first()).toBeVisible();
   });
 });
 
