@@ -1,72 +1,75 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { PdfToolPage } from "@/components/file-tools";
 import { getPdfToolBySlug } from "@/lib/file-tools/registry";
-import type { OutputFile } from "@/lib/file-tools/types";
+import Link from "next/link";
 
 const tool = getPdfToolBySlug("protect-pdf")!;
 
 /**
  * Protect PDF — client component.
  *
- * Encrypts the uploaded PDF with a user-provided password.
- * Uses pdf-lib's built-in encryption support.
+ * pdf-lib does not support PDF encryption. This page explains the
+ * limitation and provides a clear message to users. A future phase
+ * will integrate a WebAssembly-based encryption library (e.g. qpdf-wasm)
+ * to implement this feature entirely client-side.
  */
 export function ProtectPdfClient() {
-  const [password, setPassword] = useState("");
-
-  const handleProcess = useCallback(async (files: File[]): Promise<OutputFile[]> => {
-    if (!password.trim()) {
-      throw new Error("Please enter a password to protect your PDF.");
-    }
-
-    const { PDFDocument } = await import("pdf-lib");
-
-    const bytes = await files[0].arrayBuffer();
-    const pdf = await PDFDocument.load(bytes);
-
-    const outputBytes = await pdf.save({
-      userPassword: password.trim(),
-      ownerPassword: password.trim(),
-    });
-
-    const blob = new Blob([outputBytes], { type: "application/pdf" });
-
-    return [{
-      name: "protected.pdf",
-      blob,
-      type: "application/pdf",
-      size: blob.size,
-    }];
-  }, [password]);
-
   return (
-    <PdfToolPage
-      tool={tool}
-      onProcess={handleProcess}
-      processLabel="Protect PDF"
-    >
-      <div className="max-w-sm mx-auto space-y-2">
-        <label
-          htmlFor="protect-password"
-          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-        >
-          Password
-        </label>
-        <input
-          id="protect-password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter a strong password"
-          autoComplete="new-password"
-          className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-        />
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          This password will be required to open the PDF. Choose something memorable.
+    <div className="space-y-10">
+      {/* Hero */}
+      <header className="text-center space-y-3 max-w-2xl mx-auto">
+        <p className="inline-flex items-center gap-1.5 rounded-full bg-red-50 dark:bg-red-500/10 px-3 py-1 text-xs font-medium text-red-700 dark:text-red-300">
+          PDF Tool
         </p>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+          {tool.title}
+        </h1>
+        <p className="text-slate-600 dark:text-slate-300 max-w-xl mx-auto">
+          {tool.longDescription}
+        </p>
+      </header>
+
+      {/* Coming soon notice */}
+      <div className="max-w-md mx-auto rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-500/10 p-6 text-center space-y-3">
+        <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 dark:text-amber-400" aria-hidden>
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </div>
+        <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
+          Coming Soon
+        </h2>
+        <p className="text-sm text-amber-800 dark:text-amber-200">
+          PDF password protection requires encryption capabilities that are
+          not yet available in our client-side processing library. We are
+          working on integrating a WebAssembly-based solution to offer this
+          feature without uploading your files.
+        </p>
+        <Link
+          href="/tools"
+          className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 dark:text-amber-300 hover:underline"
+        >
+          &larr; Browse other PDF tools
+        </Link>
       </div>
-    </PdfToolPage>
+
+      {/* FAQ */}
+      {tool.faq.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+            Frequently Asked Questions
+          </h2>
+          <dl className="space-y-4">
+            {tool.faq.map((item) => (
+              <div key={item.q} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                <dt className="font-medium text-slate-900 dark:text-slate-100">{item.q}</dt>
+                <dd className="mt-1 text-sm text-slate-600 dark:text-slate-400">{item.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+    </div>
   );
 }
