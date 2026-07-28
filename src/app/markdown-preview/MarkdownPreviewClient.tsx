@@ -7,14 +7,24 @@ import { getNewToolBySlug } from "@/lib/tools-engine";
 const tool = getNewToolBySlug("markdown-preview")!;
 
 function markdownToHtml(md: string): string {
-  return md
+  // Sanitize: strip script tags and event handlers before processing
+  let safe = md
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
+    .replace(/javascript:/gi, "");
+
+  return safe
     .replace(/^### (.*$)/gm, "<h3>$1</h3>")
     .replace(/^## (.*$)/gm, "<h2>$1</h2>")
     .replace(/^# (.*$)/gm, "<h1>$1</h1>")
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
     .replace(/`(.*?)`/g, "<code>$1</code>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+      // Reject dangerous URL schemes
+      if (/^(javascript|data|vbscript):/i.test(url.trim())) return text;
+      return `<a href="${url}">${text}</a>`;
+    })
     .replace(/\n/g, "<br>");
 }
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPdfToolBySlug } from "@/lib/file-tools/registry";
-import { generatePdfToolMetadata, generatePdfToolJsonLd } from "@/lib/file-tools/metadata";
+import { generatePdfToolMetadata } from "@/lib/file-tools/metadata";
 import { UnlockPdfClient } from "./UnlockPdfClient";
 
 const SLUG = "unlock-pdf";
@@ -11,15 +11,5 @@ export function generateMetadata(): Metadata {
 }
 
 export default function UnlockPdfPage() {
-  return (
-    <>
-      <UnlockPdfClient />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generatePdfToolJsonLd(tool)),
-        }}
-      />
-    </>
-  );
+  return <UnlockPdfClient />;
 }

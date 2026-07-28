@@ -7,14 +7,16 @@ import { getNewToolBySlug } from "@/lib/tools-engine";
 const tool = getNewToolBySlug("slug-generator")!;
 
 function generateSlug(input: string): string {
-  return input
+  if (!input.trim()) return "";
+  const slug = input
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritical marks
+    .replace(/[^a-z0-9\s-]/g, "")   // Remove non-alphanumeric
     .trim()
-    .replace(/[\s-]+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/[\s-]+/g, "-")         // Collapse whitespace/hyphens to single hyphen
+    .replace(/^-|-$/g, "");          // Remove leading/trailing hyphens
+  return slug || "(empty — input contains no alphanumeric characters)";
 }
 
 export function SlugGeneratorClient() {
