@@ -21,38 +21,34 @@ vi.mock("@/lib/config", () => ({
 describe("createToolMetadata", () => {
   it("generates complete metadata for English", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const meta = await gen();
     expect(meta.title).toBe("Coin Flip");
     expect(meta.description).toBeTruthy();
     expect(meta.robots).toEqual({ index: true, follow: true });
-    expect(meta.alternates?.canonical).toBe("https://behumler.com/en/coin-flip");
+    expect(meta.alternates?.canonical).toBe("https://behumler.com/coin-flip");
   });
 
-  it("generates metadata for Spanish locale", async () => {
+  it("generates metadata without locale prefix", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "es" }) });
-    expect(meta.alternates?.canonical).toBe("https://behumler.com/es/coin-flip");
-    const langs = meta.alternates?.languages as Record<string, string>;
-    expect(langs["es"]).toBe("https://behumler.com/es/coin-flip");
-    expect(langs["en"]).toBe("https://behumler.com/en/coin-flip");
+    const meta = await gen();
+    expect(meta.alternates?.canonical).toBe("https://behumler.com/coin-flip");
   });
 
-  it("hreflang includes x-default", async () => {
+  it("canonical has no locale prefix", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
-    const langs = meta.alternates?.languages as Record<string, string>;
-    expect(langs["x-default"]).toBe("https://behumler.com/en/coin-flip");
+    const meta = await gen();
+    expect(meta.alternates?.canonical).not.toMatch(/\/en\//);
   });
 
   it("applies title override", async () => {
     const gen = createToolMetadata("coin-flip", { title: "Custom Title" });
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const meta = await gen();
     expect(meta.title).toBe("Custom Title");
   });
 
   it("includes OG image fallback", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const meta = await gen();
     const og = meta.openGraph as Record<string, unknown>;
     const images = og.images as Array<Record<string, unknown>>;
     expect(images[0].url).toBe("https://behumler.com/og-default.png");
@@ -62,20 +58,20 @@ describe("createToolMetadata", () => {
 
   it("Twitter card has image", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const meta = await gen();
     const tw = meta.twitter as Record<string, unknown>;
     expect(tw.images).toEqual(["https://behumler.com/og-default.png"]);
   });
 
   it("returns noindex for invalid slug", async () => {
     const gen = createToolMetadata("nonexistent-xyz");
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const meta = await gen();
     expect(meta.robots).toEqual({ index: false, follow: false });
   });
 
   it("does not emit empty keywords", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const meta = await gen();
     if (meta.keywords) {
       for (const k of meta.keywords as string[]) {
         expect(k.trim().length).toBeGreaterThan(0);
@@ -83,16 +79,16 @@ describe("createToolMetadata", () => {
     }
   });
 
-  it("no duplicate locale segments in canonical", async () => {
+  it("canonical has no locale segments", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "es" }) });
+    const meta = await gen();
     const canonical = meta.alternates?.canonical as string;
-    expect(canonical).not.toMatch(/\/es\/es\//);
+    expect(canonical).not.toMatch(/\/(en|es|de|fr|hi|ja|pt)\//);
   });
 
   it("OG url is absolute", async () => {
     const gen = createToolMetadata("coin-flip");
-    const meta = await gen({ params: Promise.resolve({ locale: "en" }) });
+    const meta = await gen();
     const og = meta.openGraph as Record<string, unknown>;
     expect(og.url).toMatch(/^https:\/\//);
   });
@@ -100,7 +96,7 @@ describe("createToolMetadata", () => {
 
 describe("generateToolJsonLd", () => {
   it("produces valid BreadcrumbList", () => {
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
+    const result = generateToolJsonLd({ slug: "coin-flip" });
     const bc = result[0] as Record<string, unknown>;
     expect(bc["@type"]).toBe("BreadcrumbList");
     const items = bc.itemListElement as Array<Record<string, unknown>>;
@@ -113,7 +109,7 @@ describe("generateToolJsonLd", () => {
   });
 
   it("produces valid SoftwareApplication", () => {
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
+    const result = generateToolJsonLd({ slug: "coin-flip" });
     const app = result[1] as Record<string, unknown>;
     expect(app["@type"]).toBe("SoftwareApplication");
     expect(app.name).toBeTruthy();
@@ -124,7 +120,7 @@ describe("generateToolJsonLd", () => {
 
   it("emits FAQPage with valid FAQs", () => {
     const faq = [{ q: "Q1?", a: "A1." }, { q: "Q2?", a: "A2." }];
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en", faq });
+    const result = generateToolJsonLd({ slug: "coin-flip", faq });
     const faqSchema = result[2] as Record<string, unknown>;
     expect(faqSchema["@type"]).toBe("FAQPage");
     const entities = faqSchema.mainEntity as Array<Record<string, unknown>>;
@@ -132,28 +128,28 @@ describe("generateToolJsonLd", () => {
   });
 
   it("omits FAQPage when no FAQs", () => {
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
+    const result = generateToolJsonLd({ slug: "coin-flip" });
     expect(result.length).toBe(2);
   });
 
   it("filters invalid FAQ entries", () => {
     const faq = [{ q: "", a: "answer" }, { q: "question", a: "" }, { q: "Valid?", a: "Yes." }];
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en", faq });
+    const result = generateToolJsonLd({ slug: "coin-flip", faq });
     const faqSchema = result[2] as Record<string, unknown>;
     const entities = faqSchema.mainEntity as Array<Record<string, unknown>>;
     expect(entities.length).toBe(1);
     expect(entities[0].name).toBe("Valid?");
   });
 
-  it("URLs preserve locale", () => {
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "de" });
+  it("URLs are absolute", () => {
+    const result = generateToolJsonLd({ slug: "coin-flip" });
     const bc = result[0] as Record<string, unknown>;
     const items = bc.itemListElement as Array<Record<string, unknown>>;
-    expect(items[0].item).toContain("/de");
+    expect(items[0].item).toMatch(/^https:\/\//);
   });
 
   it("does not contain invented ratings or reviews", () => {
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en" });
+    const result = generateToolJsonLd({ slug: "coin-flip" });
     const json = JSON.stringify(result);
     expect(json).not.toContain("aggregateRating");
     expect(json).not.toContain("Review");
@@ -161,7 +157,7 @@ describe("generateToolJsonLd", () => {
   });
 
   it("can be parsed as valid JSON", () => {
-    const result = generateToolJsonLd({ slug: "coin-flip", locale: "en", faq: [{ q: "Q?", a: "A." }] });
+    const result = generateToolJsonLd({ slug: "coin-flip", faq: [{ q: "Q?", a: "A." }] });
     const serialized = JSON.stringify(result);
     expect(() => JSON.parse(serialized)).not.toThrow();
   });

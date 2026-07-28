@@ -4,7 +4,7 @@ import { useT } from "@/lib/t";
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { useRouter } from "next/link";
+import { useRouter } from "next/navigation";
 import { ChannelSearch } from "./ChannelSearch";
 import { RecentSearches } from "./RecentSearches";
 import {

@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-import { useRouter } from "next/link";
+import { useRouter } from "next/navigation";
 import {
   searchTools,
   highlightMatch,

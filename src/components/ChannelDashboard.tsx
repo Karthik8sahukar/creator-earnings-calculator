@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useRouter } from "next/link";
+import { useRouter } from "next/navigation";
 import { EarningsCalculator } from "./EarningsCalculator";
 import { ShareSection } from "./ShareSection";
 import {
