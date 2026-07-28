@@ -1,7 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getT } from "@/lib/t";
 
 import { CreatorCard } from "@/components/creator/CreatorCard";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
 
@@ -32,7 +32,7 @@ const POPULAR_SLUGS = [
  * which reuses the existing YouTube TtlCache and never throws.
  */
 export async function PopularCreators() {
-  const t = await getTranslations("popularCreators");
+  const t = getT("popularCreators");
 
   const creators = POPULAR_SLUGS.map((slug) => getCreatorBySlug(slug)).filter(
     (c): c is NonNullable<typeof c> => Boolean(c),

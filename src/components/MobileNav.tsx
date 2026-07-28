@@ -1,10 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { LanguageSelector } from "./LanguageSelector";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { MenuIcon, XIcon } from "./icons";
 import { ThemeToggle } from "./ThemeToggle";
 import { CategoryIcon } from "./ui/Icon";
@@ -54,7 +53,7 @@ export function MobileNav({ className = "" }: { className?: string }) {
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const dialogId = useId();
   const titleId = `${dialogId}-title`;
-  const t = useTranslations();
+  const t = useT();
 
   const close = useCallback(() => {
     setOpen(false);
@@ -239,7 +238,6 @@ export function MobileNav({ className = "" }: { className?: string }) {
 
             {/* Footer */}
             <div className="border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-end gap-2">
-              <LanguageSelector />
               <ThemeToggle />
             </div>
           </div>

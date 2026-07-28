@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { ChevronDownIcon, HelpCircleIcon } from "../icons";
 
@@ -23,7 +23,7 @@ const ITEMS = [
  * the homepage schema with the existing WebSite/WebApplication JSON-LD.
  */
 export function Faq() {
-  const t = useTranslations();
+  const t = useT();
   return (
     <section aria-labelledby="faq-title">
       <div className="text-center max-w-2xl mx-auto">

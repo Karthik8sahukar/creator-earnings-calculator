@@ -1,7 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getT } from "@/lib/t";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
 import { TrendingUpIcon } from "../icons";
@@ -20,7 +20,7 @@ const TRENDING_SLUGS = [
 ] as const;
 
 export async function TrendingCreators() {
-  const t = await getTranslations("home.trending");
+  const t = getT("home.trending");
 
   const creators = TRENDING_SLUGS.map((slug) => getCreatorBySlug(slug)).filter(
     (c): c is NonNullable<typeof c> => Boolean(c),

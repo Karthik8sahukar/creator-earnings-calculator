@@ -2,7 +2,7 @@ import type { MDXComponents } from "mdx/types";
 import type { ImageProps } from "next/image";
 import Image from "next/image";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 /**
  * Contextual CTA that turns an article into a warm intro to one of

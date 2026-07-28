@@ -60,7 +60,6 @@ describe("PopularCalculators — Instagram visibility", () => {
   it("does not emit raw translation keys in the card content", () => {
     render(<PopularCalculators />);
     const card = screen.getByTestId("popular-card-instagram-money-calculator");
-    // A raw next-intl key looks like `foo.bar.baz` — assert no such
     // token appears in the rendered card.
     expect(card.textContent ?? "").not.toMatch(
       /popularCalculators\.[a-zA-Z]+\.[a-zA-Z]+/,

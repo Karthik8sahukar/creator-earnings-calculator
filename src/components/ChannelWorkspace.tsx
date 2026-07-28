@@ -1,10 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { useRouter } from "@/i18n/navigation";
+import { useRouter } from "next/navigation";
 import { ChannelSearch } from "./ChannelSearch";
 import { RecentSearches } from "./RecentSearches";
 import {
@@ -24,7 +24,7 @@ import {
  *     locale automatically.
  */
 export function ChannelWorkspace() {
-  const t = useTranslations("home");
+  const t = useT("home");
   const router = useRouter();
   const searchParams = useSearchParams();
 

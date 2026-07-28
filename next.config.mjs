@@ -1,5 +1,3 @@
-import createNextIntlPlugin from "next-intl/plugin";
-
 /** @type {import('next').NextConfig} */
 
 /**
@@ -46,21 +44,33 @@ const nextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
-      // API routes get security headers. Cache-Control is managed by
-      // each route handler individually (analytics uses s-maxage,
-      // search uses private max-age, health uses no-store, and
-      // force-dynamic routes get no-cache from Next.js automatically).
+      // API routes get security headers.
       {
         source: "/api/:path*",
         headers: securityHeaders,
       },
     ];
   },
+
+  async redirects() {
+    // Permanent redirects for old locale-prefixed URLs.
+    // Preserves query strings automatically (Next.js behavior).
+    const locales = ["en", "es", "pt", "de", "fr", "hi", "ja"];
+    return locales.flatMap((locale) => [
+      // /en → /
+      {
+        source: `/${locale}`,
+        destination: "/",
+        permanent: true,
+      },
+      // /en/:path* → /:path*
+      {
+        source: `/${locale}/:path*`,
+        destination: "/:path*",
+        permanent: true,
+      },
+    ]);
+  },
 };
 
-// Wrap the config with the next-intl plugin so per-request messages
-// are loaded through src/i18n/request.ts. This must come last so any
-// future wrappers (Sentry, etc.) can layer on top.
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
-
-export default withNextIntl(nextConfig);
+export default nextConfig;

@@ -13,10 +13,10 @@ import { expect, test } from "@playwright/test";
  *   - No translation keys are visibly rendered.
  */
 
-test("renders the Instagram Money Calculator at /en/instagram-money-calculator", async ({
+test("renders the Instagram Money Calculator at /instagram-money-calculator", async ({
   page,
 }) => {
-  await page.goto("/en/instagram-money-calculator");
+  await page.goto("/instagram-money-calculator");
   await expect(
     page.getByRole("heading", { level: 1, name: /instagram money calculator/i }),
   ).toBeVisible();
@@ -29,7 +29,7 @@ test("renders the Instagram Money Calculator at /en/instagram-money-calculator",
 });
 
 test("results respond to input changes", async ({ page }) => {
-  await page.goto("/en/instagram-money-calculator");
+  await page.goto("/instagram-money-calculator");
   const bandRow = page.getByTestId("ig-band-row");
 
   const followers = page.getByTestId("ig-followers");
@@ -43,7 +43,7 @@ test("results respond to input changes", async ({ page }) => {
 test("share URL round-trips calculator state", async ({ page }) => {
   // Land with a preset in the URL.
   await page.goto(
-    "/en/instagram-money-calculator?followers=750000&engagement=6&niche=finance&country=US",
+    "/instagram-money-calculator?followers=750000&engagement=6&niche=finance&country=US",
   );
   await expect(
     page.getByRole("heading", { level: 1, name: /instagram money calculator/i }),
@@ -58,7 +58,7 @@ test("share URL round-trips calculator state", async ({ page }) => {
 
 test("invalid query parameters are ignored safely", async ({ page }) => {
   await page.goto(
-    "/en/instagram-money-calculator?followers=NOT_A_NUMBER&country=ZZZ&niche=HACKED",
+    "/instagram-money-calculator?followers=NOT_A_NUMBER&country=ZZZ&niche=HACKED",
   );
   await expect(
     page.getByRole("heading", { level: 1, name: /instagram money calculator/i }),
@@ -69,7 +69,7 @@ test("invalid query parameters are ignored safely", async ({ page }) => {
 });
 
 test("advanced settings can be toggled", async ({ page }) => {
-  await page.goto("/en/instagram-money-calculator");
+  await page.goto("/instagram-money-calculator");
   const toggle = page.getByTestId("ig-advanced-toggle");
   await toggle.click();
   await expect(page.locator("#ig-advanced")).toBeVisible();
@@ -77,15 +77,15 @@ test("advanced settings can be toggled", async ({ page }) => {
   await expect(page.locator("#ig-advanced")).toHaveCount(0);
 });
 
-test("Hindi locale renders the calculator", async ({ page }) => {
-  await page.goto("/hi/instagram-money-calculator");
+test("page renders the calculator form", async ({ page }) => {
+  await page.goto("/instagram-money-calculator");
   await expect(
     page.getByTestId("instagram-calculator-form"),
   ).toBeVisible();
 });
 
 test("no raw translation keys are rendered", async ({ page }) => {
-  await page.goto("/en/instagram-money-calculator");
+  await page.goto("/instagram-money-calculator");
   // Translation keys look like `foo.bar.baz` — assert none are on-page.
   const text = await page.locator("main").innerText();
   expect(text).not.toMatch(/instagramCalculator\.[a-zA-Z0-9_.]+/);

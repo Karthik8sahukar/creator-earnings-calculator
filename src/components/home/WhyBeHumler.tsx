@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import {
   LockIcon,
@@ -37,7 +37,7 @@ const FEATURES: readonly Feature[] = [
 ] as const;
 
 export function WhyBeHumler() {
-  const t = useTranslations();
+  const t = useT();
   return (
     <section aria-labelledby="why-title">
       <div className="text-center max-w-2xl mx-auto">

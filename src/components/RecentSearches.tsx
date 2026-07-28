@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics";
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export function RecentSearches({ onSelect, refreshToken = 0 }: Props) {
-  const t = useTranslations("recent");
+  const t = useT("recent");
   const [list, setList] = useState<RecentChannel[]>([]);
   const [mounted, setMounted] = useState(false);
 

@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { findCategory } from "@/lib/blog";
 import type { BlogPost } from "@/lib/blog";
 
@@ -10,8 +10,8 @@ import type { BlogPost } from "@/lib/blog";
  * topic classification before diving in.
  */
 export function ArticleMeta({ post }: { post: BlogPost }) {
-  const t = useTranslations("blog");
-  const tRoot = useTranslations();
+  const t = useT("blog");
+  const tRoot = useT();
   const category = findCategory(post.categoryId);
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-slate-500 dark:text-slate-400">

@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { CreatorCard } from "./CreatorCard";
 import type { Creator } from "@/lib/creators";
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function RelatedCreators({ creators, avatars }: Props) {
-  const t = useTranslations("creator.relatedCreators");
+  const t = useT("creator.relatedCreators");
   if (creators.length === 0) return null;
 
   return (

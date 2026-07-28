@@ -3,8 +3,6 @@ import { generateToolJsonLd, safeJsonLdSerialize, type FaqItem } from "@/lib/eng
 interface Props {
   /** Tool slug from the registry. */
   slug: string;
-  /** Current locale for URL generation. */
-  locale: string;
   /** FAQ items for FAQPage schema. */
   faq?: FaqItem[];
   /** Override the breadcrumb display name. */
@@ -27,7 +25,6 @@ interface Props {
  */
 export function ToolJsonLd({
   slug,
-  locale,
   faq,
   breadcrumbName,
   applicationCategory,
@@ -35,7 +32,6 @@ export function ToolJsonLd({
 }: Props) {
   const jsonLd = generateToolJsonLd({
     slug,
-    locale,
     faq,
     breadcrumbName,
     applicationCategory,

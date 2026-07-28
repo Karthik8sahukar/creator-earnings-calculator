@@ -1,7 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getT } from "@/lib/t";
 
 import { Money } from "@/components/currency";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { GlobeIcon } from "../icons";
 import { getCountryStats } from "@/lib/creatorDirectory";
 import { COUNTRY_CODE_TO_SLUG } from "@/lib/countryData";
@@ -12,7 +12,7 @@ import { findCountry } from "@/lib/rpmData";
  * Shows country cards with creator counts and average RPM.
  */
 export async function TopByCountry() {
-  const t = await getTranslations("home.byCountry");
+  const t = getT("home.byCountry");
   const countryStats = getCountryStats();
 
   return (

@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 import { CheckIcon, ShareIcon, PlayIcon } from "../icons";
 
@@ -52,7 +52,7 @@ const PLATFORMS: readonly Platform[] = [
 ];
 
 export function CreatorPlatforms() {
-  const t = useTranslations("creatorPlatforms");
+  const t = useT("creatorPlatforms");
   return (
     <section
       aria-labelledby="creator-platforms-title"

@@ -1,6 +1,6 @@
-import { getTranslations } from "next-intl/server";
+import { getT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 /**
  * Latest blog posts section on the homepage.
@@ -59,7 +59,7 @@ const BLOG_PREVIEWS: BlogPreview[] = [
 ];
 
 export async function LatestBlogs() {
-  const t = await getTranslations("home.latestBlogs");
+  const t = getT("home.latestBlogs");
 
   return (
     <section aria-labelledby="latest-blogs-title">

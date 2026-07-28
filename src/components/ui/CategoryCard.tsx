@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import type { ToolCategoryDef } from "@/lib/tools/categories";
 
 interface Props {

@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import {
   ChartIcon,
@@ -22,7 +22,7 @@ import {
  * Labels around them ARE translated.
  */
 export function DashboardPreview() {
-  const t = useTranslations("dashboardPreview");
+  const t = useT("dashboardPreview");
 
   const stats = [
     { labelKey: "stats.subscribers", value: "1.2M", delta: "+2.4%", Icon: UsersIcon },

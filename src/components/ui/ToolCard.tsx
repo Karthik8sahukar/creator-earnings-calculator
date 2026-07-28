@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import type { ToolEntry } from "@/lib/tools/registry";
 import { getCategoryDef } from "@/lib/tools/categories";
 import { CategoryIcon } from "./Icon";

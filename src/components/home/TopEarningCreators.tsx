@@ -1,8 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { getT } from "@/lib/t";
 
 import { CreatorAvatar } from "@/components/creator/CreatorAvatar";
 import { Money } from "@/components/currency";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { DollarIcon } from "../icons";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
@@ -22,7 +22,7 @@ const TOP_EARNING_SLUGS = [
 ] as const;
 
 export async function TopEarningCreators() {
-  const t = await getTranslations("home.topEarning");
+  const t = getT("home.topEarning");
 
   const creators = TOP_EARNING_SLUGS.map((slug) => getCreatorBySlug(slug)).filter(
     (c): c is NonNullable<typeof c> => Boolean(c),

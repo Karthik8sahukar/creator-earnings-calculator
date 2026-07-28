@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -26,8 +26,8 @@ interface Props {
 type CopyState = "idle" | "copied" | "error";
 
 export function ShareSection({ url, channelTitle }: Props) {
-  const t = useTranslations("share");
-  const tCommon = useTranslations("common.actions");
+  const t = useT("share");
+  const tCommon = useT("common.actions");
   const shareText = useMemo(
     () => defaultChannelShareText(channelTitle),
     [channelTitle],

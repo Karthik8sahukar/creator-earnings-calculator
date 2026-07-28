@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 
 import { listCategorySlugs, listCountrySlugs, COUNTRY_PAGES } from "@/data/creators";
 import { listLeaderboardSlugs } from "@/data/creators/leaderboards";
-import { HREFLANG_MAP, routing } from "@/i18n/routing";
 import { BLOG_CATEGORIES, loadPosts } from "@/lib/blog";
 import { getAllCategorySlugs } from "@/lib/categoryData";
 import { publicConfig } from "@/lib/config";
@@ -86,23 +85,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogCategoryRoutes = BLOG_CATEGORIES.map((c) => `/blog/category/${c.slug}`);
 
   const perLocaleWithAlternates = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]) => {
-    const out: MetadataRoute.Sitemap = [];
-    for (const locale of routing.locales) {
-      const url = `${base}/${locale}${path}`;
-      const languages: Record<string, string> = {};
-      for (const loc of routing.locales) {
-        languages[HREFLANG_MAP[loc]] = `${base}/${loc}${path}`;
-      }
-      languages["x-default"] = `${base}/${routing.defaultLocale}${path}`;
-      out.push({
-        url,
-        lastModified: now,
-        changeFrequency,
-        priority,
-        alternates: { languages },
-      });
-    }
-    return out;
+    const url = `${base}${path}`;
+    return [{
+      url,
+      lastModified: now,
+      changeFrequency,
+      priority,
+    }];
   };
 
   const entries: MetadataRoute.Sitemap = [];
@@ -189,7 +178,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const posts = await loadPosts();
     for (const post of posts) {
-      const url = `${base}/${routing.defaultLocale}/blog/${post.slug}`;
+      const url = `${base}/blog/${post.slug}`;
       entries.push({
         url,
         lastModified: post.updatedDate

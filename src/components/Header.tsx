@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
 
-import { Link } from "@/i18n/navigation";
-import { LanguageSelector } from "./LanguageSelector";
+import { useT } from "@/lib/t";
 import { Logo } from "./Logo";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
@@ -45,7 +44,7 @@ const LEGAL_LINKS = [
  * Currency selector removed from global nav (only shown on money calculators).
  */
 export function Header() {
-  const t = useTranslations();
+  const t = useT();
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-lg dark:border-slate-800/70 dark:bg-slate-950/80">
@@ -75,7 +74,6 @@ export function Header() {
           <SearchField />
 
           <div className="hidden lg:flex items-center gap-1">
-            <LanguageSelector />
             <ThemeToggle />
           </div>
           <MobileNav className="lg:hidden" />

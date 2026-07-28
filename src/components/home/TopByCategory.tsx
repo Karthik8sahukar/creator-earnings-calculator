@@ -1,7 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getT } from "@/lib/t";
 
 import { Money } from "@/components/currency";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { ChartIcon } from "../icons";
 import { getCategoryStats } from "@/lib/creatorDirectory";
 import { findNiche } from "@/lib/rpmData";
@@ -11,7 +11,7 @@ import { findNiche } from "@/lib/rpmData";
  * Shows category cards with creator counts and RPM multipliers.
  */
 export async function TopByCategory() {
-  const t = await getTranslations("home.byCategory");
+  const t = getT("home.byCategory");
   const categoryStats = getCategoryStats();
 
   return (

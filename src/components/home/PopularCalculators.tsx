@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import {
   ChartIcon,
   DollarIcon,
@@ -67,7 +67,7 @@ function normalizeHref(href: string): string {
 }
 
 export function PopularCalculators() {
-  const t = useTranslations();
+  const t = useT();
   return (
     <section aria-labelledby="popular-calc-title">
       <div className="flex items-end justify-between mb-6 gap-4">

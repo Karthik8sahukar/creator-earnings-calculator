@@ -1,6 +1,6 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 
 interface Crumb {
   labelKey?: string;
@@ -13,7 +13,7 @@ interface Crumb {
  * emitted from the individual article page (see `[slug]/page.tsx`).
  */
 export function BlogBreadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
-  const t = useTranslations();
+  const t = useT();
   return (
     <nav
       aria-label={t("channelPage.breadcrumbAria")}

@@ -249,9 +249,11 @@ test.describe("Search Modal — Zero Results", () => {
   });
 });
 
-test.describe("Search Modal — Locale", () => {
-  test("search works in non-English locale", async ({ page }) => {
-    await page.goto("/es");
+test.describe("Search Modal — Locale Redirects", () => {
+  test("old locale URL redirects and search still works", async ({ page }) => {
+    // /en should redirect to /
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/$/);
     await page.keyboard.press("Control+k");
     const dialog = page.getByRole("dialog", { name: /search tools/i });
     await expect(dialog).toBeVisible();
@@ -259,7 +261,6 @@ test.describe("Search Modal — Locale", () => {
     const input = dialog.getByRole("textbox");
     await input.fill("coin flip");
     await page.keyboard.press("Enter");
-    // Should navigate to Spanish locale coin-flip page
-    await expect(page).toHaveURL(/\/es\/coin-flip/);
+    await expect(page).toHaveURL(/\/coin-flip/);
   });
 });

@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 /**
  * Landing-page hero for /blog. Static, server-rendered.
@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
  * one H1.
  */
 export function BlogHero({ children }: { children?: React.ReactNode }) {
-  const t = useTranslations("blog.hero");
+  const t = useT("blog.hero");
   return (
     <section className="text-center py-10 sm:py-14 space-y-4">
       <p className="chip-brand mx-auto">

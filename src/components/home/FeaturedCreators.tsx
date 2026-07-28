@@ -1,7 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getT } from "@/lib/t";
 
 import { CreatorCard } from "@/components/creator/CreatorCard";
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { getCreatorAvatars } from "@/lib/creatorAvatars";
 import { getCreatorBySlug } from "@/lib/creators";
 
@@ -21,7 +21,7 @@ const FEATURED_SLUGS = [
 ] as const;
 
 export async function FeaturedCreators() {
-  const t = await getTranslations("home.featured");
+  const t = getT("home.featured");
 
   const creators = FEATURED_SLUGS.map((slug) => getCreatorBySlug(slug)).filter(
     (c): c is NonNullable<typeof c> => Boolean(c),

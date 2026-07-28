@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useEffect, useId, useMemo, useState } from "react";
 
 import { CreatorCard } from "./CreatorCard";
@@ -47,7 +47,7 @@ export function CreatorsIndexClient({
   categories,
   avatars,
 }: Props) {
-  const t = useTranslations("creators");
+  const t = useT("creators");
   const [query, setQuery] = useState("");
   const [country, setCountry] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");

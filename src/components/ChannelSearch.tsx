@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import { useRef, useState } from "react";
 import { SearchIcon, UsersIcon } from "./icons";
 import { track } from "@/lib/analytics";
@@ -37,7 +37,7 @@ interface State {
  *   - Unsupported plain text is rejected with a friendly message.
  */
 export function ChannelSearch({ onSelect, autoFocus = false, placeholder }: Props) {
-  const t = useTranslations("search");
+  const t = useT("search");
   const [query, setQuery] = useState("");
   const [state, setState] = useState<State>({ status: "idle", results: [] });
   const abortRef = useRef<AbortController | null>(null);

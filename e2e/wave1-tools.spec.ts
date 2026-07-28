@@ -128,10 +128,10 @@ test.describe("Tool Engine Integration", () => {
     expect(data[0]["@type"]).toBe("BreadcrumbList");
   });
 
-  test("Spanish locale works", async ({ page }) => {
-    await page.goto("/es/uuid-generator");
+  test("page loads correctly", async ({ page }) => {
+    await page.goto("/uuid-generator");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page).toHaveURL(/\/es\/uuid-generator/);
+    await expect(page).toHaveURL(/\/uuid-generator/);
   });
 
   test("keyboard nav on UUID generator", async ({ page }) => {

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { formatCompact, formatRelativeDate } from "@/lib/format";
 import type { VideoItem } from "@/types/youtube";
@@ -29,8 +29,8 @@ export function CreatorVideoStrip({
   videos,
   limit = 10,
 }: Props) {
-  const t = useTranslations("creator.videos");
-  const tShared = useTranslations("videos");
+  const t = useT("creator.videos");
+  const tShared = useT("videos");
   const list = videos.slice(0, limit);
 
   return (

@@ -1,4 +1,4 @@
-import { Link } from "@/i18n/navigation";
+import Link from "next/link";
 import { ChartIcon, DollarIcon, FilmIcon, ShareIcon, TrendingUpIcon } from "../icons";
 
 export interface DevToolDef {

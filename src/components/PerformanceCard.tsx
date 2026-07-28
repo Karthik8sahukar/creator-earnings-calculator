@@ -1,11 +1,11 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { ChartIcon, EyeIcon, FilmIcon, SparklesIcon } from "./icons";
 import { formatCompact, formatNumber } from "@/lib/format";
 import type { PerformanceAnalysis } from "@/types/youtube";
 
 export function PerformanceCard({ analysis }: { analysis: PerformanceAnalysis }) {
-  const t = useTranslations("performance");
+  const t = useT("performance");
 
   const rows: [string, string, string?][] = [
     [
@@ -126,7 +126,7 @@ function ContentMix({
   shorts: number;
   longForm: number;
 }) {
-  const t = useTranslations("performance");
+  const t = useT("performance");
   return (
     <div className="rounded-lg border border-slate-100 bg-white p-4">
       <div className="flex items-center gap-2 text-slate-500">

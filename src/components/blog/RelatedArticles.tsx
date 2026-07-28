@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 
 import { ArticleCard } from "./ArticleCard";
 import type { BlogPost } from "@/lib/blog";
@@ -9,7 +9,7 @@ import type { BlogPost } from "@/lib/blog";
  * `src/lib/blog/related.ts` and is unit-tested there.
  */
 export function RelatedArticles({ posts }: { posts: BlogPost[] }) {
-  const t = useTranslations("blog.article");
+  const t = useT("blog.article");
   if (posts.length === 0) return null;
   return (
     <section aria-labelledby="related-title" className="space-y-4">

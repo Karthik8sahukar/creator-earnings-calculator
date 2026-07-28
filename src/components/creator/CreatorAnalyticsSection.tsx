@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useT } from "@/lib/t";
 import {
   Area,
   AreaChart,
@@ -39,7 +39,7 @@ const CHART_METRICS: { key: ChartMetric; labelKey: string }[] = [
 // ─── Component ──────────────────────────────────────────────────────
 
 export function CreatorAnalyticsSection({ slug, initialData }: Props) {
-  const t = useTranslations("creator.analytics");
+  const t = useT("creator.analytics");
   const { formatMoney } = useFormatMoney();
   const [analytics, setAnalytics] = useState<CreatorAnalytics | null>(initialData);
   const [range, setRange] = useState<TimeRange>("30d");
