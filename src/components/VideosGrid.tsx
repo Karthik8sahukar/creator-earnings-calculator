@@ -11,7 +11,7 @@ interface Props {
 
 export function VideosGrid({ videos }: Props) {
   const t = useT("videos");
-  const tCommon = useTranslations("common.actions");
+  const tCommon = useT("common.actions");
 
   if (videos.length === 0) {
     return <p className="text-sm text-slate-500">{t("emptyShort")}</p>;

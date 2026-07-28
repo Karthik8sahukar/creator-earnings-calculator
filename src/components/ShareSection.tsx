@@ -27,7 +27,7 @@ type CopyState = "idle" | "copied" | "error";
 
 export function ShareSection({ url, channelTitle }: Props) {
   const t = useT("share");
-  const tCommon = useTranslations("common.actions");
+  const tCommon = useT("common.actions");
   const shareText = useMemo(
     () => defaultChannelShareText(channelTitle),
     [channelTitle],

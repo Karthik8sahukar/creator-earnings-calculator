@@ -58,7 +58,7 @@ const CALCULATOR_CURRENCIES = ["USD", "INR", "EUR", "GBP", "AUD", "CAD", "JPY", 
 
 export function InstagramCalcClient() {
   const t = useT("instagramCalculator");
-  const tCommon = useTranslations("common");
+  const tCommon = useT("common");
   const [state, setState] = useState<InstagramCalculatorState>(
     INSTAGRAM_DEFAULT_STATE,
   );

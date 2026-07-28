@@ -9,7 +9,7 @@ import { calculateCpm } from "@/lib/simpleCalculators";
 
 export function CpmCalcClient() {
   const t = useT("calculators");
-  const tCpm = useTranslations("calculators.cpm");
+  const tCpm = useT("calculators.cpm");
 
   useEffect(() => {
     track({ name: "additional_calculator.opened", kind: "cpm" });

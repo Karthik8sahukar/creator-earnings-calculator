@@ -30,7 +30,7 @@ export function CreatorVideoStrip({
   limit = 10,
 }: Props) {
   const t = useT("creator.videos");
-  const tShared = useTranslations("videos");
+  const tShared = useT("videos");
   const list = videos.slice(0, limit);
 
   return (

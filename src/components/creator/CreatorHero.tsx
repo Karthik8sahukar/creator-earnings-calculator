@@ -34,7 +34,7 @@ interface Props {
  */
 export function CreatorHero({ creator, channel, isFallback = false }: Props) {
   const t = useT("creator.hero");
-  const tProfile = useTranslations("profile");
+  const tProfile = useT("profile");
 
   const canShowSubs =
     channel.subscriberCount !== null &&

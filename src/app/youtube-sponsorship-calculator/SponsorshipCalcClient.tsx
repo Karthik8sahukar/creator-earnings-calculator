@@ -9,7 +9,7 @@ import { findCountry, findNiche, NICHES, COUNTRIES, CURRENCIES } from "@/lib/rpm
 import { calculateSponsorship } from "@/lib/simpleCalculators";
 
 export function SponsorshipCalcClient() {
-  const tShared = useTranslations("calculators.shared");
+  const tShared = useT("calculators.shared");
   const t = useT("calculators.sponsorship");
 
   useEffect(() => {

@@ -9,7 +9,7 @@ import { calculateRpm } from "@/lib/simpleCalculators";
 
 export function RpmCalcClient() {
   const t = useT("calculators");
-  const tRpm = useTranslations("calculators.rpm");
+  const tRpm = useT("calculators.rpm");
 
   useEffect(() => {
     track({ name: "additional_calculator.opened", kind: "rpm" });
