@@ -434,7 +434,7 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
   { slug: "jwt-generator", href: "/jwt-generator", title: "JWT Generator", description: "Generate JSON Web Tokens with custom claims.", category: "developer-tools", tags: ["jwt", "token", "generate", "auth"] },
   { slug: "hash-generator", href: "/hash-generator", title: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes.", category: "developer-tools", tags: ["hash", "sha256", "md5", "crypto"] },
   { slug: "qr-generator", href: "/qr-generator", title: "QR Code Generator", description: "Generate QR codes for URLs, text, or Wi-Fi credentials.", category: "developer-tools", tags: ["qr", "qrcode", "generate", "barcode"], popular: true },
-  { slug: "markdown-preview", href: "/markdown-preview", title: "Markdown Preview", description: "Write Markdown and see a live rendered preview.", category: "developer-tools", tags: ["markdown", "preview", "editor", "render"] },
+  { slug: "markdown-preview", href: "/markdown-preview", title: "Markdown to HTML", description: "Convert Markdown text to clean, sanitized HTML.", category: "developer-tools", tags: ["markdown", "html", "converter", "sanitize"] },
   { slug: "diff-checker", href: "/diff-checker", title: "Diff Checker", description: "Compare two texts and highlight the differences.", category: "developer-tools", tags: ["diff", "compare", "text", "changes"] },
 
   // ─── New Text Tools ───────────────────────────────────────────────

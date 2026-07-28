@@ -92,9 +92,9 @@ export const NEW_TOOLS_REGISTRY: ToolMeta[] = [
   },
   {
     slug: "markdown-preview",
-    title: "Markdown Preview",
-    description: "Write Markdown and see a live rendered preview.",
-    longDescription: "Real-time Markdown editor with instant rendered preview. Supports GitHub Flavored Markdown including tables, task lists, and code blocks.",
+    title: "Markdown to HTML",
+    description: "Convert Markdown text to clean, sanitized HTML.",
+    longDescription: "Convert Markdown to HTML with sanitized output. Supports headings, bold, italic, links, and inline code. Script tags and dangerous attributes are stripped automatically.",
     category: "developer",
     href: "/markdown-preview",
     keywords: ["markdown preview", "markdown editor", "markdown renderer", "live markdown"],

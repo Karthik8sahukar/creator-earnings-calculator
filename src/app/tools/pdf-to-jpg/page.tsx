@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPdfToolBySlug } from "@/lib/file-tools/registry";
-import { generatePdfToolMetadata, generatePdfToolJsonLd } from "@/lib/file-tools/metadata";
+import { generatePdfToolMetadata } from "@/lib/file-tools/metadata";
 import { PdfToJpgClient } from "./PdfToJpgClient";
 
 const SLUG = "pdf-to-jpg";
@@ -11,15 +11,5 @@ export function generateMetadata(): Metadata {
 }
 
 export default function PdfToJpgPage() {
-  return (
-    <>
-      <PdfToJpgClient />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(generatePdfToolJsonLd(tool)),
-        }}
-      />
-    </>
-  );
+  return <PdfToJpgClient />;
 }

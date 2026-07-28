@@ -6,21 +6,19 @@ import { getNewToolBySlug } from "@/lib/tools-engine";
 
 const tool = getNewToolBySlug("yaml-formatter")!;
 
-function formatYaml(yaml: string): string {
-  return yaml
-    .split("\n")
-    .map((line) => {
-      const match = line.match(/^(\s*)/);
-      const indent = match ? match[1].length : 0;
-      const normalized = Math.round(indent / 2) * 2;
-      return " ".repeat(normalized) + line.trim();
-    })
-    .join("\n");
-}
-
 export function YamlFormatterClient() {
-  const handleProcess = useCallback((input: string): string => {
-    return formatYaml(input);
+  const handleProcess = useCallback(async (input: string): Promise<string> => {
+    const YAML = await import("yaml");
+
+    try {
+      const parsed = YAML.parse(input);
+      return YAML.stringify(parsed, { indent: 2 });
+    } catch (err) {
+      if (err instanceof Error) {
+        return `YAML Parse Error:\n\n${err.message}`;
+      }
+      return "Invalid YAML: could not parse the input.";
+    }
   }, []);
 
   return (
@@ -29,6 +27,7 @@ export function YamlFormatterClient() {
       description={tool.longDescription}
       onProcess={handleProcess}
       processLabel="Format"
+      inputPlaceholder="Paste YAML here..."
       faq={tool.faq}
     />
   );

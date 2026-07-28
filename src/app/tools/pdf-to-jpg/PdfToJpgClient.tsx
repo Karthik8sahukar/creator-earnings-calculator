@@ -1,88 +1,76 @@
 "use client";
 
-import { useCallback } from "react";
-import { PdfToolPage } from "@/components/file-tools";
 import { getPdfToolBySlug } from "@/lib/file-tools/registry";
-import type { OutputFile } from "@/lib/file-tools/types";
+import Link from "next/link";
 
 const tool = getPdfToolBySlug("pdf-to-jpg")!;
 
 /**
- * PDF to JPG — client component.
+ * PDF to JPG — Coming Soon.
  *
- * Converts each PDF page to a JPG image. Uses pdf-lib to extract page
- * dimensions and creates placeholder images for now since full canvas
- * rendering of PDF content requires a PDF renderer (e.g., pdfjs-dist).
- *
- * Phase 2 will integrate pdfjs-dist for true pixel-perfect rendering.
+ * Rendering PDF page content to images requires a full PDF renderer
+ * (e.g., pdfjs-dist). pdf-lib can only read/write PDF structure — it
+ * cannot render pages visually. A future release will integrate
+ * pdfjs-dist for true pixel-perfect page-to-image conversion.
  */
 export function PdfToJpgClient() {
-  const handleProcess = useCallback(async (files: File[]): Promise<OutputFile[]> => {
-    const { PDFDocument } = await import("pdf-lib");
-
-    const bytes = await files[0].arrayBuffer();
-    const pdf = await PDFDocument.load(bytes);
-    const pageCount = pdf.getPageCount();
-    const pages = pdf.getPages();
-    const outputs: OutputFile[] = [];
-
-    for (let i = 0; i < pageCount; i++) {
-      const page = pages[i];
-      const { width, height } = page.getSize();
-
-      // Create a canvas with the page dimensions (scaled for quality)
-      const scale = 2; // 2x for higher resolution
-      const canvas = document.createElement("canvas");
-      canvas.width = width * scale;
-      canvas.height = height * scale;
-      const ctx = canvas.getContext("2d")!;
-
-      // White background
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Placeholder text indicating page number
-      ctx.fillStyle = "#64748b";
-      ctx.font = `${24 * scale}px system-ui, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(
-        `Page ${i + 1}`,
-        canvas.width / 2,
-        canvas.height / 2 - 20 * scale,
-      );
-      ctx.font = `${14 * scale}px system-ui, sans-serif`;
-      ctx.fillText(
-        `${Math.round(width)} × ${Math.round(height)} pts`,
-        canvas.width / 2,
-        canvas.height / 2 + 20 * scale,
-      );
-
-      // Convert canvas to JPG blob
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob(
-          (b) => resolve(b!),
-          "image/jpeg",
-          0.92,
-        );
-      });
-
-      outputs.push({
-        name: `page-${i + 1}.jpg`,
-        blob,
-        type: "image/jpeg",
-        size: blob.size,
-      });
-    }
-
-    return outputs;
-  }, []);
-
   return (
-    <PdfToolPage
-      tool={tool}
-      onProcess={handleProcess}
-      processLabel="Convert to JPG"
-    />
+    <div className="space-y-10">
+      {/* Hero */}
+      <header className="text-center space-y-3 max-w-2xl mx-auto">
+        <p className="inline-flex items-center gap-1.5 rounded-full bg-red-50 dark:bg-red-500/10 px-3 py-1 text-xs font-medium text-red-700 dark:text-red-300">
+          PDF Tool
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+          {tool.title}
+        </h1>
+        <p className="text-slate-600 dark:text-slate-300 max-w-xl mx-auto">
+          {tool.longDescription}
+        </p>
+      </header>
+
+      {/* Coming soon notice */}
+      <div className="max-w-md mx-auto rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-500/10 p-6 text-center space-y-3">
+        <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 dark:text-amber-400" aria-hidden>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </div>
+        <h2 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
+          Coming Soon
+        </h2>
+        <p className="text-sm text-amber-800 dark:text-amber-200">
+          Converting PDF pages to images requires a full PDF renderer capable
+          of drawing text, graphics, and embedded fonts to a canvas. We are
+          integrating a browser-based PDF rendering engine (pdfjs-dist) to
+          deliver this feature without uploading your files.
+        </p>
+        <Link
+          href="/tools"
+          className="inline-flex items-center gap-1 text-sm font-medium text-amber-700 dark:text-amber-300 hover:underline"
+        >
+          &larr; Browse other PDF tools
+        </Link>
+      </div>
+
+      {/* FAQ */}
+      {tool.faq.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+            Frequently Asked Questions
+          </h2>
+          <dl className="space-y-4">
+            {tool.faq.map((item) => (
+              <div key={item.q} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4">
+                <dt className="font-medium text-slate-900 dark:text-slate-100">{item.q}</dt>
+                <dd className="mt-1 text-sm text-slate-600 dark:text-slate-400">{item.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+    </div>
   );
 }
