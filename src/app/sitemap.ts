@@ -178,7 +178,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const posts = await loadPosts();
     for (const post of posts) {
-      const url = `${base}/${"en"}/blog/${post.slug}`;
+      const url = `${base}/blog/${post.slug}`;
       entries.push({
         url,
         lastModified: post.updatedDate
