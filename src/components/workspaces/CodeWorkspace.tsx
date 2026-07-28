@@ -29,6 +29,8 @@ interface Props {
   badge?: string;
   /** FAQ items. */
   faq?: Array<{ q: string; a: string }>;
+  /** Example input text. When provided, shows a "Use Example" button. */
+  exampleInput?: string;
 }
 
 /**
@@ -56,6 +58,7 @@ export function CodeWorkspace({
   children,
   badge = "Developer Tool",
   faq,
+  exampleInput,
 }: Props) {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
@@ -128,9 +131,20 @@ export function CodeWorkspace({
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Input */}
         <div className="space-y-2">
-          <label htmlFor="code-input" className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            {inputLabel}
-          </label>
+          <div className="flex items-center justify-between">
+            <label htmlFor="code-input" className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              {inputLabel}
+            </label>
+            {exampleInput && !input && (
+              <button
+                type="button"
+                onClick={() => handleInputChange(exampleInput)}
+                className="text-xs font-medium text-brand-600 dark:text-brand-400 hover:underline"
+              >
+                Use Example
+              </button>
+            )}
+          </div>
           <textarea
             id="code-input"
             value={input}

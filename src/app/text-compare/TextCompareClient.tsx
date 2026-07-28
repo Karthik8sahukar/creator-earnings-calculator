@@ -39,7 +39,8 @@ export function TextCompareClient() {
       description={tool.longDescription}
       onProcess={handleProcess}
       faq={tool.faq}
-      inputPlaceholder={"First text\n---VS---\nSecond text"}
+      inputPlaceholder="Enter first text, then ---VS---, then second text"
+      exampleInput={"BeHumler provides free online tools.\nThis line stays the same.\n---VS---\nBeHumler provides fast, free online tools.\nThis line stays the same."}
       autoProcess={false}
       processLabel="Compare"
     />

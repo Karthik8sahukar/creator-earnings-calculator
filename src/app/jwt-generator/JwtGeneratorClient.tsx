@@ -97,7 +97,8 @@ export function JwtGeneratorClient() {
       description={tool.longDescription}
       onProcess={handleProcess}
       processLabel="Generate JWT"
-      inputPlaceholder={'{"sub":"1234","name":"Test User","iat":1700000000}\n---SECRET---\nmy-secret-key-for-testing'}
+      inputPlaceholder="Enter JSON payload, then ---SECRET---, then your secret key"
+      exampleInput={'{"sub":"1234","name":"Test User","iat":1700000000}\n---SECRET---\nmy-secret-key-for-testing'}
       badge="Developer Tool (Testing Only)"
       faq={tool.faq}
     />

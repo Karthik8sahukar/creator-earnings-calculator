@@ -38,7 +38,8 @@ export function DiffCheckerClient() {
       description={tool.longDescription}
       onProcess={handleProcess}
       processLabel="Compare"
-      inputPlaceholder={"Text A\n---COMPARE---\nText B"}
+      inputPlaceholder="Enter text A, then ---COMPARE---, then text B"
+      exampleInput={"BeHumler provides free online tools.\nThis line will be changed.\nThis line will be removed.\n---COMPARE---\nBeHumler provides fast, free online tools.\nThis line has been changed.\nThis line was added."}
       faq={tool.faq}
     />
   );
