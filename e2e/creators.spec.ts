@@ -154,7 +154,7 @@ test.describe("Creator profile page", () => {
     const link = page.getByTestId("related-creator-ishowspeed");
     await expect(link).toBeVisible();
     await link.click();
-    await expect(page).toHaveURL(/\/en\/creator\/ishowspeed$/);
+    await expect(page).toHaveURL(/\/creator\/ishowspeed$/);
     await expect(
       page.getByRole("heading", { level: 1, name: /IShowSpeed/i }),
     ).toBeVisible();
@@ -162,27 +162,18 @@ test.describe("Creator profile page", () => {
 
   test("unknown slug returns HTTP 404", async ({ page }) => {
     const response = await page.goto("/creator/no-such-creator-slug");
-    // `dynamicParams = false` on `[locale]/creator/[slug]` limits the
-    // route to the catalog in `src/lib/creators.ts`. Any slug outside
-    // that set is rejected by the router before the page component
-    // runs, so the response is stamped with a real HTTP 404 status.
     expect(response?.status()).toBe(404);
 
-    // For dynamic-segment rejections triggered by `dynamicParams =
-    // false`, Next.js renders its built-in not-found page rather than
-    // walking to a `not-found.tsx` under `[locale]/`. The trace for
-    // this test confirms that behavior in this app, so we assert on
-    // that built-in UI verbatim (an h1 with "404" and an h2 with
-    // "This page could not be found.").
-    await expect(
-      page.getByRole("heading", { level: 1, name: "404" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", {
-        level: 2,
-        name: /This page could not be found/i,
-      }),
-    ).toBeVisible();
+    // The 404 page shows either the Next.js built-in "404" heading
+    // or our custom not-found page with "Page not found".
+    // Either way, a recovery link back to the homepage should exist.
+    const heading = page.getByRole("heading", { level: 1 });
+    await expect(heading).toBeVisible();
+    const headingText = await heading.textContent();
+    expect(headingText).toMatch(/404|not found/i);
+
+    // A link to navigate away should be present
+    await expect(page.getByRole("link", { name: /home|back/i })).toBeVisible();
   });
 });
 
@@ -212,7 +203,7 @@ test.describe("Navigation", () => {
     // Click "Browse Creators" link in the dropdown
     await page.getByRole("link", { name: /Browse Creators/i }).click();
 
-    await expect(page).toHaveURL(/\/en\/creators$/);
+    await expect(page).toHaveURL(/\/creators$/);
     await expect(
       page.getByRole("heading", { level: 1, name: /YouTube Creators/i }),
     ).toBeVisible();

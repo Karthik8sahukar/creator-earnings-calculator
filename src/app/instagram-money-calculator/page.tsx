@@ -69,10 +69,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function InstagramCalculatorPage({
-}) {
+export default async function InstagramCalculatorPage() {
 
-  const t = getT("instagramCalculator.meta");
+  const t = getT("instagramCalculator");
   const tCommon = getT();
 
   const pageUrl = `${publicConfig.siteUrl}${PATH_SUFFIX}`;
