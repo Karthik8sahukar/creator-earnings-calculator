@@ -19,7 +19,7 @@ export async function generateMetadata() {
     description: t("description"),
   });
 
-  return generate({ params });
+  return generate();
 }
 
 export default async function Page() {
