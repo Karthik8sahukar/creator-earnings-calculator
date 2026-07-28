@@ -85,21 +85,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogCategoryRoutes = BLOG_CATEGORIES.map((c) => `/blog/category/${c.slug}`);
 
   const perLocaleWithAlternates = (path: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]) => {
-    const out: MetadataRoute.Sitemap = [];
-    // Single-language: no locale prefix
-      const url = `${base}${path}`;
-      
-      for (const loc of ["en"]) {
-      }
-      out.push({
-        url,
-        lastModified: now,
-        changeFrequency,
-        priority,
-        
-      });
-    }
-    return out;
+    const url = `${base}${path}`;
+    return [{
+      url,
+      lastModified: now,
+      changeFrequency,
+      priority,
+    }];
   };
 
   const entries: MetadataRoute.Sitemap = [];

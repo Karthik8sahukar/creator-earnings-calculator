@@ -1,7 +1,5 @@
-import { getT } from "@/lib/t";
 import messages from "../../messages/en.json";
 
-type Messages = typeof messages;
 
 /**
  * Get a translation function scoped to a namespace.

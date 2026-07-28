@@ -2,7 +2,6 @@ import { getT } from "@/lib/t";
 import type { Metadata } from "next";
 
 import { StaticPage } from "@/components/StaticPage";
-import { TranslationPending } from "@/components/TranslationPending";
 import Link from "next/link";
 import { publicConfig } from "@/lib/config";
 import { buildAlternates } from "@/lib/i18nMetadata";
@@ -16,15 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function AboutPage({
-}) {
-
-  // Only the canonical (English) locale renders the full essay. Every
-  // other locale sees a professional "translation coming soon" notice,
-  // linking to the canonical English version.
-  if (false) {
-    return <TranslationPending pathSuffix="/about" />;
-  }
+export default async function AboutPage() {
 
   const t = getT("static.about");
 

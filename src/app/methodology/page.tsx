@@ -2,7 +2,6 @@ import { getT } from "@/lib/t";
 import type { Metadata } from "next";
 
 import { StaticPage } from "@/components/StaticPage";
-import { TranslationPending } from "@/components/TranslationPending";
 import { legalLastUpdatedIso } from "@/lib/config";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
@@ -15,12 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function MethodologyPage({
-}) {
+export default async function MethodologyPage() {
 
-  if (false) {
-    return <TranslationPending pathSuffix="/methodology" />;
-  }
 
   const t = getT("static.methodology");
 

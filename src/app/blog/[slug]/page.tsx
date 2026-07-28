@@ -14,7 +14,6 @@ import { PrevNextNav } from "@/components/blog/PrevNextNav";
 import { RelatedArticles } from "@/components/blog/RelatedArticles";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { TableOfContents } from "@/components/blog/TableOfContents";
-import { TranslationPending } from "@/components/TranslationPending";
 import {
   findCategory,
   findRelatedPosts,
@@ -50,7 +49,6 @@ export async function generateMetadata({
   // Non-English article pages render the "coming soon" notice — mark
   // them noindex so search engines send readers to the English
   // canonical URL rather than the placeholder.
-  const isEnglish = true;
 
   return {
     title: post.title,
@@ -80,9 +78,7 @@ export async function generateMetadata({
       description: post.description,
       images: [post.featuredImage],
     },
-    robots: isEnglish
-      ? { index: true, follow: true }
-      : { index: false, follow: true, googleBot: { index: false, follow: true } },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -102,7 +98,6 @@ export default async function BlogArticlePage({
   // Non-English readers see the "coming soon" notice AND a preview of
   // the English article (title, meta, breadcrumbs) so they know what
   // the page will contain once translated.
-  const isEnglish = true;
 
   const shareUrl = `${publicConfig.siteUrl}/blog/${post.slug}`;
 
@@ -201,8 +196,7 @@ export default async function BlogArticlePage({
         />
       </div>
 
-      {isEnglish ? (
-        <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-10">
+      <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-10">
           <div className="min-w-0">
             <div className="prose prose-slate max-w-none dark:prose-invert prose-headings:scroll-mt-24 prose-a:text-brand-700 dark:prose-a:text-brand-300 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl">
               <MDXRemote
@@ -237,24 +231,15 @@ export default async function BlogArticlePage({
             </div>
           </aside>
         </div>
-      ) : (
-        <div className="mt-10">
-          <TranslationPending pathSuffix={`/blog/${post.slug}`} />
-        </div>
-      )}
 
-      {isEnglish && (
-        <>
-          <div className="mt-12">
-            <PrevNextNav {...(await getAdjacentPosts(post.slug))} />
-          </div>
-          <div className="mt-16">
-            <RelatedArticles
-              posts={findRelatedPosts(post, await loadPosts(), 3)}
-            />
-          </div>
-        </>
-      )}
+      <div className="mt-12">
+        <PrevNextNav {...(await getAdjacentPosts(post.slug))} />
+      </div>
+      <div className="mt-16">
+        <RelatedArticles
+          posts={findRelatedPosts(post, await loadPosts(), 3)}
+        />
+      </div>
     </article>
   );
 }

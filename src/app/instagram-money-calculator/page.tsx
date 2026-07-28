@@ -76,7 +76,7 @@ export default async function InstagramCalculatorPage({
   const tCommon = getT();
 
   const pageUrl = `${publicConfig.siteUrl}${PATH_SUFFIX}`;
-  const inLanguage = HREFLANG_MAP[locale as AppLocale] ?? locale;
+  const inLanguage = "en";
 
   const breadcrumbLd = {
     "@context": "https://schema.org",

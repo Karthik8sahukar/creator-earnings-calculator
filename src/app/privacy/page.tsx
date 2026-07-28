@@ -2,7 +2,6 @@ import { getT } from "@/lib/t";
 import type { Metadata } from "next";
 
 import { StaticPage } from "@/components/StaticPage";
-import { TranslationPending } from "@/components/TranslationPending";
 import { buildAlternates } from "@/lib/i18nMetadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,12 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function PrivacyPage({
-}) {
+export default async function PrivacyPage() {
 
-  if (false) {
-    return <TranslationPending pathSuffix="/privacy" />;
-  }
 
   const t = getT("static.privacy");
 
