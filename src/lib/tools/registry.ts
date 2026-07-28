@@ -415,6 +415,34 @@ export const TOOL_REGISTRY: readonly ToolEntry[] = [
     tags: ["color", "hex", "rgb", "hsl", "palette", "random", "css", "design"],
     popular: true,
   },
+
+  // ─── PDF Tools ────────────────────────────────────────────────────
+  { slug: "merge-pdf", href: "/tools/merge-pdf", title: "Merge PDF", description: "Combine multiple PDF files into one document.", category: "utilities", tags: ["pdf", "merge", "combine", "join"], featured: true, popular: true },
+  { slug: "split-pdf", href: "/tools/split-pdf", title: "Split PDF", description: "Extract pages or split a PDF into multiple files.", category: "utilities", tags: ["pdf", "split", "extract", "separate"] },
+  { slug: "rearrange-pdf", href: "/tools/rearrange-pdf", title: "Rearrange PDF", description: "Reorder pages in a PDF by dragging and dropping.", category: "utilities", tags: ["pdf", "reorder", "rearrange", "pages"] },
+  { slug: "rotate-pdf", href: "/tools/rotate-pdf", title: "Rotate PDF", description: "Rotate PDF pages 90, 180, or 270 degrees.", category: "utilities", tags: ["pdf", "rotate", "flip", "orientation"] },
+  { slug: "delete-pdf-pages", href: "/tools/delete-pdf-pages", title: "Delete PDF Pages", description: "Remove unwanted pages from a PDF file.", category: "utilities", tags: ["pdf", "delete", "remove", "pages"] },
+  { slug: "image-to-pdf", href: "/tools/image-to-pdf", title: "Image to PDF", description: "Convert JPG, PNG, or WebP images to a PDF document.", category: "converters", tags: ["image", "pdf", "convert", "jpg", "png"], popular: true },
+  { slug: "pdf-to-jpg", href: "/tools/pdf-to-jpg", title: "PDF to JPG", description: "Convert each PDF page to a high-quality JPG image.", category: "converters", tags: ["pdf", "jpg", "image", "convert", "export"] },
+  { slug: "add-watermark", href: "/tools/add-watermark", title: "Add Watermark", description: "Add text or image watermarks to PDF pages.", category: "utilities", tags: ["pdf", "watermark", "stamp", "brand"] },
+  { slug: "add-page-numbers", href: "/tools/add-page-numbers", title: "Add Page Numbers", description: "Add page numbers to every page of a PDF.", category: "utilities", tags: ["pdf", "page numbers", "numbering"] },
+
+  // ─── New Developer Tools ──────────────────────────────────────────
+  { slug: "html-formatter", href: "/html-formatter", title: "HTML Formatter", description: "Beautify and indent HTML code with proper formatting.", category: "developer-tools", tags: ["html", "format", "beautify", "indent"] },
+  { slug: "xml-formatter", href: "/xml-formatter", title: "XML Formatter", description: "Format and indent XML documents for readability.", category: "developer-tools", tags: ["xml", "format", "beautify", "indent"] },
+  { slug: "yaml-formatter", href: "/yaml-formatter", title: "YAML Formatter", description: "Format and validate YAML with proper indentation.", category: "developer-tools", tags: ["yaml", "format", "validate", "indent"] },
+  { slug: "jwt-generator", href: "/jwt-generator", title: "JWT Generator", description: "Generate JSON Web Tokens with custom claims.", category: "developer-tools", tags: ["jwt", "token", "generate", "auth"] },
+  { slug: "hash-generator", href: "/hash-generator", title: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes.", category: "developer-tools", tags: ["hash", "sha256", "md5", "crypto"] },
+  { slug: "qr-generator", href: "/qr-generator", title: "QR Code Generator", description: "Generate QR codes for URLs, text, or Wi-Fi credentials.", category: "developer-tools", tags: ["qr", "qrcode", "generate", "barcode"], popular: true },
+  { slug: "markdown-preview", href: "/markdown-preview", title: "Markdown to HTML", description: "Convert Markdown text to clean, sanitized HTML.", category: "developer-tools", tags: ["markdown", "html", "converter", "sanitize"] },
+  { slug: "diff-checker", href: "/diff-checker", title: "Diff Checker", description: "Compare two texts and highlight the differences.", category: "developer-tools", tags: ["diff", "compare", "text", "changes"] },
+
+  // ─── New Text Tools ───────────────────────────────────────────────
+  { slug: "lorem-ipsum", href: "/lorem-ipsum", title: "Lorem Ipsum Generator", description: "Generate placeholder text in paragraphs, sentences, or words.", category: "text-tools", tags: ["lorem", "ipsum", "placeholder", "dummy text"] },
+  { slug: "case-converter", href: "/case-converter", title: "Case Converter", description: "Convert text between uppercase, lowercase, title case, and more.", category: "text-tools", tags: ["case", "uppercase", "lowercase", "convert"], popular: true },
+  { slug: "remove-duplicate-lines", href: "/remove-duplicate-lines", title: "Remove Duplicate Lines", description: "Remove duplicate lines from text while preserving order.", category: "text-tools", tags: ["duplicate", "remove", "unique", "lines", "dedup"] },
+  { slug: "text-compare", href: "/text-compare", title: "Text Compare", description: "Compare two texts and see differences highlighted.", category: "text-tools", tags: ["compare", "text", "diff", "highlight"] },
+  { slug: "slug-generator", href: "/slug-generator", title: "Slug Generator", description: "Convert any text into a URL-friendly slug.", category: "text-tools", tags: ["slug", "url", "seo", "slugify"] },
 ] as const;
 
 // ─── Derived Data ───────────────────────────────────────────────────
